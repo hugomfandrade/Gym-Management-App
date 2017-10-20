@@ -21,4 +21,4 @@ The gym member can check the plans and classes suggested to him by the gym staff
 This version of the Android app uses the 4 Android Components: the multiple Activities succinctly described above, the ContentProvider in order to store data allowing the user to use the App offline, the BroadcastReceiver in order to remind the user of the suggested workout built by the staff, and the Service which interacts with the Web Service.
 
 ## Web Service
-This Android will be accessing the web service http://gym-management-app.azurewebsites.net/ throughout. This web service is a Microsoft Azure App service that enables to structurely store and access the data through a REST API.
+This Android app will be accessing the web service http://gym-management-app.azurewebsites.net/ throughout. This web service is a Microsoft Azure App service that enables to structurely store and access the data through a REST API.
