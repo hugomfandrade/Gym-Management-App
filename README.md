@@ -3,10 +3,10 @@
 This is the Android app for the Capstone project course in the Coursera Android App Development (AAD) Specialization. The Capstone started the week of Oct 16th, 2017 with the final submission due November 16th, 2017.
 
 ## Project Description
-This Android app is designed for gym use and supports three types of users: Admnistrators, Gym Staff (Personal Trainers, Instructor) and Gym members. Each one has its own account and can log in to the app. The user will interact with different components of the app, depending on the user's credential.
+This Android app is designed for gym use and supports three types of users: Administrators, Gym Staff (Personal Trainers, Instructor) and Gym members. Each one has its own account and can log in to the app. The user will interact with different components of the app, depending on the user's credential.
 
-### Admnistrators
-The admnistrator manages the accounts of both the Gym staff and Gym members, which includes creating their accounts, assigning their credentials and editing/removing their information. The Admnistrator interacts with 4 user-facing interfaces: the (1) login activity, the (2) main activity where the admnistrator may choose the (3) add new account activity, or the (4) edit/remove existing account activity.
+### Administrators
+The administrator manages the accounts of both the Gym staff and Gym members, which includes creating their accounts, assigning their credentials and editing/removing their information. The Administrator interacts with 4 user-facing interfaces: the (1) login activity, the (2) main activity where the administrator may choose the (3) add new account activity, or the (4) edit/remove existing account activity.
 
 This version of the Android app only uses two of the 4 Android Components: the multiple Activities succinctly described above, and the Service which interacts with the Web Service.
 
