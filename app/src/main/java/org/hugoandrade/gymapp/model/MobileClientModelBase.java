@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.util.Log;
 
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.common.ContextView;
@@ -35,16 +36,26 @@ public abstract class MobileClientModelBase<RequiredPresenterOps extends MVP.Req
     @Override
     public void onCreate(RequiredPresenterOps presenter) {
         mPresenter = new WeakReference<>(presenter);
-        bindToMobileServiceClientService();
+        // Set the WeakReference.
+        mPresenter =
+                new WeakReference<>(presenter);
+
+        // Bind to the Service.
+        bindService();
     }
 
     public void onDestroy(boolean isChangingConfigurations) {
-        if (!isChangingConfigurations)
-            unbindToMobileServiceClientService();
+        if (isChangingConfigurations)
+            Log.d(TAG,
+                    "just a configuration change - unbindService() not called");
+        else
+            // Unbind from the Services only if onDestroy() is not
+            // triggered by a runtime configuration change.
+            unbindService();
 
     }
 
-    private void bindToMobileServiceClientService() {
+    private void bindService() {
         if (!isServiceBound) {
             mPresenter.get().getApplicationContext().bindService(
                     MobileClientService.makeIntent(mPresenter.get().getActivityContext()),
@@ -54,7 +65,7 @@ public abstract class MobileClientModelBase<RequiredPresenterOps extends MVP.Req
         }
     }
 
-    private void unbindToMobileServiceClientService() {
+    private void unbindService() {
         if (isServiceBound) {
             if (mService != null) {
                 try {

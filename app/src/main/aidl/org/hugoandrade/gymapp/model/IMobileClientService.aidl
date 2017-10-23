@@ -11,4 +11,5 @@ interface IMobileClientService {
 
     boolean login(String username, String password);
     boolean getAllStaff();
+    boolean createStaff(String username);
 }

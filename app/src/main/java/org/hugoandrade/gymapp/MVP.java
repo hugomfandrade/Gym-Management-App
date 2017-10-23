@@ -4,9 +4,7 @@ import org.hugoandrade.gymapp.common.ContextView;
 import org.hugoandrade.gymapp.common.ModelOps;
 import org.hugoandrade.gymapp.common.PresenterOps;
 import org.hugoandrade.gymapp.data.User;
-import org.hugoandrade.gymapp.model.IMobileClientService;
 
-import java.net.UnknownServiceException;
 import java.util.List;
 
 /**
@@ -29,6 +27,23 @@ public interface MVP {
     }
     interface ProvidedLoginModelOps extends ModelOps<RequiredLoginPresenterOps> {
         void login(String username, String password);
+    }
+
+    /** For Create Staff **/
+    interface RequiredCreateStaffViewOps extends ContextView {
+        void disableUI();
+        void enableUI();
+        void successfulCreateStaff(String username, String code);
+        void reportMessage(String message);
+    }
+    interface ProvidedCreateStaffPresenterOps extends PresenterOps<RequiredCreateStaffViewOps> {
+        void createStaff(String username);
+    }
+    interface RequiredCreateStaffPresenterOps extends RequiredMobileClientPresenterBaseOps {
+        void creatingStaffOperationResult(boolean wasOperationSuccessful, String message, String username, String code);
+    }
+    interface ProvidedCreateStaffModelOps extends ModelOps<RequiredCreateStaffPresenterOps> {
+        void createStaff(String username);
     }
 
 

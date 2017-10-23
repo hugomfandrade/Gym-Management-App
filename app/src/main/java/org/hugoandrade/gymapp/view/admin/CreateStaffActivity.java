@@ -10,34 +10,30 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.data.User;
-import org.hugoandrade.gymapp.presenter.LoginPresenter;
+import org.hugoandrade.gymapp.presenter.CreateStaffPresenter;
 import org.hugoandrade.gymapp.utils.LoginUtils;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;
-import org.hugoandrade.gymapp.view.member.MemberMainActivity;
-import org.hugoandrade.gymapp.view.staff.StaffMainActivity;
 
 
-public class CreateStaffActivity extends ActivityBase<MVP.RequiredLoginViewOps,
-                                                MVP.ProvidedLoginPresenterOps,
-                                                LoginPresenter>
-        implements MVP.RequiredLoginViewOps {
+public class CreateStaffActivity extends ActivityBase<MVP.RequiredCreateStaffViewOps,
+                                                      MVP.ProvidedCreateStaffPresenterOps,
+                                                      CreateStaffPresenter>
+        implements MVP.RequiredCreateStaffViewOps {
 
     private static final String INTENT_EXTRA_USER = "intent_extra_user";
 
-    // Views for login input
+    // Views for createStaff input
+    private View vProgressBar;
+
     private EditText etUsername;
-    private EditText etPassword;
-    private TextView tvLoginButton;
-    private View mLoginButton;
-    private ProgressBar mLoginProgressBar;
+    private TextView tvCreateStaffButton;
+    private View mCreateStaffButton;
 
     public static Intent makeIntent(Context context) {
         return new Intent(context, CreateStaffActivity.class);
@@ -51,111 +47,78 @@ public class CreateStaffActivity extends ActivityBase<MVP.RequiredLoginViewOps,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        GlobalData.resetUser();
+        initializeUI();
 
-        setContentView(R.layout.activity_hello);
+        enableUI();
 
-        //initializeUI();
-
-        //setupUI();
-
-        super.onCreate(LoginPresenter.class, this);
+        super.onCreate(CreateStaffPresenter.class, this);
     }
 
     private void initializeUI() {
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_create_staff);
+
+        vProgressBar = findViewById(R.id.progressBar_waiting);
 
         etUsername = (EditText) findViewById(R.id.et_username);
-        etPassword        = (EditText) findViewById(R.id.et_password);
-        mLoginButton      = findViewById(R.id.view_group_login);
-        tvLoginButton     = (TextView) findViewById(R.id.tv_login);
-        mLoginProgressBar = (ProgressBar) findViewById(R.id.progressBar_login_button);
+        mCreateStaffButton = findViewById(R.id.view_group_create);
+        tvCreateStaffButton = (TextView) findViewById(R.id.tv_create);
 
         etUsername.addTextChangedListener(mTextWatcher);
-        etPassword.addTextChangedListener(mTextWatcher);
-        etPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        etUsername.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_ACTION_DONE) {
-                    attemptLogin();
+                    attemptCreateStaff();
                     return true;
                 }
                 return false;
             }
         });
 
-        tvLoginButton.setOnClickListener(mOnClickListener);
-    }
-
-    private void setupUI() {
-        etUsername.setText("Admin");
-        etUsername.setSelection(etUsername.getText().toString().length());
-        etPassword.setText("password");
-        checkLoginInputFieldsValidity();
-        setLoggingInStatus(false);
+        tvCreateStaffButton.setOnClickListener(mOnClickListener);
     }
 
     @Override
-    public void setLoggingInStatus(boolean isLoggingIn) {
-        etUsername.setEnabled(!isLoggingIn);
-        etPassword.setEnabled(!isLoggingIn);
-        mLoginButton.setBackgroundColor(isLoggingIn ?
-                Color.parseColor("#3d000000"):
-                Color.parseColor("#3dffffff"));
-        mLoginProgressBar.setVisibility(isLoggingIn ?
-                View.VISIBLE :
-                View.INVISIBLE);
+    public void disableUI() {
+        vProgressBar.setVisibility(View.VISIBLE);
     }
 
-    private void checkLoginInputFieldsValidity() {
+    @Override
+    public void enableUI() {
+        vProgressBar.setVisibility(View.INVISIBLE);
+    }
+
+    private void checkUsernameValidity() {
 
         String username = etUsername.getText().toString();
-        String password = etPassword.getText().toString();
 
-        if (!LoginUtils.isPasswordAtLeast4CharactersLong(password)
-                || !LoginUtils.isPasswordNotAllSpaces(password)
-                || !LoginUtils.isUsernameAtLeast4CharactersLong(username)
+        if (!LoginUtils.isUsernameAtLeast4CharactersLong(username)
                 || !LoginUtils.isUsernameNotAllSpaces(username)) {
 
-            tvLoginButton.setClickable(false);
-            tvLoginButton.setTextColor(Color.parseColor("#3dffffff"));
+            tvCreateStaffButton.setClickable(false);
+            tvCreateStaffButton.setTextColor(Color.parseColor("#3dffffff"));
             return;
         }
 
-        tvLoginButton.setClickable(true);
-        tvLoginButton.setTextColor(Color.WHITE);
+        tvCreateStaffButton.setClickable(true);
+        tvCreateStaffButton.setTextColor(Color.WHITE);
     }
 
-    private void attemptLogin() {
+    private void attemptCreateStaff() {
 
         String username = etUsername.getText().toString();
-        String password = etPassword.getText().toString();
 
-        if (!LoginUtils.isPasswordAtLeast4CharactersLong(password)
-                || !LoginUtils.isPasswordNotAllSpaces(password)
-                || !LoginUtils.isUsernameAtLeast4CharactersLong(username)
+        if (!LoginUtils.isUsernameAtLeast4CharactersLong(username)
                 || !LoginUtils.isUsernameNotAllSpaces(username))  {
 
             return;
         }
 
-        getPresenter().login(username, password);
+        getPresenter().createStaff(username);
     }
 
     @Override
-    public void successfulLogin(String credential) {
-        switch (credential) {
-            case User.Credential.ADMIN:
-                startActivity(AdminMainActivity.makeIntent(this));
-                break;
-            case User.Credential.STAFF:
-                startActivity(StaffMainActivity.makeIntent(this));
-                break;
-            case User.Credential.MEMBER:
-                startActivity(MemberMainActivity.makeIntent(this));
-                break;
-        }
-        finish();
+    public void successfulCreateStaff(String username, String code) {
     }
 
     @Override
@@ -166,8 +129,8 @@ public class CreateStaffActivity extends ActivityBase<MVP.RequiredLoginViewOps,
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (v == tvLoginButton) {
-                attemptLogin();
+            if (v == tvCreateStaffButton) {
+                attemptCreateStaff();
             }
         }
     };
@@ -179,7 +142,7 @@ public class CreateStaffActivity extends ActivityBase<MVP.RequiredLoginViewOps,
         public void afterTextChanged(Editable s) { }
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            checkLoginInputFieldsValidity();
+            checkUsernameValidity();
         }
     };
 }

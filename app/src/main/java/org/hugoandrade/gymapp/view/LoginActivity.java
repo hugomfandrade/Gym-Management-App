@@ -31,7 +31,7 @@ public class LoginActivity extends ActivityBase<MVP.RequiredLoginViewOps,
         implements MVP.RequiredLoginViewOps {
 
 
-    // Views for login input
+    // Views for createStaff input
     private EditText etUsername;
     private EditText etPassword;
     private TextView tvLoginButton;

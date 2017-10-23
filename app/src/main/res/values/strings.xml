@@ -8,4 +8,5 @@
     <string name="action_check_gym_staff">Check Gym Staff</string>
     <string name="action_check_gym_members">Check Gym Members</string>
     <string name="no_staff">no staff</string>
+    <string name="action_create">Create</string>
 </resources>

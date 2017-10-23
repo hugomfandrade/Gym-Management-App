@@ -130,7 +130,6 @@ public class MobileClientService extends Service {
 
         @Override
         public boolean getAllStaff() throws RemoteException {
-            Log.e(TAG, "getAllStaff");
             if (mMobileServiceClient == null)
                 return false;
 
@@ -141,7 +140,6 @@ public class MobileClientService extends Service {
                 Futures.addCallback(future, new FutureCallback<JsonElement>() {
                     @Override
                     public void onSuccess(JsonElement jsonElement) {
-                        Log.e(TAG, jsonElement.toString());
                         List<String> idList = parser.parseStrings(jsonElement, User.Credential.Cols.USER_ID);
 
                         List<User> userList = new ArrayList<>();
@@ -153,7 +151,6 @@ public class MobileClientService extends Service {
                                         .select(User.Entry.Cols.ID, User.Entry.Cols.USERNAME)
                                         .execute().get();
 
-                                Log.e(TAG, userResult.toString());
                                 if (userResult.getAsJsonArray().size() != 0) {
                                     userList.add(parser.parseUser(userResult.getAsJsonArray().get(0).getAsJsonObject()));
                                 }
@@ -183,6 +180,11 @@ public class MobileClientService extends Service {
                 return false;
             }
             return true;
+        }
+
+        @Override
+        public boolean createStaff(String username) throws RemoteException {
+            return false;
         }
 
         private void getCredential(final User user) {

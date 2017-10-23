@@ -15,22 +15,25 @@ import java.util.List;
 public class MobileClientData implements Parcelable {
 
     /*
-     * These fields store the MobileClientData's state.
-     */
+         * These fields store the MobileClientData's state.
+         */
     private final int mOperationType;
     private final int mOperationResult;
     private User mUser;
     private List<User> mStaffList;
+    private String mUsername;
+    private String mCode;
     private String mErrorMessage;
 
     public static final int OPERATION_LOGIN = 3;
     public static final int OPERATION_GET_ALL_STAFF = 4;
+    public static final int OPERATION_CREATE_STAFF = 5;
 
     public static final int OPERATION_SUCCESS = 1;
     public static final int OPERATION_FAILURE = 2;
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({OPERATION_LOGIN, OPERATION_GET_ALL_STAFF})
+    @IntDef({OPERATION_LOGIN, OPERATION_GET_ALL_STAFF, OPERATION_CREATE_STAFF})
     @interface OpType {}
 
     @Retention(RetentionPolicy.SOURCE)
@@ -71,6 +74,22 @@ public class MobileClientData implements Parcelable {
         mStaffList = staffList;
     }
 
+    public String getUsername() {
+        return mUsername;
+    }
+
+    public void setUsername(String username) {
+        mUsername = username;
+    }
+
+    public String getCode() {
+        return mCode;
+    }
+
+    public void setCode(String code) {
+        mCode = code;
+    }
+
     public String getErrorMessage() {
         return mErrorMessage;
     }
@@ -98,6 +117,8 @@ public class MobileClientData implements Parcelable {
         dest.writeInt(mOperationResult);
         dest.writeParcelable(mUser, flags);
         dest.writeTypedList(mStaffList);
+        dest.writeString(mUsername);
+        dest.writeString(mCode);
         dest.writeString(mErrorMessage);
     }
 
@@ -117,6 +138,8 @@ public class MobileClientData implements Parcelable {
         mUser = in.readParcelable(User.class.getClassLoader());
         mStaffList = new ArrayList<>();
         in.readTypedList(mStaffList, User.CREATOR);
+        mUsername = in.readString();
+        mCode = in.readString();
         mErrorMessage = in.readString();
     }
 
