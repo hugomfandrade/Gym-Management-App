@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?colorPrimary">
+
+    <TextView
+        android:id="@+id/tv_no_staffs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/no_staff"
+        android:textColor="#fff"
+        android:textSize="22sp"
+        android:visibility="invisible"
+        />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_staff"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_create_staff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="20dp"
+        android:tint="#fff"
+        android:src="@android:drawable/ic_input_add"/>
+
+    <include layout="@layout/layout_waiting_progress_bar"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"/>
+
+</RelativeLayout>
