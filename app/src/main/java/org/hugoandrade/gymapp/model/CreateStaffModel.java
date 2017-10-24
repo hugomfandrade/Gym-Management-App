@@ -4,10 +4,8 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import org.hugoandrade.gymapp.MVP;
-import org.hugoandrade.gymapp.data.User;
+import org.hugoandrade.gymapp.data.WaitingUser;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
-
-import java.util.List;
 
 public class CreateStaffModel extends MobileClientModelBase<MVP.RequiredCreateStaffPresenterOps>
 
@@ -17,36 +15,36 @@ public class CreateStaffModel extends MobileClientModelBase<MVP.RequiredCreateSt
     public void sendResults(MobileClientData data) {
         if (data.getOperationType() == MobileClientData.OPERATION_CREATE_STAFF) {
             if (data.getOperationResult() == MobileClientData.OPERATION_SUCCESS)
-                creatingStaffRequestResultSuccess(data.getUsername(), data.getCode());
+                creatingUserRequestResultSuccess(data.getWaitingUser());
             else
-                creatingStaffRequestResultFailure(data.getErrorMessage());
+                creatingUserRequestResultFailure(data.getErrorMessage());
         }
     }
 
     @Override
-    public void createStaff(String username) {
+    public void createUser(WaitingUser waitingUser) {
         if (getService() == null) {
             Log.w(TAG, "Service is still not bound");
-            creatingStaffRequestResultFailure("Not bound to the service");
+            creatingUserRequestResultFailure("Not bound to the service");
             return;
         }
 
         try {
-            boolean isLoggingIn = getService().createStaff(username);
+            boolean isLoggingIn = getService().createUser(waitingUser);
             if (!isLoggingIn) {
-                creatingStaffRequestResultFailure("No Network Connection");
+                creatingUserRequestResultFailure("No Network Connection");
             }
         } catch (RemoteException e) {
             e.printStackTrace();
-            creatingStaffRequestResultFailure("Error sending message");
+            creatingUserRequestResultFailure("Error sending message");
         }
     }
 
-    private void creatingStaffRequestResultFailure(String errorMessage) {
-        getPresenter().creatingStaffOperationResult(false, errorMessage, null, null);
+    private void creatingUserRequestResultFailure(String errorMessage) {
+        getPresenter().creatingStaffOperationResult(false, errorMessage, null);
     }
 
-    private void creatingStaffRequestResultSuccess(String username, String code) {
-        getPresenter().creatingStaffOperationResult(true, null, username, code);
+    private void creatingUserRequestResultSuccess(WaitingUser waitingUser) {
+        getPresenter().creatingStaffOperationResult(true, null, waitingUser);
     }
 }

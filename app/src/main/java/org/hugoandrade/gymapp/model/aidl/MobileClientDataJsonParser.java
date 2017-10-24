@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.hugoandrade.gymapp.data.User;
+import org.hugoandrade.gymapp.data.WaitingUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,15 @@ public class MobileClientDataJsonParser {
      */
     private final String TAG =
             getClass().getSimpleName();
+
+
+    public WaitingUser parseWaitingUser(JsonObject jsonObject) {
+        return new WaitingUser(
+                getJsonPrimitive(jsonObject, WaitingUser.Entry.Cols.ID, null),
+                getJsonPrimitive(jsonObject, WaitingUser.Entry.Cols.USERNAME, null),
+                getJsonPrimitive(jsonObject, WaitingUser.Entry.Cols.CREDENTIAL, null),
+                getJsonPrimitive(jsonObject, WaitingUser.Entry.Cols.CODE, null));
+    }
 
     public User parseUser(JsonObject jsonObject) {
         return new User(

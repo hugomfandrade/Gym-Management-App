@@ -3,13 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
     android:background="?colorPrimary">
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="24dp"
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:layout_centerInParent="true">
@@ -37,25 +37,41 @@
         </android.support.design.widget.TextInputLayout>
 
         <RelativeLayout
-            android:id="@+id/view_group_create"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
-            android:background="#3dffffff">
+            android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/tv_create"
+                android:id="@+id/tv_code"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/action_create"
-                android:textColor="#3dffffff"
+                android:layout_height="48dp"
+                android:textColor="#fff"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textAllCaps="true"
                 android:layout_centerInParent="true"
-                android:gravity="center"
-                android:background="?android:attr/selectableItemBackground"/>
+                android:gravity="center"/>
+
+            <RelativeLayout
+                android:id="@+id/view_group_create"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:background="#3dffffff">
+
+                <TextView
+                    android:id="@+id/tv_create"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/action_create"
+                    android:textColor="#3dffffff"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:background="?android:attr/selectableItemBackground"/>
+
+            </RelativeLayout>
 
         </RelativeLayout>
 

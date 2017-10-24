@@ -1,5 +1,6 @@
 package org.hugoandrade.gymapp.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -31,10 +32,13 @@ public class LoginActivity extends ActivityBase<MVP.RequiredLoginViewOps,
         implements MVP.RequiredLoginViewOps {
 
 
+    private static final int SIGN_UP_REQUEST_CODE = 100;
+
     // Views for createStaff input
     private EditText etUsername;
     private EditText etPassword;
     private TextView tvLoginButton;
+    private View tvSignUp;
     private View mLoginButton;
     private ProgressBar mLoginProgressBar;
 
@@ -61,6 +65,8 @@ public class LoginActivity extends ActivityBase<MVP.RequiredLoginViewOps,
     private void initializeUI() {
         setContentView(R.layout.activity_login);
 
+        tvSignUp = findViewById(R.id.tv_sign_up);
+
         etUsername = (EditText) findViewById(R.id.et_username);
         etPassword        = (EditText) findViewById(R.id.et_password);
         mLoginButton      = findViewById(R.id.view_group_login);
@@ -81,6 +87,7 @@ public class LoginActivity extends ActivityBase<MVP.RequiredLoginViewOps,
         });
 
         tvLoginButton.setOnClickListener(mOnClickListener);
+        tvSignUp.setOnClickListener(mOnClickListener);
     }
 
     private void setupUI() {
@@ -165,8 +172,25 @@ public class LoginActivity extends ActivityBase<MVP.RequiredLoginViewOps,
             if (v == tvLoginButton) {
                 attemptLogin();
             }
+            else if (v == tvSignUp) {
+                startActivityForResult(SignUpActivity.makeIntent(LoginActivity.this), SIGN_UP_REQUEST_CODE);
+            }
         }
     };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SIGN_UP_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                User user = SignUpActivity.extractUserFromIntent(data);
+                etUsername.setText(user.getUsername());
+                etPassword.setText(user.getPassword());
+            }
+
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
     private TextWatcher mTextWatcher = new TextWatcher() {
         @Override

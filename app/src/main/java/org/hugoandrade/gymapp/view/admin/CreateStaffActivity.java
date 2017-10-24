@@ -15,6 +15,7 @@ import android.widget.TextView;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.data.User;
+import org.hugoandrade.gymapp.data.WaitingUser;
 import org.hugoandrade.gymapp.presenter.CreateStaffPresenter;
 import org.hugoandrade.gymapp.utils.LoginUtils;
 import org.hugoandrade.gymapp.utils.UIUtils;
@@ -32,6 +33,7 @@ public class CreateStaffActivity extends ActivityBase<MVP.RequiredCreateStaffVie
     private View vProgressBar;
 
     private EditText etUsername;
+    private TextView tvCode;
     private TextView tvCreateStaffButton;
     private View mCreateStaffButton;
 
@@ -60,6 +62,7 @@ public class CreateStaffActivity extends ActivityBase<MVP.RequiredCreateStaffVie
         vProgressBar = findViewById(R.id.progressBar_waiting);
 
         etUsername = (EditText) findViewById(R.id.et_username);
+        tvCode = (TextView) findViewById(R.id.tv_code);
         mCreateStaffButton = findViewById(R.id.view_group_create);
         tvCreateStaffButton = (TextView) findViewById(R.id.tv_create);
 
@@ -76,6 +79,8 @@ public class CreateStaffActivity extends ActivityBase<MVP.RequiredCreateStaffVie
         });
 
         tvCreateStaffButton.setOnClickListener(mOnClickListener);
+
+        tvCode.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -114,11 +119,18 @@ public class CreateStaffActivity extends ActivityBase<MVP.RequiredCreateStaffVie
             return;
         }
 
+        UIUtils.hideSoftKeyboardAndClearFocus(etUsername);
+
         getPresenter().createStaff(username);
     }
 
     @Override
-    public void successfulCreateStaff(String username, String code) {
+    public void successfulCreateStaff(WaitingUser waitingUser) {
+        mCreateStaffButton.setVisibility(View.INVISIBLE);
+
+        etUsername.setEnabled(false);
+        tvCode.setVisibility(View.VISIBLE);
+        tvCode.setText(waitingUser.getCode());
     }
 
     @Override

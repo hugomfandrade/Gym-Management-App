@@ -1,6 +1,5 @@
 package org.hugoandrade.gymapp.model.service;
 
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +9,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.util.Pair;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -30,6 +30,7 @@ import com.squareup.okhttp.OkHttpClient;
 
 import org.hugoandrade.gymapp.DevConstants;
 import org.hugoandrade.gymapp.data.User;
+import org.hugoandrade.gymapp.data.WaitingUser;
 import org.hugoandrade.gymapp.model.IMobileClientService;
 import org.hugoandrade.gymapp.model.IMobileClientServiceCallback;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
@@ -44,9 +45,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class MobileClientService extends Service {
-
-    private String TAG = getClass().getSimpleName();
+public class MobileClientService extends LifecycleLoggingService {
 
     private boolean isClientInitialized = false;
 
@@ -67,6 +66,7 @@ public class MobileClientService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
 
@@ -74,19 +74,23 @@ public class MobileClientService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        registerForNetworkChangeReceiver(true);
+        registerReceiver(mReceiver,
+                new IntentFilter(NetworkChangeBroadcastReceiver.ACTION_NETWORK_CHANGE_RECEIVER));
+
         if (NetworkUtils.isNetworkAvailable(getApplicationContext())) {
-            initNuadaMobileServiceClient();
+            initMobileServiceClient();
         }
     }
     @Override
     public IBinder onBind(Intent intent) {
-        return mBinder;//mRequestMessenger.getBinder();
+        super.onBind(intent);
+        return mBinder;
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        return true;//super.onUnbind(intent);
+        super.onUnbind(intent);
+        return true;
     }
 
     @Override
@@ -97,7 +101,8 @@ public class MobileClientService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        registerForNetworkChangeReceiver(false);
+
+        unregisterReceiver(mReceiver);
     }
 
     private final IMobileClientService.Stub mBinder = new IMobileClientService.Stub() {
@@ -123,6 +128,44 @@ public class MobileClientService extends Service {
                 @Override
                 public void onFailure(@NonNull Throwable t) {
                     reportOperationFailure(MobileClientData.OPERATION_LOGIN, t.getMessage());
+                }
+            });
+            return true;
+        }
+
+        @Override
+        public boolean signUp(final String username, final String password) throws RemoteException {
+            if (mMobileServiceClient == null)
+                return false;
+
+            ArrayList<Pair<String, String>> parameters = new ArrayList<>();
+            parameters.add(new Pair<>(User.Entry.REQUEST_TYPE, User.Entry.SIGN_UP));
+
+            ListenableFuture<JsonObject> future =
+                    new MobileServiceJsonTable(User.Entry.TABLE_NAME, mMobileServiceClient)
+                            .insert(formatter.getAsJsonObject(username, password), parameters);
+            Futures.addCallback(future, new FutureCallback<JsonObject>() {
+                @Override
+                public void onSuccess(JsonObject jsonObject) {
+                    Log.e(TAG, "SignUp: " + jsonObject.toString());
+
+                    MobileClientData m = new MobileClientData(
+                            MobileClientData.OPERATION_SIGN_UP,
+                            MobileClientData.OPERATION_SUCCESS);
+                    m.setUser(new User(username, password));
+
+                    try {
+                        if (mCallback != null)
+                            mCallback.sendResults(m);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.e(TAG, "SignUp: " + t.getMessage());
+                    reportOperationFailure(MobileClientData.OPERATION_SIGN_UP, t.getMessage());
                 }
             });
             return true;
@@ -183,8 +226,82 @@ public class MobileClientService extends Service {
         }
 
         @Override
-        public boolean createStaff(String username) throws RemoteException {
-            return false;
+        public boolean createUser(WaitingUser waitingUser) throws RemoteException {
+            // ******* OK *******//
+            if (mMobileServiceClient == null)
+                return false;
+
+            ListenableFuture<JsonObject> future
+                    = new MobileServiceJsonTable(WaitingUser.Entry.TABLE_NAME, mMobileServiceClient)
+                    .insert(formatter.getAsJsonObject(waitingUser));
+            Futures.addCallback(future, new FutureCallback<JsonObject>() {
+                @Override
+                public void onSuccess(JsonObject jsonObject) {
+
+                    MobileClientData m = new MobileClientData(
+                            MobileClientData.OPERATION_CREATE_STAFF,
+                            MobileClientData.OPERATION_SUCCESS);
+                    m.setWaitingUser(parser.parseWaitingUser(jsonObject));
+
+                    try {
+                        if (mCallback != null)
+                            mCallback.sendResults(m);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    reportOperationFailure(MobileClientData.OPERATION_CREATE_STAFF, t.getMessage());
+                }
+            });
+            return true;
+        }
+
+        @Override
+        public boolean validateUser(final WaitingUser waitingUser) throws RemoteException {
+            // ******* OK *******//
+            if (mMobileServiceClient == null)
+                return false;
+
+            ListenableFuture<JsonElement> future
+                    = new MobileServiceJsonTable(WaitingUser.Entry.TABLE_NAME, mMobileServiceClient)
+                    .where().field(WaitingUser.Entry.Cols.USERNAME).eq(waitingUser.getUsername())
+                    .and().field(WaitingUser.Entry.Cols.CODE).eq(waitingUser.getCode())
+                    .execute();
+            Futures.addCallback(future, new FutureCallback<JsonElement>() {
+                @Override
+                public void onSuccess(JsonElement jsonElement) {
+                    Log.e(TAG, "ValidateUser: " + jsonElement.toString());
+
+                    if (jsonElement.getAsJsonArray().size() == 0) {
+                        reportOperationFailure(
+                                MobileClientData.OPERATION_VALIDATE,
+                                "Username-Code combo does not exist");
+                        return;
+                    }
+
+                    MobileClientData m = new MobileClientData(
+                            MobileClientData.OPERATION_VALIDATE,
+                            MobileClientData.OPERATION_SUCCESS);
+                    m.setWaitingUser(parser.parseWaitingUser(jsonElement.getAsJsonArray().get(0).getAsJsonObject()));
+
+                    try {
+                        if (mCallback != null)
+                            mCallback.sendResults(m);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.e(TAG, "ValidateUser: " + t.getMessage());
+                    reportOperationFailure(MobileClientData.OPERATION_VALIDATE, t.getMessage());
+                }
+            });
+            return true;
         }
 
         private void getCredential(final User user) {
@@ -240,8 +357,6 @@ public class MobileClientService extends Service {
                 }
 
                 private void sendSuccessfulLoginResult(User user) {
-                    Log.e(TAG, ":: " + user.getUserID());
-                    Log.e(TAG, ":: " + user.getToken());
                     MobileServiceUser mMobileServiceUser = new MobileServiceUser(user.getUserID());
                     mMobileServiceUser.setAuthenticationToken(user.getToken());
                     mMobileServiceClient.setCurrentUser(mMobileServiceUser);
@@ -290,7 +405,7 @@ public class MobileClientService extends Service {
     };
 
 
-    private void initNuadaMobileServiceClient () {
+    private void initMobileServiceClient() {
         if (isClientInitialized)
             setContextAndFilter(getApplicationContext(), new ProgressFilter());
         else {
@@ -304,17 +419,6 @@ public class MobileClientService extends Service {
     private void destroyMobileServiceClient() {
         isClientInitialized = false;
         mMobileServiceClient = null;
-    }
-
-    private void registerForNetworkChangeReceiver(boolean register) {
-        if (register) {
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(NetworkChangeBroadcastReceiver.ACTION_NETWORK_CHANGE_RECEIVER);
-            getApplicationContext().registerReceiver(mReceiver, filter);
-        }
-        else {
-            getApplicationContext().unregisterReceiver(mReceiver);
-        }
     }
 
     private boolean initMobileServiceClient(Context context, ServiceFilter filter) throws MalformedURLException {
@@ -359,7 +463,7 @@ public class MobileClientService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (NetworkUtils.isNetworkAvailable(context)) {
-                initNuadaMobileServiceClient();
+                initMobileServiceClient();
             }
             else {
                 destroyMobileServiceClient();

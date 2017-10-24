@@ -3,6 +3,7 @@ package org.hugoandrade.gymapp.presenter;
 import android.content.Context;
 
 import org.hugoandrade.gymapp.MVP;
+import org.hugoandrade.gymapp.data.WaitingUser;
 import org.hugoandrade.gymapp.model.CreateStaffModel;
 
 public class CreateStaffPresenter extends PresenterBase<MVP.RequiredCreateStaffViewOps,
@@ -44,14 +45,14 @@ public class CreateStaffPresenter extends PresenterBase<MVP.RequiredCreateStaffV
     public void createStaff(String username) {
         getView().disableUI();
 
-        getModel().createStaff(username);
+        getModel().createUser(new WaitingUser(username, WaitingUser.Credential.STAFF));
     }
 
     @Override
-    public void creatingStaffOperationResult(boolean wasOperationSuccessful, String message, String username, String code) {
+    public void creatingStaffOperationResult(boolean wasOperationSuccessful, String message, WaitingUser waitingUser) {
         if (wasOperationSuccessful) {
 
-            getView().successfulCreateStaff(username, code);
+            getView().successfulCreateStaff(waitingUser);
         }
         else {
             if (message != null)

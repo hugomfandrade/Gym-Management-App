@@ -3,6 +3,7 @@ package org.hugoandrade.gymapp.model.aidl;
 import com.google.gson.JsonObject;
 
 import org.hugoandrade.gymapp.data.User;
+import org.hugoandrade.gymapp.data.WaitingUser;
 
 /**
  * Parses the objects to Json data.
@@ -15,6 +16,15 @@ public class MobileClientDataJsonFormatter {
         return JsonObjectBuilder.instance()
                 .addProperty(User.Entry.Cols.USERNAME, username)
                 .addProperty(User.Entry.Cols.PASSWORD, password)
+                .create();
+    }
+
+    public JsonObject getAsJsonObject(WaitingUser waitingUser) {
+
+        return JsonObjectBuilder.instance()
+                .addProperty(WaitingUser.Entry.Cols.USERNAME, waitingUser.getUsername())
+                .addProperty(WaitingUser.Entry.Cols.CREDENTIAL, waitingUser.getCredential())
+                .addProperty(WaitingUser.Entry.Cols.CODE, waitingUser.getCode())
                 .create();
     }
 

@@ -31,10 +31,14 @@ public class User implements Parcelable {
             public static final String USER_ID = "UserID";
             public static final String TOKEN = "Token";
         }
+
+        public static final String REQUEST_TYPE = "RequestType";
+        public static final String SIGN_UP = "SignUp";
     }
 
     private String mID;
     private String mUsername;
+    private String mPassword;
     private String mCredential;
 
     private String mUserID;
@@ -47,12 +51,21 @@ public class User implements Parcelable {
         mToken = token;
     }
 
+    public User(String username, String password) {
+        mUsername = username;
+        mPassword = password;
+    }
+
     public String getID() {
         return mID;
     }
 
     public String getUsername() {
         return mUsername;
+    }
+
+    public String getPassword() {
+        return mPassword;
     }
 
     public void setCredential(String credential) {
@@ -78,7 +91,9 @@ public class User implements Parcelable {
     public void readFromParcel(Parcel in) {
         mID = in.readString();
         mUsername = in.readString();
+        mPassword = in.readString();
         mCredential = in.readString();
+        mToken = in.readString();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -101,6 +116,8 @@ public class User implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(mID);
         parcel.writeString(mUsername);
+        parcel.writeString(mPassword);
         parcel.writeString(mCredential);
+        parcel.writeString(mToken);
     }
 }

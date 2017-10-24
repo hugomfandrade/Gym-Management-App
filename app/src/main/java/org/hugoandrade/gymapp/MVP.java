@@ -4,6 +4,7 @@ import org.hugoandrade.gymapp.common.ContextView;
 import org.hugoandrade.gymapp.common.ModelOps;
 import org.hugoandrade.gymapp.common.PresenterOps;
 import org.hugoandrade.gymapp.data.User;
+import org.hugoandrade.gymapp.data.WaitingUser;
 
 import java.util.List;
 
@@ -29,21 +30,45 @@ public interface MVP {
         void login(String username, String password);
     }
 
+    /** For SignUp **/
+    interface RequiredSignUpViewOps extends ContextView {
+        void disableValidateUI();
+        void enableValidateUI();
+        void disableSignUpUI();
+        void enableSignUpUI();
+        void successfulWaitingUser(WaitingUser waitingUser);
+        void successfulSignUp(User user);
+
+        void reportMessage(String message);
+    }
+    interface ProvidedSignUpPresenterOps extends PresenterOps<RequiredSignUpViewOps> {
+        void validateWaitingUser(String username, String code);
+        void signUp(String username, String password);
+    }
+    interface RequiredSignUpPresenterOps extends RequiredMobileClientPresenterBaseOps {
+        void validateWaitingUserOperationResult(boolean wasOperationSuccessful, String message, WaitingUser waitingUser);
+        void signUpOperationResult(boolean wasOperationSuccessful, String message, User user);
+    }
+    interface ProvidedSignUpModelOps extends ModelOps<RequiredSignUpPresenterOps> {
+        void validateWaitingUser(WaitingUser waitingUser);
+        void signUp(String username, String password);
+    }
+
     /** For Create Staff **/
     interface RequiredCreateStaffViewOps extends ContextView {
         void disableUI();
         void enableUI();
-        void successfulCreateStaff(String username, String code);
+        void successfulCreateStaff(WaitingUser waitingUser);
         void reportMessage(String message);
     }
     interface ProvidedCreateStaffPresenterOps extends PresenterOps<RequiredCreateStaffViewOps> {
         void createStaff(String username);
     }
     interface RequiredCreateStaffPresenterOps extends RequiredMobileClientPresenterBaseOps {
-        void creatingStaffOperationResult(boolean wasOperationSuccessful, String message, String username, String code);
+        void creatingStaffOperationResult(boolean wasOperationSuccessful, String message, WaitingUser waitingUser);
     }
     interface ProvidedCreateStaffModelOps extends ModelOps<RequiredCreateStaffPresenterOps> {
-        void createStaff(String username);
+        void createUser(WaitingUser waitingUser);
     }
 
 

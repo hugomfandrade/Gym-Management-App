@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.support.annotation.IntDef;
 
 import org.hugoandrade.gymapp.data.User;
+import org.hugoandrade.gymapp.data.WaitingUser;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -21,19 +22,22 @@ public class MobileClientData implements Parcelable {
     private final int mOperationResult;
     private User mUser;
     private List<User> mStaffList;
-    private String mUsername;
-    private String mCode;
+    private WaitingUser mWaitingUser;
     private String mErrorMessage;
 
     public static final int OPERATION_LOGIN = 3;
     public static final int OPERATION_GET_ALL_STAFF = 4;
     public static final int OPERATION_CREATE_STAFF = 5;
+    public static final int OPERATION_VALIDATE = 6;
+    public static final int OPERATION_SIGN_UP = 7;
 
     public static final int OPERATION_SUCCESS = 1;
     public static final int OPERATION_FAILURE = 2;
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({OPERATION_LOGIN, OPERATION_GET_ALL_STAFF, OPERATION_CREATE_STAFF})
+    @IntDef({OPERATION_LOGIN, OPERATION_GET_ALL_STAFF, OPERATION_CREATE_STAFF,
+            OPERATION_VALIDATE, OPERATION_SIGN_UP
+    })
     @interface OpType {}
 
     @Retention(RetentionPolicy.SOURCE)
@@ -74,20 +78,12 @@ public class MobileClientData implements Parcelable {
         mStaffList = staffList;
     }
 
-    public String getUsername() {
-        return mUsername;
+    public WaitingUser getWaitingUser() {
+        return mWaitingUser;
     }
 
-    public void setUsername(String username) {
-        mUsername = username;
-    }
-
-    public String getCode() {
-        return mCode;
-    }
-
-    public void setCode(String code) {
-        mCode = code;
+    public void setWaitingUser(WaitingUser waitingUser) {
+        mWaitingUser = waitingUser;
     }
 
     public String getErrorMessage() {
@@ -117,8 +113,7 @@ public class MobileClientData implements Parcelable {
         dest.writeInt(mOperationResult);
         dest.writeParcelable(mUser, flags);
         dest.writeTypedList(mStaffList);
-        dest.writeString(mUsername);
-        dest.writeString(mCode);
+        dest.writeParcelable(mWaitingUser, flags);
         dest.writeString(mErrorMessage);
     }
 
@@ -129,7 +124,7 @@ public class MobileClientData implements Parcelable {
      * The order of reading in variables HAS TO MATCH the order in
      * writeToParcel(Parcel, int)
      *
-     * @param in
+     * @param in parcel
      */
     private MobileClientData(Parcel in) {
 
@@ -138,8 +133,7 @@ public class MobileClientData implements Parcelable {
         mUser = in.readParcelable(User.class.getClassLoader());
         mStaffList = new ArrayList<>();
         in.readTypedList(mStaffList, User.CREATOR);
-        mUsername = in.readString();
-        mCode = in.readString();
+        mWaitingUser = in.readParcelable(WaitingUser.class.getClassLoader());
         mErrorMessage = in.readString();
     }
 
