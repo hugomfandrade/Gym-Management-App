@@ -24,7 +24,9 @@ public class SignUpPresenter extends PresenterBase<MVP.RequiredSignUpViewOps,
     }
 
     @Override
-    public void onResume() { }
+    public void onResume() {
+        getModel().registerCallback();
+    }
 
     @Override
     public void onConfigurationChange(MVP.RequiredSignUpViewOps view) { }

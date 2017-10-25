@@ -28,7 +28,7 @@ public abstract class MobileClientModelBase<RequiredPresenterOps extends MVP.Req
 
     private IMobileClientService mService;
 
-    private boolean isServiceBound = false;
+    protected boolean isServiceBound = false;
 
     public MobileClientModelBase() {
     }
@@ -55,7 +55,7 @@ public abstract class MobileClientModelBase<RequiredPresenterOps extends MVP.Req
 
     }
 
-    private void bindService() {
+    protected void bindService() {
         if (!isServiceBound) {
             mPresenter.get().getApplicationContext().bindService(
                     MobileClientService.makeIntent(mPresenter.get().getActivityContext()),
@@ -65,7 +65,7 @@ public abstract class MobileClientModelBase<RequiredPresenterOps extends MVP.Req
         }
     }
 
-    private void unbindService() {
+    protected void unbindService() {
         if (isServiceBound) {
             if (mService != null) {
                 try {
@@ -86,10 +86,10 @@ public abstract class MobileClientModelBase<RequiredPresenterOps extends MVP.Req
             mService = IMobileClientService.Stub.asInterface(binder);
             try {
                 mService.registerCallback(mCallback);
-            } catch (Exception e) {
+            } catch (RemoteException e) {
                 e.printStackTrace();
             }
-            mPresenter.get().notifyServiceIsBound(); /**/
+            mPresenter.get().notifyServiceIsBound();
             isServiceBound = true;
         }
 
@@ -99,6 +99,16 @@ public abstract class MobileClientModelBase<RequiredPresenterOps extends MVP.Req
             isServiceBound = false;
         }
     };
+
+    @Override
+    public void registerCallback() {
+        if (mService != null)
+            try {
+                mService.registerCallback(mCallback);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+    }
 
     protected IMobileClientService getService() {
         return mService;

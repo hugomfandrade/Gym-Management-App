@@ -17,64 +17,76 @@ import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.common.CustomRecyclerScroll;
 import org.hugoandrade.gymapp.data.User;
-import org.hugoandrade.gymapp.presenter.GymStaffListPresenter;
+import org.hugoandrade.gymapp.presenter.GymUserListPresenter;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GymStaffListActivity extends ActivityBase<MVP.RequiredGymStaffListViewOps,
-                                                       MVP.ProvidedGymStaffListPresenterOps,
-                                                       GymStaffListPresenter>
+public class GymUserListActivity extends ActivityBase<MVP.RequiredGymUserListViewOps,
+                                                      MVP.ProvidedGymUserListPresenterOps,
+                                                      GymUserListPresenter>
 
-        implements MVP.RequiredGymStaffListViewOps {
+        implements MVP.RequiredGymUserListViewOps {
 
-    private static final int CREATE_STAFF_REQUEST_CODE = 300;
+    private static final int CREATE_USER_REQUEST_CODE = 300;
+
+    private static final String INTENT_EXTRA_CREDENTIAL = "intent_extra_credential";
+
+    private String mCredential;
 
     private View vProgressBar;
+
     /**
-     * FAB to create a new Staff.
+     * FAB to create a new Gym User.
      */
-    private FloatingActionButton fabCreateStaff;
+    private FloatingActionButton fabCreateGymUser;
 
-    private UserListAdapter mStaffListAdapter;
+    private UserListAdapter mGymUserListAdapter;
 
-    private View tvNoStaffMessage;
+    private TextView tvNoGymUserMessage;
 
-    public static Intent makeIntent(Context context) {
-        return new Intent(context, GymStaffListActivity.class);
+    public static Intent makeIntent(Context context, String credential) {
+        return new Intent(context, GymUserListActivity.class)
+                .putExtra(INTENT_EXTRA_CREDENTIAL, credential);
+    }
+
+    private static String extractCredentialFromIntent(Intent intent) {
+        return intent.getStringExtra(INTENT_EXTRA_CREDENTIAL);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mCredential = extractCredentialFromIntent(getIntent());
+
         initializeUI();
 
-        super.onCreate(GymStaffListPresenter.class, this);
+        super.onCreate(GymUserListPresenter.class, this);
     }
 
     private void initializeUI() {
-        setContentView(R.layout.activity_admin_list_of_staff);
+        setContentView(R.layout.activity_admin_list_of_user);
 
         vProgressBar = findViewById(R.id.progressBar_waiting);
 
-        fabCreateStaff = (FloatingActionButton) findViewById(R.id.fab_create_staff);
-        fabCreateStaff.setOnClickListener(new View.OnClickListener() {
+        fabCreateGymUser = (FloatingActionButton) findViewById(R.id.fab_create_user);
+        fabCreateGymUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivityForResult(
-                        CreateStaffActivity.makeIntent(GymStaffListActivity.this),
-                        CREATE_STAFF_REQUEST_CODE);
+                        CreateGymUserActivity.makeIntent(GymUserListActivity.this, mCredential),
+                        CREATE_USER_REQUEST_CODE);
             }
         });
 
-        mStaffListAdapter = new UserListAdapter();
-        RecyclerView rvStaff = (RecyclerView) findViewById(R.id.rv_staff);
-        rvStaff.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        rvStaff.setAdapter(mStaffListAdapter);
-        rvStaff.addOnScrollListener(new CustomRecyclerScroll() {
+        mGymUserListAdapter = new UserListAdapter();
+        RecyclerView rvGymUsers = (RecyclerView) findViewById(R.id.rv_users);
+        rvGymUsers.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        rvGymUsers.setAdapter(mGymUserListAdapter);
+        rvGymUsers.addOnScrollListener(new CustomRecyclerScroll() {
             @Override
             public void show() {
                 showFab();
@@ -86,14 +98,22 @@ public class GymStaffListActivity extends ActivityBase<MVP.RequiredGymStaffListV
             }
         });
 
-        tvNoStaffMessage = findViewById(R.id.tv_no_staffs);
+        tvNoGymUserMessage = (TextView) findViewById(R.id.tv_no_users);
+        switch (mCredential) {
+            case User.Credential.MEMBER:
+                tvNoGymUserMessage.setText(R.string.no_members);
+                break;
+            case User.Credential.STAFF:
+                tvNoGymUserMessage.setText(R.string.no_staff);
+                break;
+        }
     }
 
     /**
      * Show FloatingActionButton when the the RecyclerView is scrolling upwards.
      */
     public void showFab() {
-        fabCreateStaff.animate().translationY(0)
+        fabCreateGymUser.animate().translationY(0)
                 .setInterpolator(new DecelerateInterpolator(2)).start();
     }
 
@@ -101,8 +121,8 @@ public class GymStaffListActivity extends ActivityBase<MVP.RequiredGymStaffListV
      * Hide FloatingActionButton when the RecyclerView is scrolling downwards.
      */
     public void hideFab() {
-        fabCreateStaff.animate().translationY(fabCreateStaff.getHeight() +
-                ((ViewGroup.MarginLayoutParams) fabCreateStaff.getLayoutParams()).bottomMargin)
+        fabCreateGymUser.animate().translationY(fabCreateGymUser.getHeight() +
+                ((ViewGroup.MarginLayoutParams) fabCreateGymUser.getLayoutParams()).bottomMargin)
                 .setInterpolator(new AccelerateInterpolator(2)).start();
     }
 
@@ -117,18 +137,23 @@ public class GymStaffListActivity extends ActivityBase<MVP.RequiredGymStaffListV
     }
 
     @Override
-    public void displayStaffList(List<User> userList) {
-        mStaffListAdapter.setAll(userList);
+    public String getCredential() {
+        return mCredential;
+    }
 
-        tvNoStaffMessage.setVisibility(userList.size() == 0 ? View.VISIBLE : View.INVISIBLE);
+    @Override
+    public void displayGymUserList(List<User> userList) {
+        mGymUserListAdapter.setAll(userList);
+
+        tvNoGymUserMessage.setVisibility(userList.size() == 0 ? View.VISIBLE : View.INVISIBLE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CREATE_STAFF_REQUEST_CODE) {
+        if (requestCode == CREATE_USER_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                User newUser = CreateStaffActivity.extractUserFromIntent(data);
-                mStaffListAdapter.add(newUser);
+                User newUser = CreateGymUserActivity.extractUserFromIntent(data);
+                mGymUserListAdapter.add(newUser);
             }
             return;
         }
@@ -157,7 +182,7 @@ public class GymStaffListActivity extends ActivityBase<MVP.RequiredGymStaffListV
         @Override
         public UserListAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
             LayoutInflater vi = LayoutInflater.from(viewGroup.getContext());
-            View v = vi.inflate(R.layout.list_item_staff, viewGroup, false);
+            View v = vi.inflate(R.layout.list_item_user, viewGroup, false);
             return new UserListAdapter.ViewHolder(v);
         }
 
@@ -172,6 +197,7 @@ public class GymStaffListActivity extends ActivityBase<MVP.RequiredGymStaffListV
                 }
             });
             holder.tvUsername.setText(user.getUsername());
+            holder.tvCredential.setText(user.getCredential());
         }
 
         @Override
@@ -186,10 +212,12 @@ public class GymStaffListActivity extends ActivityBase<MVP.RequiredGymStaffListV
 
         class ViewHolder extends RecyclerView.ViewHolder {
             TextView tvUsername;
+            TextView tvCredential;
 
             ViewHolder(View view) {
                 super(view);
-                tvUsername = (TextView) view.findViewById(R.id.tv_staff_username);
+                tvUsername = (TextView) view.findViewById(R.id.tv_gym_user_username);
+                tvCredential = (TextView) view.findViewById(R.id.tv_gym_user_credential);
             }
         }
     }

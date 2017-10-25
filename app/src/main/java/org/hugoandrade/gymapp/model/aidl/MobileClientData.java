@@ -21,13 +21,13 @@ public class MobileClientData implements Parcelable {
     private final int mOperationType;
     private final int mOperationResult;
     private User mUser;
-    private List<User> mStaffList;
+    private List<User> mUserList;
     private WaitingUser mWaitingUser;
     private String mErrorMessage;
 
     public static final int OPERATION_LOGIN = 3;
-    public static final int OPERATION_GET_ALL_STAFF = 4;
-    public static final int OPERATION_CREATE_STAFF = 5;
+    public static final int OPERATION_GET_ALL_USER = 4;
+    public static final int OPERATION_CREATE_USER = 5;
     public static final int OPERATION_VALIDATE = 6;
     public static final int OPERATION_SIGN_UP = 7;
 
@@ -35,7 +35,7 @@ public class MobileClientData implements Parcelable {
     public static final int OPERATION_FAILURE = 2;
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({OPERATION_LOGIN, OPERATION_GET_ALL_STAFF, OPERATION_CREATE_STAFF,
+    @IntDef({OPERATION_LOGIN, OPERATION_GET_ALL_USER, OPERATION_CREATE_USER,
             OPERATION_VALIDATE, OPERATION_SIGN_UP
     })
     @interface OpType {}
@@ -70,12 +70,12 @@ public class MobileClientData implements Parcelable {
         mUser = user;
     }
 
-    public List<User> getStaffList() {
-        return mStaffList;
+    public List<User> getUserList() {
+        return mUserList;
     }
 
-    public void setStaffList(List<User> staffList) {
-        mStaffList = staffList;
+    public void setUserList(List<User> userList) {
+        mUserList = userList;
     }
 
     public WaitingUser getWaitingUser() {
@@ -112,7 +112,7 @@ public class MobileClientData implements Parcelable {
         dest.writeInt(mOperationType);
         dest.writeInt(mOperationResult);
         dest.writeParcelable(mUser, flags);
-        dest.writeTypedList(mStaffList);
+        dest.writeTypedList(mUserList);
         dest.writeParcelable(mWaitingUser, flags);
         dest.writeString(mErrorMessage);
     }
@@ -131,8 +131,8 @@ public class MobileClientData implements Parcelable {
         mOperationType = in.readInt();
         mOperationResult = in.readInt();
         mUser = in.readParcelable(User.class.getClassLoader());
-        mStaffList = new ArrayList<>();
-        in.readTypedList(mStaffList, User.CREATOR);
+        mUserList = new ArrayList<>();
+        in.readTypedList(mUserList, User.CREATOR);
         mWaitingUser = in.readParcelable(WaitingUser.class.getClassLoader());
         mErrorMessage = in.readString();
     }

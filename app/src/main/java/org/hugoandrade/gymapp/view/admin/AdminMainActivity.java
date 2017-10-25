@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.R;
+import org.hugoandrade.gymapp.data.User;
 
 public class AdminMainActivity extends AppCompatActivity {
 
@@ -36,7 +37,7 @@ public class AdminMainActivity extends AppCompatActivity {
         tvGymMemberList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(GymMemberListActivity.makeIntent(AdminMainActivity.this));
+                startActivity(GymUserListActivity.makeIntent(AdminMainActivity.this, User.Credential.MEMBER));
             }
         });
 
@@ -44,7 +45,7 @@ public class AdminMainActivity extends AppCompatActivity {
         tvGymStaffList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(GymStaffListActivity.makeIntent(AdminMainActivity.this));
+                startActivity(GymUserListActivity.makeIntent(AdminMainActivity.this, User.Credential.STAFF));
             }
         });
     }

@@ -34,7 +34,7 @@ public class LoginActivity extends ActivityBase<MVP.RequiredLoginViewOps,
 
     private static final int SIGN_UP_REQUEST_CODE = 100;
 
-    // Views for createStaff input
+    // Views for Login input
     private EditText etUsername;
     private EditText etPassword;
     private TextView tvLoginButton;

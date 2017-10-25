@@ -4,31 +4,33 @@ import android.content.Context;
 
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.User;
-import org.hugoandrade.gymapp.model.GymStaffListModel;
+import org.hugoandrade.gymapp.model.GymUserListModel;
 
 import java.util.List;
 
-public class GymStaffListPresenter extends PresenterBase<MVP.RequiredGymStaffListViewOps,
-                                                         MVP.RequiredGymStaffListPresenterOps,
-                                                         MVP.ProvidedGymStaffListModelOps,
-                                                         GymStaffListModel>
-        implements MVP.ProvidedGymStaffListPresenterOps,
-                   MVP.RequiredGymStaffListPresenterOps {
+public class GymUserListPresenter extends PresenterBase<MVP.RequiredGymUserListViewOps,
+                                                        MVP.RequiredGymUserListPresenterOps,
+                                                        MVP.ProvidedGymUserListModelOps,
+                                                        GymUserListModel>
+        implements MVP.ProvidedGymUserListPresenterOps,
+                   MVP.RequiredGymUserListPresenterOps {
 
     @Override
-    public void onCreate(MVP.RequiredGymStaffListViewOps view) {
+    public void onCreate(MVP.RequiredGymUserListViewOps view) {
         // Invoke the special onCreate() method in PresenterBase,
         // passing in the ImageModel class to instantiate/manage and
         // "this" to provide ImageModel with this OldMVP.RequiredModelOps
         // instance.
-        super.onCreate(view, GymStaffListModel.class, this);
+        super.onCreate(view, GymUserListModel.class, this);
     }
 
     @Override
-    public void onResume() { }
+    public void onResume() {
+        getModel().registerCallback();
+    }
 
     @Override
-    public void onConfigurationChange(MVP.RequiredGymStaffListViewOps view) { }
+    public void onConfigurationChange(MVP.RequiredGymUserListViewOps view) { }
 
     @Override
     public void onPause() { }
@@ -40,13 +42,13 @@ public class GymStaffListPresenter extends PresenterBase<MVP.RequiredGymStaffLis
 
     @Override
     public void notifyServiceIsBound() {
-        getAllStaff();
+        getAllGymUsers();
     }
 
-    public void getAllStaff() {
+    private void getAllGymUsers() {
         getView().disableUI();
 
-        getModel().getAllStaff();
+        getModel().getAllGymUsers(getView().getCredential());
     }
 
     @Override
@@ -60,13 +62,13 @@ public class GymStaffListPresenter extends PresenterBase<MVP.RequiredGymStaffLis
     }
 
     @Override
-    public void gettingAllStaffOperationResult(boolean wasOperationSuccessful,
-                                               String errorMessage,
-                                               List<User> userList) {
+    public void gettingAllGymUsersOperationResult(boolean wasOperationSuccessful,
+                                                  String errorMessage,
+                                                  List<User> userList) {
 
         if (wasOperationSuccessful) {
 
-            getView().displayStaffList(userList);
+            getView().displayGymUserList(userList);
         }
         else {
             if (errorMessage != null)

@@ -24,7 +24,9 @@ public class LoginPresenter extends PresenterBase<MVP.RequiredLoginViewOps,
     }
 
     @Override
-    public void onResume() { }
+    public void onResume() {
+        getModel().registerCallback();
+    }
 
     @Override
     public void onConfigurationChange(MVP.RequiredLoginViewOps view) { }
@@ -35,6 +37,11 @@ public class LoginPresenter extends PresenterBase<MVP.RequiredLoginViewOps,
     @Override
     public void onDestroy(boolean isChangingConfiguration) {
         getModel().onDestroy(isChangingConfiguration);
+    }
+
+    @Override
+    public void notifyServiceIsBound() {
+        // No-ops
     }
 
     @Override

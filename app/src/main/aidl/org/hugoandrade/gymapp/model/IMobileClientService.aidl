@@ -1,4 +1,4 @@
-// IMobileServiceClientService.aidl
+// IMobileClientService.aidl
 package org.hugoandrade.gymapp.model;
 
 // Declare any non-default types here with import statements
@@ -11,7 +11,7 @@ interface IMobileClientService {
 
     boolean login(String username, String password);
     boolean signUp(String username, String password);
-    boolean getAllStaff();
-    boolean createUser(in WaitingUser waitingUser);
-    boolean validateUser(in WaitingUser waitingUser);
+    boolean getAllGymUsers(String credential);
+    boolean createGymUser(in WaitingUser waitingUser);
+    boolean validateGymUser(in WaitingUser waitingUser);
 }

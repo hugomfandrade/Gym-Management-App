@@ -133,6 +133,20 @@ public abstract class ActivityBase<RequiredViewOps,
     }
 
     @Override
+    protected void onResume() {
+        mPresenterInstance.onResume();
+
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        mPresenterInstance.onPause();
+
+        super.onPause();
+    }
+
+    @Override
     protected void onDestroy() {
         mPresenterInstance.onDestroy(isChangingConfigurations());
 

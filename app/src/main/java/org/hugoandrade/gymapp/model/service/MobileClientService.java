@@ -172,50 +172,25 @@ public class MobileClientService extends LifecycleLoggingService {
         }
 
         @Override
-        public boolean getAllStaff() throws RemoteException {
+        public boolean getAllGymUsers(final String credential) throws RemoteException {
             if (mMobileServiceClient == null)
                 return false;
 
             try {
                 ListenableFuture<JsonElement> future
-                        = new MobileServiceJsonTable(User.Credential.STAFF, mMobileServiceClient)
+                        = new MobileServiceJsonTable(credential, mMobileServiceClient)
                         .execute();
                 Futures.addCallback(future, new FutureCallback<JsonElement>() {
                     @Override
                     public void onSuccess(JsonElement jsonElement) {
                         List<String> idList = parser.parseStrings(jsonElement, User.Credential.Cols.USER_ID);
 
-                        List<User> userList = new ArrayList<>();
-
-                        for (String id : idList) {
-                            try {
-                                JsonElement userResult = new MobileServiceJsonTable(User.Entry.TABLE_NAME, mMobileServiceClient)
-                                        .where().field(User.Entry.Cols.ID).eq(id)
-                                        .select(User.Entry.Cols.ID, User.Entry.Cols.USERNAME)
-                                        .execute().get();
-
-                                if (userResult.getAsJsonArray().size() != 0) {
-                                    userList.add(parser.parseUser(userResult.getAsJsonArray().get(0).getAsJsonObject()));
-                                }
-                            } catch (InterruptedException | ExecutionException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        MobileClientData m = new MobileClientData(
-                                MobileClientData.OPERATION_GET_ALL_STAFF,
-                                MobileClientData.OPERATION_SUCCESS);
-                        m.setStaffList(userList);
-                        try {
-                            if (mCallback != null)
-                                mCallback.sendResults(m);
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                        }
+                        getUsers(idList, credential);
                     }
 
                     @Override
                     public void onFailure(@NonNull Throwable t) {
-                        reportOperationFailure(MobileClientData.OPERATION_GET_ALL_STAFF, t.getMessage());
+                        reportOperationFailure(MobileClientData.OPERATION_GET_ALL_USER, t.getMessage());
                     }
                 });
             } catch (MobileServiceException e) {
@@ -225,8 +200,52 @@ public class MobileClientService extends LifecycleLoggingService {
             return true;
         }
 
+        private void getUsers(List<String> idList, final String credential) {
+
+            new AsyncTask<String, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(String... ids) {
+
+                    List<User> userList = new ArrayList<>();
+
+                    for (String id : ids) {
+                        try {
+                            JsonElement userResult =
+                                    new MobileServiceJsonTable(User.Entry.TABLE_NAME, mMobileServiceClient)
+                                            .where().field(User.Entry.Cols.ID).eq(id)
+                                            .select(User.Entry.Cols.ID, User.Entry.Cols.USERNAME)
+                                            .execute().get();
+
+                            if (userResult.getAsJsonArray().size() != 0) {
+                                User user = parser.parseUser(userResult.getAsJsonArray().get(0).getAsJsonObject());
+                                user.setCredential(credential);
+                                userList.add(user);
+                            }
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                            Log.e(TAG, "Error: " + e.getMessage());
+                        }
+                    }
+
+                    MobileClientData m = new MobileClientData(
+                            MobileClientData.OPERATION_GET_ALL_USER,
+                            MobileClientData.OPERATION_SUCCESS);
+                    m.setUserList(userList);
+                    try {
+                        if (mCallback != null)
+                            mCallback.sendResults(m);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+
+                    return null;
+                }
+            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, idList.toArray(new String[idList.size()]));
+        }
+
         @Override
-        public boolean createUser(WaitingUser waitingUser) throws RemoteException {
+        public boolean createGymUser(WaitingUser waitingUser) throws RemoteException {
             // ******* OK *******//
             if (mMobileServiceClient == null)
                 return false;
@@ -239,7 +258,7 @@ public class MobileClientService extends LifecycleLoggingService {
                 public void onSuccess(JsonObject jsonObject) {
 
                     MobileClientData m = new MobileClientData(
-                            MobileClientData.OPERATION_CREATE_STAFF,
+                            MobileClientData.OPERATION_CREATE_USER,
                             MobileClientData.OPERATION_SUCCESS);
                     m.setWaitingUser(parser.parseWaitingUser(jsonObject));
 
@@ -253,14 +272,14 @@ public class MobileClientService extends LifecycleLoggingService {
 
                 @Override
                 public void onFailure(@NonNull Throwable t) {
-                    reportOperationFailure(MobileClientData.OPERATION_CREATE_STAFF, t.getMessage());
+                    reportOperationFailure(MobileClientData.OPERATION_CREATE_USER, t.getMessage());
                 }
             });
             return true;
         }
 
         @Override
-        public boolean validateUser(final WaitingUser waitingUser) throws RemoteException {
+        public boolean validateGymUser(final WaitingUser waitingUser) throws RemoteException {
             // ******* OK *******//
             if (mMobileServiceClient == null)
                 return false;
@@ -378,12 +397,14 @@ public class MobileClientService extends LifecycleLoggingService {
 
         @Override
         public void registerCallback(IMobileClientServiceCallback cb) throws RemoteException {
+            Log.d(TAG, "-- registerCallback -- ");
             // TODO if (mCallback != null) mCallback.onUnregistered();
             mCallback = cb;
         }
 
         @Override
         public void unregisterCallback(IMobileClientServiceCallback cb) throws RemoteException {
+            Log.d(TAG, "-- unregisterCallback -- ");
             if (mCallback == cb)
                 mCallback = null;
         }

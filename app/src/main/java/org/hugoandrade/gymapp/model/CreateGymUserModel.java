@@ -7,13 +7,13 @@ import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.WaitingUser;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
-public class CreateStaffModel extends MobileClientModelBase<MVP.RequiredCreateStaffPresenterOps>
+public class CreateGymUserModel extends MobileClientModelBase<MVP.RequiredCreateGymUserPresenterOps>
 
-    implements MVP.ProvidedCreateStaffModelOps {
+    implements MVP.ProvidedCreateGymUserModelOps {
 
     @Override
     public void sendResults(MobileClientData data) {
-        if (data.getOperationType() == MobileClientData.OPERATION_CREATE_STAFF) {
+        if (data.getOperationType() == MobileClientData.OPERATION_CREATE_USER) {
             if (data.getOperationResult() == MobileClientData.OPERATION_SUCCESS)
                 creatingUserRequestResultSuccess(data.getWaitingUser());
             else
@@ -22,7 +22,7 @@ public class CreateStaffModel extends MobileClientModelBase<MVP.RequiredCreateSt
     }
 
     @Override
-    public void createUser(WaitingUser waitingUser) {
+    public void createGymUser(WaitingUser waitingUser) {
         if (getService() == null) {
             Log.w(TAG, "Service is still not bound");
             creatingUserRequestResultFailure("Not bound to the service");
@@ -30,7 +30,7 @@ public class CreateStaffModel extends MobileClientModelBase<MVP.RequiredCreateSt
         }
 
         try {
-            boolean isLoggingIn = getService().createUser(waitingUser);
+            boolean isLoggingIn = getService().createGymUser(waitingUser);
             if (!isLoggingIn) {
                 creatingUserRequestResultFailure("No Network Connection");
             }
@@ -41,10 +41,10 @@ public class CreateStaffModel extends MobileClientModelBase<MVP.RequiredCreateSt
     }
 
     private void creatingUserRequestResultFailure(String errorMessage) {
-        getPresenter().creatingStaffOperationResult(false, errorMessage, null);
+        getPresenter().creatingGymUserOperationResult(false, errorMessage, null);
     }
 
     private void creatingUserRequestResultSuccess(WaitingUser waitingUser) {
-        getPresenter().creatingStaffOperationResult(true, null, waitingUser);
+        getPresenter().creatingGymUserOperationResult(true, null, waitingUser);
     }
 }

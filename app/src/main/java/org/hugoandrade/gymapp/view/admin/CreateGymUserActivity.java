@@ -16,29 +16,37 @@ import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.data.WaitingUser;
-import org.hugoandrade.gymapp.presenter.CreateStaffPresenter;
+import org.hugoandrade.gymapp.presenter.CreateGymUserPresenter;
 import org.hugoandrade.gymapp.utils.LoginUtils;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;
 
 
-public class CreateStaffActivity extends ActivityBase<MVP.RequiredCreateStaffViewOps,
-                                                      MVP.ProvidedCreateStaffPresenterOps,
-                                                      CreateStaffPresenter>
-        implements MVP.RequiredCreateStaffViewOps {
+public class CreateGymUserActivity extends ActivityBase<MVP.RequiredCreateGymUserViewOps,
+                                                        MVP.ProvidedCreateGymUserPresenterOps,
+                                                        CreateGymUserPresenter>
+        implements MVP.RequiredCreateGymUserViewOps {
 
     private static final String INTENT_EXTRA_USER = "intent_extra_user";
+    private static final String INTENT_EXTRA_CREDENTIAL = "intent_extra_credential";
 
-    // Views for createStaff input
+    private String mCredential;
+
+    // Views for CreateUser input
     private View vProgressBar;
 
     private EditText etUsername;
     private TextView tvCode;
-    private TextView tvCreateStaffButton;
-    private View mCreateStaffButton;
+    private TextView tvCreateGymUserButton;
+    private View mCreateGymUserButton;
 
-    public static Intent makeIntent(Context context) {
-        return new Intent(context, CreateStaffActivity.class);
+    public static Intent makeIntent(Context context, String credential) {
+        return new Intent(context, CreateGymUserActivity.class)
+                .putExtra(INTENT_EXTRA_CREDENTIAL, credential);
+    }
+
+    private static String extractCredentialFromIntent(Intent intent) {
+        return intent.getStringExtra(INTENT_EXTRA_CREDENTIAL);
     }
 
     public static User extractUserFromIntent(Intent data) {
@@ -49,36 +57,38 @@ public class CreateStaffActivity extends ActivityBase<MVP.RequiredCreateStaffVie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mCredential = extractCredentialFromIntent(getIntent());
+
         initializeUI();
 
         enableUI();
 
-        super.onCreate(CreateStaffPresenter.class, this);
+        super.onCreate(CreateGymUserPresenter.class, this);
     }
 
     private void initializeUI() {
-        setContentView(R.layout.activity_create_staff);
+        setContentView(R.layout.activity_admin_create_user);
 
         vProgressBar = findViewById(R.id.progressBar_waiting);
 
         etUsername = (EditText) findViewById(R.id.et_username);
         tvCode = (TextView) findViewById(R.id.tv_code);
-        mCreateStaffButton = findViewById(R.id.view_group_create);
-        tvCreateStaffButton = (TextView) findViewById(R.id.tv_create);
+        mCreateGymUserButton = findViewById(R.id.view_group_create);
+        tvCreateGymUserButton = (TextView) findViewById(R.id.tv_create);
 
         etUsername.addTextChangedListener(mTextWatcher);
         etUsername.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_ACTION_DONE) {
-                    attemptCreateStaff();
+                if (id == R.id.create || id == EditorInfo.IME_ACTION_DONE) {
+                    attemptCreateUser();
                     return true;
                 }
                 return false;
             }
         });
 
-        tvCreateStaffButton.setOnClickListener(mOnClickListener);
+        tvCreateGymUserButton.setOnClickListener(mOnClickListener);
 
         tvCode.setVisibility(View.INVISIBLE);
     }
@@ -100,16 +110,16 @@ public class CreateStaffActivity extends ActivityBase<MVP.RequiredCreateStaffVie
         if (!LoginUtils.isUsernameAtLeast4CharactersLong(username)
                 || !LoginUtils.isUsernameNotAllSpaces(username)) {
 
-            tvCreateStaffButton.setClickable(false);
-            tvCreateStaffButton.setTextColor(Color.parseColor("#3dffffff"));
+            tvCreateGymUserButton.setClickable(false);
+            tvCreateGymUserButton.setTextColor(Color.parseColor("#3dffffff"));
             return;
         }
 
-        tvCreateStaffButton.setClickable(true);
-        tvCreateStaffButton.setTextColor(Color.WHITE);
+        tvCreateGymUserButton.setClickable(true);
+        tvCreateGymUserButton.setTextColor(Color.WHITE);
     }
 
-    private void attemptCreateStaff() {
+    private void attemptCreateUser() {
 
         String username = etUsername.getText().toString();
 
@@ -121,12 +131,12 @@ public class CreateStaffActivity extends ActivityBase<MVP.RequiredCreateStaffVie
 
         UIUtils.hideSoftKeyboardAndClearFocus(etUsername);
 
-        getPresenter().createStaff(username);
+        getPresenter().createGymUser(username, mCredential);
     }
 
     @Override
-    public void successfulCreateStaff(WaitingUser waitingUser) {
-        mCreateStaffButton.setVisibility(View.INVISIBLE);
+    public void successfulCreateGymUser(WaitingUser waitingUser) {
+        mCreateGymUserButton.setVisibility(View.INVISIBLE);
 
         etUsername.setEnabled(false);
         tvCode.setVisibility(View.VISIBLE);
@@ -141,8 +151,8 @@ public class CreateStaffActivity extends ActivityBase<MVP.RequiredCreateStaffVie
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (v == tvCreateStaffButton) {
-                attemptCreateStaff();
+            if (v == tvCreateGymUserButton) {
+                attemptCreateUser();
             }
         }
     };

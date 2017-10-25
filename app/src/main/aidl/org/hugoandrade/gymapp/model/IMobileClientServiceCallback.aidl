@@ -1,18 +1,18 @@
-// IMobileServiceClientServiceCallback.aidl
+// IMobileClientServiceCallback.aidl
 package org.hugoandrade.gymapp.model;
 
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
 /**
  * Interface defining the method that receives callbacks from the
- * MobileServiceClientService.
+ * MobileClientService.
  */
 interface IMobileClientServiceCallback {
 
     /**
-     * This one-way (non-blocking) method allows MobileServiceClientService
+     * This one-way (non-blocking) method allows MobileClientService
      * to return the MobileClientData results associated with the one-way
-     * IMobileServiceClientService calls.
+     * IMobileClientService calls.
      */
     oneway void sendResults(in MobileClientData mobileClientData);
 

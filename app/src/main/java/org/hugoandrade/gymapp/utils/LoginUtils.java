@@ -1,7 +1,7 @@
 package org.hugoandrade.gymapp.utils;
 
 /**
- * Class containing static helper methods to perform createStaff related tasks.
+ * Class containing static helper methods to perform Login related tasks.
  */
 public final class LoginUtils {
     /**

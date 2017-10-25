@@ -32,14 +32,11 @@
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".view.admin.GymStaffListActivity"
+            android:name=".view.admin.GymUserListActivity"
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".view.admin.GymMemberListActivity"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".view.admin.CreateStaffActivity"
+            android:name=".view.admin.CreateGymUserActivity"
             android:screenOrientation="portrait"/>
 
         <activity

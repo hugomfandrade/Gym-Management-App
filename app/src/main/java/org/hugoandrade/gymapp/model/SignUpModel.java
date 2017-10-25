@@ -37,7 +37,7 @@ public class SignUpModel extends MobileClientModelBase<MVP.RequiredSignUpPresent
         }
 
         try {
-            boolean isValidatingUser = getService().validateUser(waitingUser);
+            boolean isValidatingUser = getService().validateGymUser(waitingUser);
             if (!isValidatingUser) {
                 validatingUserRequestResultFailure("No Network Connection");
             }
