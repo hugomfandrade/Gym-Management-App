@@ -35,7 +35,6 @@ public abstract class MobileClientModelBase<RequiredPresenterOps extends MVP.Req
 
     @Override
     public void onCreate(RequiredPresenterOps presenter) {
-        mPresenter = new WeakReference<>(presenter);
         // Set the WeakReference.
         mPresenter =
                 new WeakReference<>(presenter);

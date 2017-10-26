@@ -52,6 +52,10 @@
             android:process=":azureService"
             android:enabled="true"/>
 
+        <provider
+            android:name=".provider.StorageProvider"
+            android:authorities="org.hugoandrade.gymapp.provider"
+            android:exported="false" />
     </application>
 
 </manifest>

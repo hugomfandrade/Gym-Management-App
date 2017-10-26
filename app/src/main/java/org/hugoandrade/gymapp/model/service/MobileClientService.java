@@ -108,7 +108,7 @@ public class MobileClientService extends LifecycleLoggingService {
     private final IMobileClientService.Stub mBinder = new IMobileClientService.Stub() {
 
         @Override // ******* OK *******//
-        public boolean login(String username, String password) throws RemoteException {
+        public boolean login(String username, final String password) throws RemoteException {
             // ******* OK *******//
             if (mMobileServiceClient == null)
                 return false;
@@ -121,6 +121,7 @@ public class MobileClientService extends LifecycleLoggingService {
                 public void onSuccess(JsonObject jsonObject) {
 
                     User user = parser.parseUser(jsonObject);
+                    user.setPassword(password);
 
                     getCredential(user);
                 }
@@ -201,47 +202,20 @@ public class MobileClientService extends LifecycleLoggingService {
         }
 
         private void getUsers(List<String> idList, final String credential) {
-
-            new AsyncTask<String, Void, Void>() {
-
-                @Override
-                protected Void doInBackground(String... ids) {
-
-                    List<User> userList = new ArrayList<>();
-
-                    for (String id : ids) {
-                        try {
-                            JsonElement userResult =
-                                    new MobileServiceJsonTable(User.Entry.TABLE_NAME, mMobileServiceClient)
-                                            .where().field(User.Entry.Cols.ID).eq(id)
-                                            .select(User.Entry.Cols.ID, User.Entry.Cols.USERNAME)
-                                            .execute().get();
-
-                            if (userResult.getAsJsonArray().size() != 0) {
-                                User user = parser.parseUser(userResult.getAsJsonArray().get(0).getAsJsonObject());
-                                user.setCredential(credential);
-                                userList.add(user);
+            new GetUserAsyncTask(credential, mMobileServiceClient)
+                    .setOnFinishedListener(new GetUserAsyncTask.OnFinishedListener() {
+                        @Override
+                        public void onFinished(MobileClientData mobileClientData) {
+                            try {
+                                if (mCallback != null)
+                                    mCallback.sendResults(mobileClientData);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
                             }
-                        } catch (InterruptedException | ExecutionException e) {
-                            e.printStackTrace();
-                            Log.e(TAG, "Error: " + e.getMessage());
                         }
-                    }
-
-                    MobileClientData m = new MobileClientData(
-                            MobileClientData.OPERATION_GET_ALL_USER,
-                            MobileClientData.OPERATION_SUCCESS);
-                    m.setUserList(userList);
-                    try {
-                        if (mCallback != null)
-                            mCallback.sendResults(m);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-
-                    return null;
-                }
-            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, idList.toArray(new String[idList.size()]));
+                    })
+                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                                       idList.toArray(new String[idList.size()]));
         }
 
         @Override
@@ -324,75 +298,26 @@ public class MobileClientService extends LifecycleLoggingService {
         }
 
         private void getCredential(final User user) {
-            new AsyncTask<User, Void, Void>() {
-
-                @Override
-                protected Void doInBackground(User... users) {
-                    User user = users[0];
-
-                    String userID = user.getID();
-
-                    try {
-                        JsonElement adminResult =
-                                new MobileServiceJsonTable(User.Credential.ADMIN, mMobileServiceClient)
-                                        .where().field(User.Credential.Cols.USER_ID).eq(userID)
-                                        .execute().get();
-
-                        if (adminResult.getAsJsonArray().size() != 0) {
-                            user.setCredential(User.Credential.ADMIN);
-                            sendSuccessfulLoginResult(user);
-                            return null;
+            new GetCredentialAsyncTask(mMobileServiceClient)
+                    .setOnFinishedListener(new GetCredentialAsyncTask.OnFinishedListener() {
+                        @Override
+                        public void onFinished(MobileClientData mobileClientData) {
+                            try {
+                                if (mCallback != null)
+                                    mCallback.sendResults(mobileClientData);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
                         }
 
-                        JsonElement staffResult =
-                                new MobileServiceJsonTable(User.Credential.STAFF, mMobileServiceClient)
-                                        .where().field(User.Credential.Cols.USER_ID).eq(userID)
-                                        .execute().get();
-
-                        if (staffResult.getAsJsonArray().size() != 0) {
-                            user.setCredential(User.Credential.STAFF);
-                            sendSuccessfulLoginResult(user);
-                            return null;
+                        @Override
+                        public void onSuccessfulLogin(User user) {
+                            MobileServiceUser mMobileServiceUser = new MobileServiceUser(user.getUserID());
+                            mMobileServiceUser.setAuthenticationToken(user.getToken());
+                            mMobileServiceClient.setCurrentUser(mMobileServiceUser);
                         }
-
-                        JsonElement memberResult =
-                                new MobileServiceJsonTable(User.Credential.MEMBER, mMobileServiceClient)
-                                        .where().field(User.Credential.Cols.USER_ID).eq(userID)
-                                        .execute().get();
-
-                        if (memberResult.getAsJsonArray().size() != 0) {
-                            user.setCredential(User.Credential.MEMBER);
-                            sendSuccessfulLoginResult(user);
-                            return null;
-                        }
-
-                        reportOperationFailure(MobileClientData.OPERATION_LOGIN, "Credential not found");
-
-                    } catch (InterruptedException | ExecutionException e) {
-
-                        reportOperationFailure(MobileClientData.OPERATION_LOGIN, e.getMessage());
-                    }
-                    return null;
-                }
-
-                private void sendSuccessfulLoginResult(User user) {
-                    MobileServiceUser mMobileServiceUser = new MobileServiceUser(user.getUserID());
-                    mMobileServiceUser.setAuthenticationToken(user.getToken());
-                    mMobileServiceClient.setCurrentUser(mMobileServiceUser);
-
-                    MobileClientData m = new MobileClientData(
-                            MobileClientData.OPERATION_LOGIN,
-                            MobileClientData.OPERATION_SUCCESS);
-                    m.setUser(user);
-
-                    try {
-                        if (mCallback != null)
-                            mCallback.sendResults(m);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, user);
+                    })
+                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, user);
         }
 
         @Override
@@ -425,6 +350,165 @@ public class MobileClientService extends LifecycleLoggingService {
         }
     };
 
+    private static class GetUserAsyncTask extends AsyncTask<String, Void, Void> {
+
+        private static final String TAG = GetUserAsyncTask.class.getSimpleName();
+
+        private final String mCredential;
+        private final MobileServiceClient mMobileServiceClient;
+
+        private OnFinishedListener mListener;
+
+        private MobileClientDataJsonParser parser = new MobileClientDataJsonParser();
+
+        GetUserAsyncTask(String credential, MobileServiceClient mobileServiceClient) {
+
+            mCredential = credential;
+            mMobileServiceClient = mobileServiceClient;
+        }
+
+        GetUserAsyncTask setOnFinishedListener(OnFinishedListener listener) {
+            mListener = listener;
+            return this;
+        }
+
+        @Override
+        protected Void doInBackground(String... ids) {
+
+            List<User> userList = new ArrayList<>();
+
+            for (String id : ids) {
+                try {
+                    JsonElement userResult =
+                            new MobileServiceJsonTable(User.Entry.TABLE_NAME, mMobileServiceClient)
+                                    .where().field(User.Entry.Cols.ID).eq(id)
+                                    .select(User.Entry.Cols.ID, User.Entry.Cols.USERNAME)
+                                    .execute().get();
+
+                    if (userResult.getAsJsonArray().size() != 0) {
+                        User user = parser.parseUser(userResult.getAsJsonArray().get(0).getAsJsonObject());
+                        user.setCredential(mCredential);
+                        userList.add(user);
+                    }
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "Error: " + e.getMessage());
+                }
+            }
+
+            MobileClientData m = new MobileClientData(
+                    MobileClientData.OPERATION_GET_ALL_USER,
+                    MobileClientData.OPERATION_SUCCESS);
+            m.setUserList(userList);
+
+            if (mListener != null)
+                mListener.onFinished(m);
+
+            return null;
+        }
+
+        interface OnFinishedListener {
+            void onFinished(MobileClientData mobileClientData);
+        }
+    }
+
+    private static class GetCredentialAsyncTask extends AsyncTask<User, Void, Void> {
+
+        @SuppressWarnings("unused")
+        private static final String TAG = GetCredentialAsyncTask.class.getSimpleName();
+
+        private final MobileServiceClient mMobileServiceClient;
+
+        private OnFinishedListener mListener;
+
+        GetCredentialAsyncTask(MobileServiceClient mobileServiceClient) {
+            mMobileServiceClient = mobileServiceClient;
+        }
+
+        GetCredentialAsyncTask setOnFinishedListener(OnFinishedListener listener) {
+            mListener = listener;
+            return this;
+        }
+
+        @Override
+        protected Void doInBackground(User... users) {
+            User user = users[0];
+
+            String userID = user.getID();
+
+            try {
+                JsonElement adminResult =
+                        new MobileServiceJsonTable(User.Credential.ADMIN, mMobileServiceClient)
+                                .where().field(User.Credential.Cols.USER_ID).eq(userID)
+                                .execute().get();
+
+                if (adminResult.getAsJsonArray().size() != 0) {
+                    user.setCredential(User.Credential.ADMIN);
+                    sendSuccessfulLoginResult(user);
+                    return null;
+                }
+
+                JsonElement staffResult =
+                        new MobileServiceJsonTable(User.Credential.STAFF, mMobileServiceClient)
+                                .where().field(User.Credential.Cols.USER_ID).eq(userID)
+                                .execute().get();
+
+                if (staffResult.getAsJsonArray().size() != 0) {
+                    user.setCredential(User.Credential.STAFF);
+                    sendSuccessfulLoginResult(user);
+                    return null;
+                }
+
+                JsonElement memberResult =
+                        new MobileServiceJsonTable(User.Credential.MEMBER, mMobileServiceClient)
+                                .where().field(User.Credential.Cols.USER_ID).eq(userID)
+                                .execute().get();
+
+                if (memberResult.getAsJsonArray().size() != 0) {
+                    user.setCredential(User.Credential.MEMBER);
+                    sendSuccessfulLoginResult(user);
+                    return null;
+                }
+
+                sendFailedLoginResult("Credential not found");
+
+            } catch (InterruptedException | ExecutionException e) {
+
+                sendFailedLoginResult(e.getMessage());
+            }
+            return null;
+        }
+
+        private void sendSuccessfulLoginResult(User user) {
+            if (mListener != null)
+                mListener.onSuccessfulLogin(user);
+
+            MobileClientData m = new MobileClientData(
+                    MobileClientData.OPERATION_LOGIN,
+                    MobileClientData.OPERATION_SUCCESS);
+            m.setUser(user);
+
+
+            if (mListener != null)
+                mListener.onFinished(m);
+        }
+
+        private void sendFailedLoginResult(String message) {
+
+            MobileClientData m = new MobileClientData(
+                    MobileClientData.OPERATION_LOGIN,
+                    MobileClientData.OPERATION_FAILURE);
+            m.setErrorMessage(message);
+
+            if (mListener != null)
+                mListener.onFinished(m);
+        }
+
+        interface OnFinishedListener {
+            void onFinished(MobileClientData mobileClientData);
+            void onSuccessfulLogin(User user);
+        }
+    }
 
     private void initMobileServiceClient() {
         if (isClientInitialized)
@@ -442,42 +526,36 @@ public class MobileClientService extends LifecycleLoggingService {
         mMobileServiceClient = null;
     }
 
-    private boolean initMobileServiceClient(Context context, ServiceFilter filter) throws MalformedURLException {
+    private void initMobileServiceClient(Context context, ServiceFilter filter) throws MalformedURLException {
         if (isClientInitialized)
-            return false;
-        else {
+            return;
 
-
-            mMobileServiceClient = new MobileServiceClient(
-                    DevConstants.APP_URL,
-                    context);
-            // Extend timeout from default of 10s to 20s
-            mMobileServiceClient.setAndroidHttpClientFactory(new OkHttpClientFactory() {
-                @Override
-                public OkHttpClient createOkHttpClient() {
-                    OkHttpClient client = new OkHttpClient();
-                    client.setReadTimeout(20, TimeUnit.SECONDS);
-                    client.setWriteTimeout(20, TimeUnit.SECONDS);
-                    return client;
-                }
-            });
-            if (filter != null)
-                mMobileServiceClient = mMobileServiceClient.withFilter(filter);
-            isClientInitialized = true;
-            return true;
-        }
+        mMobileServiceClient = new MobileServiceClient(
+                DevConstants.APP_URL,
+                context);
+        // Extend timeout from default of 10s to 20s
+        mMobileServiceClient.setAndroidHttpClientFactory(new OkHttpClientFactory() {
+            @Override
+            public OkHttpClient createOkHttpClient() {
+                OkHttpClient client = new OkHttpClient();
+                client.setReadTimeout(20, TimeUnit.SECONDS);
+                client.setWriteTimeout(20, TimeUnit.SECONDS);
+                return client;
+            }
+        });
+        if (filter != null)
+            mMobileServiceClient = mMobileServiceClient.withFilter(filter);
+        isClientInitialized = true;
     }
 
-    private boolean setContextAndFilter(Context context, ServiceFilter filter){
+    private void setContextAndFilter(Context context, ServiceFilter filter){
         if (isClientInitialized)
-            return false;
-        else {
-            if(context != null)
-                mMobileServiceClient.setContext(context);
-            if(filter != null)
-                mMobileServiceClient = mMobileServiceClient.withFilter(filter);
-            return true;
-        }
+            return;
+
+        if (context != null)
+            mMobileServiceClient.setContext(context);
+        if (filter != null)
+            mMobileServiceClient = mMobileServiceClient.withFilter(filter);
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -502,7 +580,7 @@ public class MobileClientService extends LifecycleLoggingService {
             ListenableFuture<ServiceFilterResponse> future = nextServiceFilterCallback.onNext(request);
             Futures.addCallback(future, new FutureCallback<ServiceFilterResponse>() {
                 @Override
-                public void onFailure(Throwable e) {
+                public void onFailure(@NonNull Throwable e) {
                     resultFuture.setException(e);
                 }
 

@@ -57,8 +57,6 @@ public class LoginActivity extends ActivityBase<MVP.RequiredLoginViewOps,
 
         initializeUI();
 
-        setupUI();
-
         super.onCreate(LoginPresenter.class, this);
     }
 
@@ -90,10 +88,14 @@ public class LoginActivity extends ActivityBase<MVP.RequiredLoginViewOps,
         tvSignUp.setOnClickListener(mOnClickListener);
     }
 
-    private void setupUI() {
-        etUsername.setText("Admin");
-        etUsername.setSelection(etUsername.getText().toString().length());
-        etPassword.setText("password");
+    @Override
+    public void displayLastLogin(User user) {
+        etUsername.setText(user.getUsername());
+        etPassword.setText(user.getPassword());
+
+        //etUsername.setText("Admin");
+        //etPassword.setText("password");
+
         checkLoginInputFieldsValidity();
         setLoggingInStatus(false);
     }

@@ -1,6 +1,7 @@
 package org.hugoandrade.gymapp.presenter;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
@@ -21,6 +22,8 @@ public class LoginPresenter extends PresenterBase<MVP.RequiredLoginViewOps,
         // "this" to provide ImageModel with this OldMVP.RequiredModelOps
         // instance.
         super.onCreate(view, LoginModel.class, this);
+
+        getModel().getLastLogin();
     }
 
     @Override
@@ -54,6 +57,10 @@ public class LoginPresenter extends PresenterBase<MVP.RequiredLoginViewOps,
     @Override
     public void loginOperationResult(boolean wasOperationSuccessful, String message, User user) {
         if (wasOperationSuccessful) {
+            Log.e(TAG, user.toString());
+
+            getModel().insertLastLogin(user);
+
             GlobalData.initializeUser(user);
 
             getView().successfulLogin(user.getCredential());
@@ -64,6 +71,11 @@ public class LoginPresenter extends PresenterBase<MVP.RequiredLoginViewOps,
         }
 
         getView().setLoggingInStatus(false);
+    }
+
+    @Override
+    public void displayLastLogin(User user) {
+        getView().displayLastLogin(user);
     }
 
     @Override

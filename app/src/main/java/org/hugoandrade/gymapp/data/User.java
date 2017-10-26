@@ -1,11 +1,10 @@
 package org.hugoandrade.gymapp.data;
 
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by Hugo Andrade on 22/10/2017.
- */
+import org.hugoandrade.gymapp.provider.StorageProvider;
 
 public class User implements Parcelable {
 
@@ -34,6 +33,35 @@ public class User implements Parcelable {
 
         public static final String REQUEST_TYPE = "RequestType";
         public static final String SIGN_UP = "SignUp";
+
+
+        // SQLite table User
+        // PATH & TOKEN for entire table
+        public static final String PATH = TABLE_NAME;
+        /**
+         * The code that is returned when a URI for more than 1 items is
+         * matched against the given components.  Must be positive.
+         */
+        public static final int PATH_TOKEN = 110;
+
+        // PATH & TOKEN for single row of table
+        public static final String PATH_FOR_ID = PATH + "/#";
+
+        /**
+         * The code that is returned when a URI for exactly 1 item is
+         * matched against the given components.  Must be positive.
+         */
+        public static final int PATH_FOR_ID_TOKEN = 120;
+
+        // CONTENT/MIME TYPE for this content
+        private final static String MIME_TYPE_END = PATH;
+        public static final String CONTENT_TYPE_DIR = StorageProvider.ORGANIZATIONAL_NAME
+                + ".cursor.dir/" + StorageProvider.ORGANIZATIONAL_NAME + "." + MIME_TYPE_END;
+        public static final String CONTENT_ITEM_TYPE = StorageProvider.ORGANIZATIONAL_NAME
+                + ".cursor.item/" + StorageProvider.ORGANIZATIONAL_NAME + "." + MIME_TYPE_END;
+
+        public static final Uri CONTENT_URI = StorageProvider.BASE_URI.buildUpon()
+                .appendPath(PATH).build();
     }
 
     private String mID;
@@ -43,6 +71,9 @@ public class User implements Parcelable {
 
     private String mUserID;
     private String mToken;
+
+    public User() {
+    }
 
     public User(String id, String username, String userID, String token) {
         mID = id;
@@ -62,6 +93,10 @@ public class User implements Parcelable {
 
     public String getUsername() {
         return mUsername;
+    }
+
+    public void setPassword(String password) {
+        mPassword = password;
     }
 
     public String getPassword() {
@@ -93,6 +128,7 @@ public class User implements Parcelable {
         mUsername = in.readString();
         mPassword = in.readString();
         mCredential = in.readString();
+        mUserID = in.readString();
         mToken = in.readString();
     }
 
@@ -118,6 +154,19 @@ public class User implements Parcelable {
         parcel.writeString(mUsername);
         parcel.writeString(mPassword);
         parcel.writeString(mCredential);
+        parcel.writeString(mUserID);
         parcel.writeString(mToken);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "mID='" + mID + '\'' +
+                ", mUsername='" + mUsername + '\'' +
+                ", mPassword='" + mPassword + '\'' +
+                ", mCredential='" + mCredential + '\'' +
+                ", mUserID='" + mUserID + '\'' +
+                ", mToken='" + mToken + '\'' +
+                '}';
     }
 }

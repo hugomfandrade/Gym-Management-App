@@ -15,7 +15,11 @@ import java.util.List;
 public interface MVP {
     /** For LOGIN **/
     interface RequiredLoginViewOps extends ContextView {
+
+        void displayLastLogin(User user);
+
         void setLoggingInStatus(boolean isLoggingIn);
+
         void successfulLogin(String credential);
 
         void reportMessage(String message);
@@ -25,9 +29,15 @@ public interface MVP {
     }
     interface RequiredLoginPresenterOps extends RequiredMobileClientPresenterBaseOps {
         void loginOperationResult(boolean wasOperationSuccessful, String message, User user);
+
+        void displayLastLogin(User user);
     }
     interface ProvidedLoginModelOps extends ProvidedMobileClientModelBaseOps<RequiredLoginPresenterOps> {
         void login(String username, String password);
+
+        void getLastLogin();
+
+        void insertLastLogin(User user);
     }
 
     /** For SignUp **/
