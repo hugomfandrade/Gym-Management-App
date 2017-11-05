@@ -2,6 +2,9 @@ package org.hugoandrade.gymapp;
 
 import org.hugoandrade.gymapp.data.User;
 
+/*
+ * Static class that stores the logged in User
+ */
 public class GlobalData {
 
     private static User user;

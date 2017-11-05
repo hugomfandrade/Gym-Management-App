@@ -1,7 +1,6 @@
 package org.hugoandrade.gymapp.presenter;
 
 import android.content.Context;
-import android.util.Log;
 
 import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
@@ -18,16 +17,18 @@ public class LoginPresenter extends PresenterBase<MVP.RequiredLoginViewOps,
     @Override
     public void onCreate(MVP.RequiredLoginViewOps view) {
         // Invoke the special onCreate() method in PresenterBase,
-        // passing in the ImageModel class to instantiate/manage and
-        // "this" to provide ImageModel with this OldMVP.RequiredModelOps
+        // passing in the LoginModel class to instantiate/manage and
+        // "this" to provide LoginModel with this MVP.RequiredLoginModelOps
         // instance.
         super.onCreate(view, LoginModel.class, this);
 
+        // get last used username-password from StorageProvider
         getModel().getLastLogin();
     }
 
     @Override
     public void onResume() {
+        // this activity is focused, so register callback from service
         getModel().registerCallback();
     }
 
@@ -49,16 +50,19 @@ public class LoginPresenter extends PresenterBase<MVP.RequiredLoginViewOps,
 
     @Override
     public void login(String username, String password) {
-        getView().setLoggingInStatus(true);
+        // disable UI while waiting for web service response
+        getView().disableUI();
 
+        // try to login with username-password combo
         getModel().login(username, password);
     }
 
     @Override
     public void loginOperationResult(boolean wasOperationSuccessful, String message, User user) {
         if (wasOperationSuccessful) {
-            Log.e(TAG, user.toString());
 
+            // operation was successful, go to main activity and store username-password
+            // in the StorageProvider
             getModel().insertLastLogin(user);
 
             GlobalData.initializeUser(user);
@@ -66,11 +70,13 @@ public class LoginPresenter extends PresenterBase<MVP.RequiredLoginViewOps,
             getView().successfulLogin(user.getCredential());
         }
         else {
+            // operation failed, show error message
             if (message != null)
                 getView().reportMessage(message);
         }
 
-        getView().setLoggingInStatus(false);
+        // enable UI
+        getView().enableUI();
     }
 
     @Override

@@ -45,6 +45,10 @@ public class WaitingUser implements Parcelable {
         mCredential = credential;
     }
 
+    public String getID() {
+        return mID;
+    }
+
     public String getUsername() {
         return mUsername;
     }

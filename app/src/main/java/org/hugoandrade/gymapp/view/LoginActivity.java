@@ -3,7 +3,9 @@ package org.hugoandrade.gymapp.view;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,6 +21,7 @@ import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.presenter.LoginPresenter;
+import org.hugoandrade.gymapp.presenter.broadcastreceiver.NetworkChangeBroadcastReceiver;
 import org.hugoandrade.gymapp.utils.LoginUtils;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.admin.AdminMainActivity;
@@ -37,23 +40,23 @@ public class LoginActivity extends ActivityBase<MVP.RequiredLoginViewOps,
     // Views for Login input
     private EditText etUsername;
     private EditText etPassword;
-    private TextView tvLoginButton;
     private View tvSignUp;
     private View mLoginButton;
+    private TextView tvLoginButton;
     private ProgressBar mLoginProgressBar;
-
-    public static Intent makeIntent(Context context) {
-        return new Intent(context, LoginActivity.class)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // To start using the app, use the credentials "Admin"/"password"
+        // as the Username/Password combo.
+
         GlobalData.resetUser();
+
+        getApplicationContext().registerReceiver(
+                new NetworkChangeBroadcastReceiver(),
+                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         initializeUI();
 
@@ -96,23 +99,11 @@ public class LoginActivity extends ActivityBase<MVP.RequiredLoginViewOps,
         //etUsername.setText("Admin");
         //etPassword.setText("password");
 
-        checkLoginInputFieldsValidity();
-        setLoggingInStatus(false);
+        checkValidityOfLoginInputFields();
+        enableUI();
     }
 
-    @Override
-    public void setLoggingInStatus(boolean isLoggingIn) {
-        etUsername.setEnabled(!isLoggingIn);
-        etPassword.setEnabled(!isLoggingIn);
-        mLoginButton.setBackgroundColor(isLoggingIn ?
-                Color.parseColor("#3d000000"):
-                Color.parseColor("#3dffffff"));
-        mLoginProgressBar.setVisibility(isLoggingIn ?
-                View.VISIBLE :
-                View.INVISIBLE);
-    }
-
-    private void checkLoginInputFieldsValidity() {
+    private void checkValidityOfLoginInputFields() {
 
         String username = etUsername.getText().toString();
         String password = etPassword.getText().toString();
@@ -140,7 +131,7 @@ public class LoginActivity extends ActivityBase<MVP.RequiredLoginViewOps,
                 || !LoginUtils.isPasswordNotAllSpaces(password)
                 || !LoginUtils.isUsernameAtLeast4CharactersLong(username)
                 || !LoginUtils.isUsernameNotAllSpaces(username))  {
-
+            reportMessage(getString(R.string.invalid_username_password));
             return;
         }
 
@@ -161,6 +152,24 @@ public class LoginActivity extends ActivityBase<MVP.RequiredLoginViewOps,
                 break;
         }
         finish();
+    }
+
+    @Override
+    public void disableUI() {
+
+        etUsername.setEnabled(false);
+        etPassword.setEnabled(false);
+        mLoginButton.setBackgroundColor(Color.parseColor("#3d000000"));
+        mLoginProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void enableUI() {
+
+        etUsername.setEnabled(true);
+        etPassword.setEnabled(true);
+        mLoginButton.setBackgroundColor(Color.parseColor("#3dffffff"));
+        mLoginProgressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -187,6 +196,7 @@ public class LoginActivity extends ActivityBase<MVP.RequiredLoginViewOps,
                 User user = SignUpActivity.extractUserFromIntent(data);
                 etUsername.setText(user.getUsername());
                 etPassword.setText(user.getPassword());
+                checkValidityOfLoginInputFields();
             }
 
             return;
@@ -201,7 +211,7 @@ public class LoginActivity extends ActivityBase<MVP.RequiredLoginViewOps,
         public void afterTextChanged(Editable s) { }
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            checkLoginInputFieldsValidity();
+            checkValidityOfLoginInputFields();
         }
     };
 }

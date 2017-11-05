@@ -25,6 +25,7 @@ public class CreateGymUserPresenter extends PresenterBase<MVP.RequiredCreateGymU
 
     @Override
     public void onResume() {
+        // this activity is focused, so register callback from service
         getModel().registerCallback();
     }
 
@@ -46,8 +47,10 @@ public class CreateGymUserPresenter extends PresenterBase<MVP.RequiredCreateGymU
 
     @Override
     public void createGymUser(String username, String credential) {
+        // disable UI while waiting for web service response
         getView().disableUI();
 
+        // create gym user with 'username' as username and of type 'credential'
         getModel().createGymUser(new WaitingUser(username, credential));
     }
 
@@ -55,13 +58,16 @@ public class CreateGymUserPresenter extends PresenterBase<MVP.RequiredCreateGymU
     public void creatingGymUserOperationResult(boolean wasOperationSuccessful, String message, WaitingUser waitingUser) {
         if (wasOperationSuccessful) {
 
+            // operation was successful, show generated code
             getView().successfulCreateGymUser(waitingUser);
         }
         else {
+            // operation failed, show error message
             if (message != null)
                 getView().reportMessage(message);
         }
 
+        // enable UI
         getView().enableUI();
     }
 

@@ -9,7 +9,6 @@ public abstract class CustomRecyclerScroll extends RecyclerView.OnScrollListener
     private int scrollDist = 0;
     private boolean isVisible = true;
 
-    // We don't use this method because its action is called per pixel value change
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);

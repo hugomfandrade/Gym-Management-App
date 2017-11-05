@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Gym App</string>
+    <string name="invalid_username_password">Username or Password is invalid</string>
     <string name="action_log_in">log in</string>
     <string name="action_validate">validate</string>
     <string name="action_sign_up">sign up</string>
@@ -8,10 +9,35 @@
     <string name="hint_password">Password</string>
     <string name="hint_password_confirm">Confirm Password</string>
     <string name="hint_username">Username</string>
+    <string name="hint_name">Name</string>
     <string name="hint_code">Code</string>
     <string name="action_check_gym_staff">Check Gym Staff</string>
+    <string name="action_check_my_gym_staff">My Gym Staff</string>
     <string name="action_check_gym_members">Check Gym Members</string>
     <string name="no_staff">no staff</string>
     <string name="no_members">no members</string>
+    <string name="no_exercises">no exercises</string>
+    <string name="no_my_members">no my members</string>
+    <string name="no_my_staff">no my staff</string>
+    <string name="no_history">no history</string>
+    <string name="gym_staff">Gym Staff</string>
+    <string name="gym_members">Gym Members</string>
+    <string name="gym_exercises">Exercises</string>
+    <string name="create_gym_staff">Create Gym Staff</string>
+    <string name="create_gym_member">Create Gym Member</string>
+    <string name="create_exercise">Create Exercise</string>
     <string name="action_create">Create</string>
+    <string name="action_add_gym_members">Add Gym Member</string>
+    <string name="action_check_my_gym_members">My Gym Members</string>
+    <string name="action_build_workout">Build Workout</string>
+    <string name="action_check_my_history">My History</string>
+    <string name="action_check_gym_exercises">Check Exercises</string>
+    <string name="action_add">Add</string>
+    <string name="action_save">SAVE</string>
+    <string name="add_exercise">Add Exercise</string>
+    <string name="action_cancel">cancel</string>
+    <string name="action_set">set</string>
+    <string name="exercise_plan">Exercise Plan</string>
+
+
 </resources>

@@ -5,8 +5,13 @@ import android.util.Log;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import org.hugoandrade.gymapp.data.Exercise;
+import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.ExerciseRecord;
+import org.hugoandrade.gymapp.data.ExerciseSet;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.data.WaitingUser;
+import org.hugoandrade.gymapp.utils.ISO8601Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +35,20 @@ public class MobileClientDataJsonParser {
                 getJsonPrimitive(jsonObject, WaitingUser.Entry.Cols.USERNAME, null),
                 getJsonPrimitive(jsonObject, WaitingUser.Entry.Cols.CREDENTIAL, null),
                 getJsonPrimitive(jsonObject, WaitingUser.Entry.Cols.CODE, null));
+    }
+
+    public List<User> parseUsers(JsonElement jsonElement) {
+        List<User> userList = new ArrayList<>();
+
+        for (JsonElement item : jsonElement.getAsJsonArray()) {
+            try {
+                userList.add(parseUser(item.getAsJsonObject()));
+            } catch (ClassCastException e) {
+                Log.e(TAG, "Exception caught when parsing User" +
+                        " data from azure table: " + e.getMessage());
+            }
+        }
+        return userList;
     }
 
     public User parseUser(JsonObject jsonObject) {
@@ -56,6 +75,91 @@ public class MobileClientDataJsonParser {
 
     public String parseString(JsonObject result, String columnName) {
         return getJsonPrimitive(result, columnName, null);
+    }
+
+    public List<Exercise> parseExercises(JsonElement jsonElement) {
+        List<Exercise> exerciseList = new ArrayList<>();
+
+        for (JsonElement item : jsonElement.getAsJsonArray()) {
+            try {
+                exerciseList.add(parseExercise(item.getAsJsonObject()));
+            } catch (ClassCastException e) {
+                Log.e(TAG, "Exception caught when parsing Exercise" +
+                        " data from azure table: " + e.getMessage());
+            }
+        }
+        return exerciseList;
+    }
+
+    public Exercise parseExercise(JsonObject jsonObject) {
+        return new Exercise(
+                getJsonPrimitive(jsonObject, Exercise.Entry.Cols.ID, null),
+                getJsonPrimitive(jsonObject, Exercise.Entry.Cols.NAME, null));
+    }
+
+    public List<ExerciseRecord> parseExerciseRecords(JsonElement jsonElement) {
+        List<ExerciseRecord> exerciseRecordList = new ArrayList<>();
+
+        for (JsonElement item : jsonElement.getAsJsonArray()) {
+            try {
+                exerciseRecordList.add(parseExerciseRecord(item.getAsJsonObject()));
+            } catch (ClassCastException e) {
+                Log.e(TAG, "Exception caught when parsing ExerciseRecord" +
+                        " data from azure table: " + e.getMessage());
+            }
+        }
+        return exerciseRecordList;
+    }
+
+    public ExerciseRecord parseExerciseRecord(JsonObject jsonObject) {
+        return new ExerciseRecord(
+                getJsonPrimitive(jsonObject, ExerciseRecord.Entry.Cols.ID, null),
+                getJsonPrimitive(jsonObject, ExerciseRecord.Entry.Cols.EXERCISE_SET_ID, null),
+                getJsonPrimitive(jsonObject, ExerciseRecord.Entry.Cols.EXERCISE_SET_ORDER, -1),
+                getJsonPrimitive(jsonObject, ExerciseRecord.Entry.Cols.NUMBER_OF_REPETITIONS, -1));
+    }
+
+    public List<ExerciseSet> parseExerciseSets(JsonElement jsonElement) {
+        List<ExerciseSet> exerciseSetList = new ArrayList<>();
+
+        for (JsonElement item : jsonElement.getAsJsonArray()) {
+            try {
+                exerciseSetList.add(parseExerciseSet(item.getAsJsonObject()));
+            } catch (ClassCastException e) {
+                Log.e(TAG, "Exception caught when parsing ExerciseSet" +
+                        " data from azure table: " + e.getMessage());
+            }
+        }
+        return exerciseSetList;
+    }
+
+    public ExerciseSet parseExerciseSet(JsonObject jsonObject) {
+        return new ExerciseSet(
+                getJsonPrimitive(jsonObject, ExerciseSet.Entry.Cols.ID, null),
+                getJsonPrimitive(jsonObject, ExerciseSet.Entry.Cols.EXERCISE_ID, null),
+                getJsonPrimitive(jsonObject, ExerciseSet.Entry.Cols.EXERCISE_PLAN_RECORD_ID, null),
+                getJsonPrimitive(jsonObject, ExerciseSet.Entry.Cols.EXERCISE_PLAN_RECORD_ORDER, -1));
+    }
+
+    public List<ExercisePlanRecord> parseExercisePlanRecords(JsonElement jsonElement) {
+        List<ExercisePlanRecord> exercisePlanRecordList = new ArrayList<>();
+
+        for (JsonElement item : jsonElement.getAsJsonArray()) {
+            try {
+                exercisePlanRecordList.add(parseExercisePlanRecord(item.getAsJsonObject()));
+            } catch (ClassCastException e) {
+                Log.e(TAG, "Exception caught when parsing ExercisePlanRecord" +
+                        " data from azure table: " + e.getMessage());
+            }
+        }
+        return exercisePlanRecordList;
+    }
+
+    public ExercisePlanRecord parseExercisePlanRecord(JsonObject jsonObject) {
+        return new ExercisePlanRecord(
+                getJsonPrimitive(jsonObject, ExercisePlanRecord.Entry.Cols.ID, null),
+                getJsonPrimitive(jsonObject, ExercisePlanRecord.Entry.Cols.MEMBER_ID, null),
+                ISO8601Utils.toCalendar(getJsonPrimitive(jsonObject, ExercisePlanRecord.Entry.Cols.DATETIME, null)));
     }
 
     public float getJsonPrimitive(JsonObject jsonObject, String jsonMemberName, float defaultValue) {

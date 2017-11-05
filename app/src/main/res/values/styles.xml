@@ -6,9 +6,18 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="actionMenuTextColor">#fff</item>
+        <item name="android:actionMenuTextColor">#fff</item>
 
     </style>
 
+
+    <style name="AppTheme.Filter">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@color/background</item>
+    </style>
 
 
     <style name="textInputLabelForLogin" parent="TextAppearance.AppCompat">
@@ -19,6 +28,32 @@
         <item name="colorAccent">#7AFFFFFF</item>
         <item name="colorControlNormal">@android:color/white</item>
         <item name="colorControlActivated">@android:color/white</item>
+    </style>
+
+
+
+    <style name="ActionBarStyleOverlay" >
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="colorControlNormal">#fff</item>
+        <item name="colorControlHighlight">#3fff</item>
+    </style>
+
+    <style name="ActionBarThemeOverlay" >
+        <item name="colorControlNormal">#fff</item>
+        <item name="colorControlHighlight">#3fff</item>
+    </style>
+
+    <style name="ActionBarThemeOverlay.Popup" >
+        <item name="android:background">#fff</item>
+        <item name="android:textColor">#fff</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="ActionBarThemeOverlay.TitleText" >
+        <item name="android:textColor">#fff</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 
 </resources>

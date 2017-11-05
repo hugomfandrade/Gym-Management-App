@@ -75,6 +75,10 @@ public class User implements Parcelable {
     public User() {
     }
 
+    public User(String id) {
+        mID = id;
+    }
+
     public User(String id, String username, String userID, String token) {
         mID = id;
         mUsername = username;
@@ -93,6 +97,10 @@ public class User implements Parcelable {
 
     public String getUsername() {
         return mUsername;
+    }
+
+    public void setUsername(String username) {
+        mUsername = username;
     }
 
     public void setPassword(String password) {

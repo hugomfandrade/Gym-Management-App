@@ -14,6 +14,12 @@ import org.hugoandrade.gymapp.data.User;
 
 public class AdminMainActivity extends AppCompatActivity {
 
+    /**
+     * Factory method that makes an Intent used to start this Activity
+     * when passed to startActivity().
+     *
+     * @param context The context of the calling component.
+     */
     public static Intent makeIntent(Context context) {
         return new Intent(context, AdminMainActivity.class);
     }
@@ -28,6 +34,7 @@ public class AdminMainActivity extends AppCompatActivity {
     private void initializeUI() {
         setContentView(R.layout.activity_admin_main);
 
+        // set up greeting text
         TextView tvAdminGreeting = (TextView) findViewById(R.id.tv_admin_greeting);
         tvAdminGreeting.setText(TextUtils.concat("Hello, ",
                                                  GlobalData.getUser().getUsername(),
@@ -37,6 +44,7 @@ public class AdminMainActivity extends AppCompatActivity {
         tvGymMemberList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Admin wants to check the gym member list. Start activity using MEMBER credential
                 startActivity(GymUserListActivity.makeIntent(AdminMainActivity.this, User.Credential.MEMBER));
             }
         });
@@ -45,7 +53,17 @@ public class AdminMainActivity extends AppCompatActivity {
         tvGymStaffList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Admin wants to check the gym staff list. Start activity using STAFF credential
                 startActivity(GymUserListActivity.makeIntent(AdminMainActivity.this, User.Credential.STAFF));
+            }
+        });
+
+        View tvExercisesList = findViewById(R.id.tv_check_exercises);
+        tvExercisesList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Admin wants to check the exercises of the gym.
+                startActivity(ExerciseListActivity.makeIntent(AdminMainActivity.this));
             }
         });
     }

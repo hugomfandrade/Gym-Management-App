@@ -5,6 +5,9 @@ import android.database.Cursor;
 
 import org.hugoandrade.gymapp.data.User;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CursorParser {
 
     public User parseUser(Cursor c) {
@@ -12,6 +15,17 @@ public class CursorParser {
                 getColumnValue(c, User.Entry.Cols.USERNAME, null),
                 getColumnValue(c, User.Entry.Cols.PASSWORD, null)
         );
+    }
+    public List<User> parseUsers(Cursor c) {
+        List<User> rValue = new ArrayList<>();
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    rValue.add(parseUser(c));
+                } while (c.moveToNext());
+            }
+        }
+        return rValue;
     }
 
     private int getColumnValue(Cursor cursor, String columnName, int defaultValue) {

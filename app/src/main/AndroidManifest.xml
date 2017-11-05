@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:allowBackup="true"
@@ -25,7 +26,9 @@
 
         <activity
             android:name=".view.SignUpActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:configChanges="orientation"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".view.admin.AdminMainActivity"
@@ -36,16 +39,54 @@
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".view.admin.CreateGymUserActivity"
+            android:name=".view.admin.ExerciseListActivity"
             android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.admin.CreateGymUserActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".view.admin.CreateExerciseActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".view.staff.StaffMainActivity"
             android:screenOrientation="portrait"/>
 
         <activity
+            android:name=".view.staff.AddGymMemberActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
             android:name=".view.member.MemberMainActivity"
             android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.member.MyGymStaffActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.member.BuildWorkoutActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.member.HistoryActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.member.WorkoutActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:theme="@style/AppTheme.Filter"
+            android:name=".view.member.SelectExercisesActivity"
+            android:parentActivityName=".view.member.BuildWorkoutActivity"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".model.service.MobileClientService"
@@ -56,6 +97,7 @@
             android:name=".provider.StorageProvider"
             android:authorities="org.hugoandrade.gymapp.provider"
             android:exported="false" />
+
     </application>
 
 </manifest>
