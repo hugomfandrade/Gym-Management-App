@@ -5,6 +5,7 @@ import org.hugoandrade.gymapp.common.ModelOps;
 import org.hugoandrade.gymapp.common.PresenterOps;
 import org.hugoandrade.gymapp.data.Exercise;
 import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.data.WaitingUser;
 
@@ -354,6 +355,61 @@ public interface MVP {
     /* ****************************************************** */
 
     /** These interfaces define the minimum public API provided and required by the
+     * SuggestedPlanDetailsActivity class in the View layer, the SuggestedPlanDetailsPresenter in the
+     * Presenter layer, and SuggestedPlanDetailsModel in the Model layer to interact between each other.
+     */
+    interface RequiredSuggestedPlanDetailsViewOps extends RequiredMobileClientViewBaseOps {
+        /*
+         * Suggested plan was dismissed. Return to previous activity
+         */
+        void suggestedPlanDismissed(ExercisePlanRecordSuggested suggestedPlan);
+    }
+    interface ProvidedSuggestedPlanDetailsPresenterOps extends PresenterOps<RequiredSuggestedPlanDetailsViewOps> {
+        /*
+         * Member dismisses the suggested plan
+         */
+        void dismissSuggestedPlan(ExercisePlanRecordSuggested suggestedPlan, boolean wasDone);
+    }
+    interface RequiredSuggestedPlanDetailsPresenterOps extends RequiredMobileClientPresenterBaseOps {
+        /*
+         * Handle the operation result of dismissing the suggested plan
+         */
+        void dismissingSuggestedPlanOperationResult(boolean wasOperationSuccessful, String errorMessage, ExercisePlanRecordSuggested suggestedPlan);
+    }
+    interface ProvidedSuggestedPlanDetailsModelOps extends ProvidedMobileClientModelBaseOps<RequiredSuggestedPlanDetailsPresenterOps> {
+        /*
+         * Try dismissing the suggested plan via the Service.
+         */
+        void dismissSuggestedPlan(ExercisePlanRecordSuggested suggestedPlan, boolean wasDone);
+    }
+
+
+    /** These interfaces define the minimum public API provided and required by the
+     * SuggestedPlansActivity class in the View layer, the SuggestedPlansPresenter in the
+     * Presenter layer, and SuggestedPlansModel in the Model layer to interact between each other.
+     */
+    interface RequiredSuggestedPlansViewOps extends RequiredMobileClientViewBaseOps {
+        /*
+         * Display suggested plans in list
+         */
+        void displaySuggestedPlansList(List<ExercisePlanRecordSuggested> suggestedPlanList);
+    }
+    interface ProvidedSuggestedPlansPresenterOps extends PresenterOps<RequiredSuggestedPlansViewOps> {
+    }
+    interface RequiredSuggestedPlansPresenterOps extends RequiredMobileClientPresenterBaseOps {
+        /*
+         * Handle the operation result of getting the suggested plans
+         */
+        void gettingSuggestedPlansOperationResult(boolean wasOperationSuccessful, String errorMessage, List<ExercisePlanRecordSuggested> suggestedPlanList);
+    }
+    interface ProvidedSuggestedPlansModelOps extends ProvidedMobileClientModelBaseOps<RequiredSuggestedPlansPresenterOps> {
+        /*
+         * Try getting the suggested plans of the member with ID userID via the Service.
+         */
+        void getSuggestedPlans(String userID);
+    }
+
+    /** These interfaces define the minimum public API provided and required by the
      * MyGymStaffActivity class in the View layer, the MyGymStaffPresenter in the
      * Presenter layer, and MyGymStaffModel in the Model layer to interact between each other.
      */
@@ -379,6 +435,10 @@ public interface MVP {
     }
 
 
+    /* ****************************************************** */
+    /* ***************** Gym Member & Staff ***************** */
+    /* ****************************************************** */
+
     /** These interfaces define the minimum public API provided and required by the
      * HistoryActivity class in the View layer, the HistoryPresenter in the
      * Presenter layer, and HistoryModel in the Model layer to interact between each other.
@@ -388,6 +448,11 @@ public interface MVP {
          * Display all exercise plan records in list
          */
         void displayExercisePlanRecordList(List<ExercisePlanRecord> exercisePlanRecordList);
+
+        /*
+         * Returns the ID of the selected user of this activity.
+         */
+        String getUserID();
     }
     interface ProvidedHistoryPresenterOps extends PresenterOps<RequiredHistoryViewOps> {
     }
@@ -425,6 +490,10 @@ public interface MVP {
          * Member wants to create by saving the built exercise plan record in the Web service.
          */
         void createWorkout(ExercisePlanRecord exercisePlanRecord);
+        /*
+         * Staff wants to create by saving the suggested exercise plan record in the Web service.
+         */
+        void createSuggestedWorkout(ExercisePlanRecordSuggested exercisePlanRecordSuggested);
     }
     interface RequiredBuildWorkoutPresenterOps extends RequiredMobileClientPresenterBaseOps {
         /*
@@ -435,6 +504,10 @@ public interface MVP {
          * Handle the operation result of creating a new exercise plan record.
          */
         void creatingExercisePlanOperationResult(boolean wasOperationSuccessful, String errorMessage, ExercisePlanRecord exercisePlanRecord);
+        /*
+         * Handle the operation result of creating a new suggested exercise plan record.
+         */
+        void creatingExercisePlanSuggestedOperationResult(boolean wasOperationSuccessful, String errorMessage, ExercisePlanRecordSuggested exercisePlanRecordSuggested);
     }
     interface ProvidedBuildWorkoutModelOps extends ProvidedMobileClientModelBaseOps<RequiredBuildWorkoutPresenterOps> {
         /*
@@ -442,11 +515,18 @@ public interface MVP {
          */
         void createWorkout(ExercisePlanRecord exercisePlanRecord);
         /*
+         * Try creating a new ExercisePlanRecordSuggested by trying to insert this instance via the Service.
+         */
+        void createSuggestedWorkout(ExercisePlanRecordSuggested exercisePlanRecordSuggested);
+        /*
          * Try getting all exercises via the Service.
          */
         void getExercises();
     }
 
+    /* ****************************************************** */
+    /* ****************** Base Interfaces ******************* */
+    /* ****************************************************** */
 
     /**
      * Base View Ops that all views in the "View" layer which interact with the

@@ -7,7 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -22,9 +22,8 @@ import org.hugoandrade.gymapp.presenter.StaffMainPresenter;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;
 import org.hugoandrade.gymapp.view.adapter.UserListAdapter;
-import org.hugoandrade.gymapp.view.admin.CreateGymUserActivity;
+import org.hugoandrade.gymapp.view.staffmember.HistoryActivity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class StaffMainActivity extends ActivityBase<MVP.RequiredStaffMainViewOps,
@@ -104,6 +103,14 @@ public class StaffMainActivity extends ActivityBase<MVP.RequiredStaffMainViewOps
 
         // set up recycler view and adapter
         mMyGymMemberListAdapter = new UserListAdapter();
+        mMyGymMemberListAdapter.setOnItemClickedListener(new UserListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClicked(User user) {
+
+                // Member wants to check the history of saved exercise plans
+                startActivity(HistoryActivity.makeIntent(StaffMainActivity.this, user));
+            }
+        });
         RecyclerView rvGymUsers = (RecyclerView) findViewById(R.id.rv_my_members);
         rvGymUsers.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         rvGymUsers.setAdapter(mMyGymMemberListAdapter);

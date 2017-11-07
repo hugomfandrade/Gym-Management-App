@@ -5,6 +5,7 @@ import android.content.Context;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.Exercise;
 import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
 import org.hugoandrade.gymapp.model.BuildWorkoutModel;
 
 import java.util.List;
@@ -56,7 +57,6 @@ public class BuildWorkoutPresenter extends PresenterBase<MVP.RequiredBuildWorkou
         getModel().getExercises();
     }
 
-
     @Override
     public void createWorkout(ExercisePlanRecord exercisePlanRecord) {
         // disable UI while waiting for web service response
@@ -64,6 +64,15 @@ public class BuildWorkoutPresenter extends PresenterBase<MVP.RequiredBuildWorkou
 
         // save exercise plan record in web service
         getModel().createWorkout(exercisePlanRecord);
+    }
+
+    @Override
+    public void createSuggestedWorkout(ExercisePlanRecordSuggested exercisePlanRecordSuggested) {
+        // disable UI while waiting for web service response
+        getView().disableUI();
+
+        // save suggested exercise plan record in web service
+        getModel().createSuggestedWorkout(exercisePlanRecordSuggested);
     }
 
     @Override
@@ -105,6 +114,26 @@ public class BuildWorkoutPresenter extends PresenterBase<MVP.RequiredBuildWorkou
 
             // operation was successful, return to previous activity
             getView().exercisePlanCreated(exercisePlanRecord);
+        }
+        else {
+            // operation failed, show error message
+            if (errorMessage != null)
+                getView().reportMessage(errorMessage);
+        }
+
+        // enable UI
+        getView().enableUI();
+    }
+
+    @Override
+    public void creatingExercisePlanSuggestedOperationResult(boolean wasOperationSuccessful,
+                                                             String errorMessage,
+                                                             ExercisePlanRecordSuggested exercisePlanRecordSuggested) {
+
+        if (wasOperationSuccessful) {
+
+            // operation was successful, return to previous activity
+            getView().exercisePlanCreated(null);
         }
         else {
             // operation failed, show error message

@@ -71,21 +71,29 @@
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".view.member.BuildWorkoutActivity"
+            android:name=".view.member.SuggestedPlansActivity"
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".view.member.HistoryActivity"
+            android:name=".view.member.SuggestedPlanDetailsActivity"
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".view.member.WorkoutActivity"
+            android:name=".view.staffmember.BuildWorkoutActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.staffmember.HistoryActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.staffmember.WorkoutActivity"
             android:screenOrientation="portrait"/>
 
         <activity
             android:theme="@style/AppTheme.Filter"
-            android:name=".view.member.SelectExercisesActivity"
-            android:parentActivityName=".view.member.BuildWorkoutActivity"
+            android:name=".view.staffmember.SelectExercisesActivity"
+            android:parentActivityName=".view.staffmember.BuildWorkoutActivity"
             android:screenOrientation="portrait" />
 
         <service

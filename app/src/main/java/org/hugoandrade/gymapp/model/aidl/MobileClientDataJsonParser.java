@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 
 import org.hugoandrade.gymapp.data.Exercise;
 import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
 import org.hugoandrade.gymapp.data.ExerciseRecord;
 import org.hugoandrade.gymapp.data.ExerciseSet;
 import org.hugoandrade.gymapp.data.User;
@@ -160,6 +161,28 @@ public class MobileClientDataJsonParser {
                 getJsonPrimitive(jsonObject, ExercisePlanRecord.Entry.Cols.ID, null),
                 getJsonPrimitive(jsonObject, ExercisePlanRecord.Entry.Cols.MEMBER_ID, null),
                 ISO8601Utils.toCalendar(getJsonPrimitive(jsonObject, ExercisePlanRecord.Entry.Cols.DATETIME, null)));
+    }
+
+    public List<ExercisePlanRecordSuggested> parseExercisePlanRecordSuggesteds(JsonElement jsonElement) {
+        List<ExercisePlanRecordSuggested> exercisePlanRecordSuggestedList = new ArrayList<>();
+
+        for (JsonElement item : jsonElement.getAsJsonArray()) {
+            try {
+                exercisePlanRecordSuggestedList.add(parseExercisePlanRecordSuggested(item.getAsJsonObject()));
+            } catch (ClassCastException e) {
+                Log.e(TAG, "Exception caught when parsing ExercisePlanRecordSuggested" +
+                        " data from azure table: " + e.getMessage());
+            }
+        }
+        return exercisePlanRecordSuggestedList;
+    }
+
+    public ExercisePlanRecordSuggested parseExercisePlanRecordSuggested(JsonObject jsonObject) {
+        return new ExercisePlanRecordSuggested(
+                getJsonPrimitive(jsonObject, ExercisePlanRecordSuggested.Entry.Cols.ID, null),
+                getJsonPrimitive(jsonObject, ExercisePlanRecordSuggested.Entry.Cols.MEMBER_ID, null),
+                getJsonPrimitive(jsonObject, ExercisePlanRecordSuggested.Entry.Cols.STAFF_ID, null),
+                ISO8601Utils.toCalendar(getJsonPrimitive(jsonObject, ExercisePlanRecordSuggested.Entry.Cols.DATETIME, null)));
     }
 
     public float getJsonPrimitive(JsonObject jsonObject, String jsonMemberName, float defaultValue) {

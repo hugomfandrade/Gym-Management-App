@@ -45,15 +45,15 @@ public class HistoryPresenter extends PresenterBase<MVP.RequiredHistoryViewOps,
     @Override
     public void notifyServiceIsBound() {
         // Once service is bound, get all exercise plans of the logged in gym member
-        getHistory();
+        getHistory(getView().getUserID());
     }
 
-    private void getHistory() {
+    private void getHistory(String userID) {
         // disable UI while waiting for web service response
         getView().disableUI();
 
         // get all exercise plans recorded by the gym member
-        getModel().getHistory(GlobalData.getUser().getID());
+        getModel().getHistory(userID);
     }
 
     @Override

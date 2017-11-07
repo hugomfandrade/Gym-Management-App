@@ -7,6 +7,7 @@ import org.hugoandrade.gymapp.data.WaitingUser;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.data.Exercise;
 import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
 
 interface IMobileClientService {
     void registerCallback(IMobileClientServiceCallback cb);
@@ -25,4 +26,7 @@ interface IMobileClientService {
     boolean createExercise(in Exercise exercise);
     boolean createWorkout(in ExercisePlanRecord exercisePlanRecord);
     boolean getExercisePlanRecordList(String userID);
+    boolean createSuggestedWorkout(in ExercisePlanRecordSuggested exercisePlanRecordSuggested);
+    boolean getExercisePlanRecordSuggestedList(String userID);
+    boolean dismissSuggestedPlan(in ExercisePlanRecordSuggested exercisePlanRecordSuggested, boolean wasDone);
 }

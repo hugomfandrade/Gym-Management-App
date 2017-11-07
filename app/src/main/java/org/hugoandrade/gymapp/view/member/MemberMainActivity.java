@@ -10,7 +10,8 @@ import android.widget.TextView;
 
 import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.R;
-import org.hugoandrade.gymapp.utils.UIUtils;
+import org.hugoandrade.gymapp.view.staffmember.BuildWorkoutActivity;
+import org.hugoandrade.gymapp.view.staffmember.HistoryActivity;
 
 
 public class MemberMainActivity extends AppCompatActivity {
@@ -50,12 +51,21 @@ public class MemberMainActivity extends AppCompatActivity {
             }
         });
 
+        View tvCheckSuggestedPlans = findViewById(R.id.tv_check_suggested_plans);
+        tvCheckSuggestedPlans.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Member wants to check the suggested plans
+                startActivity(SuggestedPlansActivity.makeIntent(MemberMainActivity.this));
+            }
+        });
+
         View tvBuildWorkout = findViewById(R.id.tv_build_workout);
         tvBuildWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Member wants to create a exercise plan
-                startActivity(BuildWorkoutActivity.makeIntent(MemberMainActivity.this));
+                startActivity(BuildWorkoutActivity.makeIntent(MemberMainActivity.this, GlobalData.getUser()));
             }
         });
 
@@ -64,7 +74,8 @@ public class MemberMainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Member wants to check the history of saved exercise plans
-                startActivity(HistoryActivity.makeIntent(MemberMainActivity.this));
+                startActivity(HistoryActivity.makeIntent(MemberMainActivity.this,
+                                                         GlobalData.getUser()));
             }
         });
     }

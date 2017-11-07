@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.Pair;
 
@@ -31,6 +32,7 @@ import com.squareup.okhttp.OkHttpClient;
 import org.hugoandrade.gymapp.DevConstants;
 import org.hugoandrade.gymapp.data.Exercise;
 import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
 import org.hugoandrade.gymapp.data.ExerciseRecord;
 import org.hugoandrade.gymapp.data.ExerciseSet;
 import org.hugoandrade.gymapp.data.StaffMember;
@@ -389,7 +391,6 @@ public class MobileClientService extends LifecycleLoggingService {
             return true;
         }
 
-
         @Override
         public boolean getGymMembersExceptMine(final String userID) throws RemoteException {
             if (mMobileServiceClient == null)
@@ -560,6 +561,9 @@ public class MobileClientService extends LifecycleLoggingService {
 
         @Override
         public boolean createWorkout(final ExercisePlanRecord exercisePlanRecord) throws RemoteException {
+            if (mMobileServiceClient == null)
+                return false;
+
             ListenableFuture<JsonObject> future
                     = new MobileServiceJsonTable(ExercisePlanRecord.Entry.TABLE_NAME, mMobileServiceClient)
                     .insert(formatter.getAsJsonObject(exercisePlanRecord));
@@ -629,6 +633,79 @@ public class MobileClientService extends LifecycleLoggingService {
         }
 
         @Override
+        public boolean createSuggestedWorkout(final ExercisePlanRecordSuggested exercisePlanRecordSuggested) throws RemoteException {
+            if (mMobileServiceClient == null)
+                return false;
+
+            ListenableFuture<JsonObject> future
+                    = new MobileServiceJsonTable(ExercisePlanRecordSuggested.Entry.TABLE_NAME, mMobileServiceClient)
+                    .insert(formatter.getAsJsonObject(exercisePlanRecordSuggested));
+            Futures.addCallback(future, new FutureCallback<JsonObject>() {
+                @Override
+                public void onSuccess(JsonObject jsonObject) {
+
+                    String exercisePlanRecordID = parser.parseString(jsonObject, ExercisePlanRecord.Entry.Cols.ID);
+
+                    for (final ExerciseSet exerciseSet : exercisePlanRecordSuggested.getExerciseSetList()) {
+                        exerciseSet.setExercisePlanRecordID(exercisePlanRecordID);
+
+                        ListenableFuture<JsonObject> future
+                                = new MobileServiceJsonTable(ExerciseSet.Entry.TABLE_NAME, mMobileServiceClient)
+                                .insert(formatter.getAsJsonObject(exerciseSet));
+                        Futures.addCallback(future, new FutureCallback<JsonObject>() {
+                            @Override
+                            public void onSuccess(JsonObject jsonObject) {
+
+                                String exerciseSetID = parser.parseString(jsonObject, ExerciseSet.Entry.Cols.ID);
+
+                                for (final ExerciseRecord exerciseRecord : exerciseSet.getExerciseRecordList()) {
+                                    exerciseRecord.setExerciseSetID(exerciseSetID);
+
+                                    ListenableFuture<JsonObject> future
+                                            = new MobileServiceJsonTable(ExerciseRecord.Entry.TABLE_NAME, mMobileServiceClient)
+                                            .insert(formatter.getAsJsonObject(exerciseRecord));
+                                    Futures.addCallback(future, new FutureCallback<JsonObject>() {
+                                        @Override
+                                        public void onSuccess(JsonObject jsonObject) {
+                                            Log.d(TAG, "Successfully inserted ExerciseRecord");
+                                        }
+
+                                        @Override
+                                        public void onFailure(@NonNull Throwable t) {
+                                            Log.e(TAG, "Error inserting ExerciseRecord: " + t.getMessage());
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(@NonNull Throwable t) {
+                                Log.e(TAG, "Error inserting ExerciseSet: " + t.getMessage());
+                            }
+                        });
+                    }
+
+                    MobileClientData m = new MobileClientData(
+                            MobileClientData.OPERATION_CREATE_SUGGESTED_EXERCISE_PLAN,
+                            MobileClientData.OPERATION_SUCCESS);
+
+                    try {
+                        if (mCallback != null)
+                            mCallback.sendResults(m);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    reportOperationFailure(MobileClientData.OPERATION_CREATE_SUGGESTED_EXERCISE_PLAN, t.getMessage());
+                }
+            });
+            return true;
+        }
+
+        @Override
         public boolean getExercisePlanRecordList(String userID) throws RemoteException {
             if (mMobileServiceClient == null)
                 return false;
@@ -669,15 +746,171 @@ public class MobileClientService extends LifecycleLoggingService {
                                     }
                                 }
                             }).executeOnExecutor(
-                                    AsyncTask.THREAD_POOL_EXECUTOR,
-                                    exercisePlanRecordList.toArray(
-                                            new ExercisePlanRecord[exercisePlanRecordList.size()]));
+                            AsyncTask.THREAD_POOL_EXECUTOR,
+                            exercisePlanRecordList.toArray(
+                                    new ExercisePlanRecord[exercisePlanRecordList.size()]));
 
                 }
 
                 @Override
                 public void onFailure(@NonNull Throwable t) {
                     reportOperationFailure(MobileClientData.OPERATION_GET_HISTORY, t.getMessage());
+                }
+            });
+
+            return true;
+        }
+
+        @Override
+        public boolean getExercisePlanRecordSuggestedList(String userID) throws RemoteException {
+            if (mMobileServiceClient == null)
+                return false;
+
+            ListenableFuture<JsonElement> future
+                    = new MobileServiceJsonTable(ExercisePlanRecordSuggested.Entry.TABLE_NAME, mMobileServiceClient)
+                    .where().field(ExercisePlanRecordSuggested.Entry.Cols.MEMBER_ID).eq(userID)
+                    .execute();
+            Futures.addCallback(future, new FutureCallback<JsonElement>() {
+                @Override
+                public void onSuccess(JsonElement result) {
+
+                    List<ExercisePlanRecordSuggested> exercisePlanRecordSuggestedList
+                            = parser.parseExercisePlanRecordSuggesteds(result);
+
+                    GetExercisePlanRecordSuggestedInfoTask.instance(mMobileServiceClient)
+                            .setOnFinishedListener(new BaseTask.OnFinishedListener<ExercisePlanRecordSuggested>() {
+                                @Override
+                                public void onFinished(List<ExercisePlanRecordSuggested> resultList) {
+
+                                    Collections.sort(resultList, new Comparator<ExercisePlanRecordSuggested>() {
+                                        @Override
+                                        public int compare(ExercisePlanRecordSuggested o1, ExercisePlanRecordSuggested o2) {
+                                            return o1.getDatetime().before(o2.getDatetime())? 1 : -1;
+                                        }
+                                    });
+
+                                    MobileClientData m = new MobileClientData(
+                                            MobileClientData.OPERATION_GET_HISTORY_SUGGESTED,
+                                            MobileClientData.OPERATION_SUCCESS);
+                                    m.setExercisePlanRecordSuggestedList(resultList);
+
+                                    try {
+                                        if (mCallback != null)
+                                            mCallback.sendResults(m);
+                                    } catch (RemoteException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }).executeOnExecutor(
+                            AsyncTask.THREAD_POOL_EXECUTOR,
+                            exercisePlanRecordSuggestedList.toArray(
+                                    new ExercisePlanRecordSuggested[exercisePlanRecordSuggestedList.size()]));
+
+                }
+
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    reportOperationFailure(MobileClientData.OPERATION_GET_HISTORY_SUGGESTED, t.getMessage());
+                }
+            });
+
+            return true;
+        }
+
+        @Override
+        public boolean dismissSuggestedPlan(final ExercisePlanRecordSuggested exercisePlanRecordSuggested,
+                                            final boolean wasDone) throws RemoteException {
+            if (mMobileServiceClient == null)
+                return false;
+
+            JsonObject jsonObject = formatter.getAsJsonObject(exercisePlanRecordSuggested);
+            jsonObject.addProperty(ExercisePlanRecordSuggested.Entry.Cols.ID, exercisePlanRecordSuggested.getID());
+
+            ListenableFuture<Void> future
+                    = new MobileServiceJsonTable(ExercisePlanRecordSuggested.Entry.TABLE_NAME, mMobileServiceClient)
+                    .delete(jsonObject);
+            Futures.addCallback(future, new FutureCallback<Void>() {
+                @Override
+                public void onSuccess(@Nullable Void result) {
+
+                    if (wasDone)
+                        createWorkout(exercisePlanRecordSuggested);
+
+                    MobileClientData m = new MobileClientData(
+                            MobileClientData.OPERATION_DISMISS_SUGGESTED_PLAN,
+                            MobileClientData.OPERATION_SUCCESS);
+                    m.setExercisePlanRecordSuggested(exercisePlanRecordSuggested);
+
+                    try {
+                        if (mCallback != null)
+                            mCallback.sendResults(m);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                private void createWorkout(ExercisePlanRecordSuggested exercisePlanRecordSuggested) {
+                    final ExercisePlanRecord planRecord = exercisePlanRecordSuggested.getAsExercisePlan();
+
+                    ListenableFuture<JsonObject> future
+                            = new MobileServiceJsonTable(ExercisePlanRecord.Entry.TABLE_NAME, mMobileServiceClient)
+                            .insert(formatter.getAsJsonObject(planRecord));
+                    Futures.addCallback(future, new FutureCallback<JsonObject>() {
+                        @Override
+                        public void onSuccess(JsonObject jsonObject) {
+
+                            String exercisePlanRecordID = parser.parseString(jsonObject, ExercisePlanRecord.Entry.Cols.ID);
+
+                            for (final ExerciseSet exerciseSet : planRecord.getExerciseSetList()) {
+                                exerciseSet.setExercisePlanRecordID(exercisePlanRecordID);
+
+                                ListenableFuture<JsonObject> future
+                                        = new MobileServiceJsonTable(ExerciseSet.Entry.TABLE_NAME, mMobileServiceClient)
+                                        .insert(formatter.getAsJsonObject(exerciseSet));
+                                Futures.addCallback(future, new FutureCallback<JsonObject>() {
+                                    @Override
+                                    public void onSuccess(JsonObject jsonObject) {
+
+                                        String exerciseSetID = parser.parseString(jsonObject, ExerciseSet.Entry.Cols.ID);
+
+                                        for (final ExerciseRecord exerciseRecord : exerciseSet.getExerciseRecordList()) {
+                                            exerciseRecord.setExerciseSetID(exerciseSetID);
+
+                                            ListenableFuture<JsonObject> future
+                                                    = new MobileServiceJsonTable(ExerciseRecord.Entry.TABLE_NAME, mMobileServiceClient)
+                                                    .insert(formatter.getAsJsonObject(exerciseRecord));
+                                            Futures.addCallback(future, new FutureCallback<JsonObject>() {
+                                                @Override
+                                                public void onSuccess(JsonObject jsonObject) {
+                                                    Log.d(TAG, "Successfully inserted ExerciseRecord");
+                                                }
+
+                                                @Override
+                                                public void onFailure(@NonNull Throwable t) {
+                                                    Log.e(TAG, "Error inserting ExerciseRecord: " + t.getMessage());
+                                                }
+                                            });
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(@NonNull Throwable t) {
+                                        Log.e(TAG, "Error inserting ExerciseSet: " + t.getMessage());
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Throwable t) {
+                            Log.e(TAG, "Error inserting ExercisePlanRecord: " + t.getMessage());
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    reportOperationFailure(MobileClientData.OPERATION_DISMISS_SUGGESTED_PLAN, t.getMessage());
                 }
             });
 
@@ -963,6 +1196,101 @@ public class MobileClientService extends LifecycleLoggingService {
         }
     }
 
+    private static class GetExercisePlanRecordSuggestedInfoTask extends BaseTask<ExercisePlanRecordSuggested> {
+
+        public static GetExercisePlanRecordSuggestedInfoTask instance(MobileServiceClient mobileServiceClient) {
+            return new GetExercisePlanRecordSuggestedInfoTask(mobileServiceClient);
+        }
+
+        GetExercisePlanRecordSuggestedInfoTask(MobileServiceClient mobileServiceClient) {
+            super(mobileServiceClient);
+        }
+
+        @Override
+        protected void doProcessing(final ExercisePlanRecordSuggested[] records) {
+
+            final List<String> ids = new ArrayList<>();
+            for (ExercisePlanRecordSuggested record : records) {
+                if (!ids.contains(record.getMemberID()))
+                    ids.add(record.getMemberID());
+                if (!ids.contains(record.getStaffID()))
+                    ids.add(record.getStaffID());
+            }
+
+            final List<User> users = new ArrayList<>();
+            for (String id : ids)
+                users.add(new User(id));
+
+
+            GetUserInfoTask.instance(mMobileServiceClient)
+                    .setOnFinishedListener(new OnFinishedListener<User>() {
+                        @Override
+                        public void onFinished(List<User> resultList) {
+
+                            for (ExercisePlanRecordSuggested record : records) {
+                                for (User user : resultList) {
+                                    if (user.getID().equals(record.getMemberID()))
+                                        record.setMember(user);
+                                    if (user.getID().equals(record.getStaffID()))
+                                        record.setStaff(user);
+                                }
+                            }
+                            getExercisePlanRecordSuggestedInfo(records);
+                        }
+                    }).executeOnExecutor(
+                    AsyncTask.THREAD_POOL_EXECUTOR,
+                    users.toArray(new User[users.size()]));
+        }
+
+        private void getExercisePlanRecordSuggestedInfo(final ExercisePlanRecordSuggested[] records) {
+            final List<String> ids = new ArrayList<>();
+
+            for (ExercisePlanRecordSuggested record : records)
+                if (!ids.contains(record.getID()))
+                    ids.add(record.getID());
+
+            ListenableFuture<JsonElement> future =
+                    MobileServiceJsonTableBuilder.instance(ExerciseSet.Entry.TABLE_NAME, mMobileServiceClient)
+                            .where(ExerciseSet.Entry.Cols.EXERCISE_PLAN_RECORD_ID, ids.toArray(new String[ids.size()]))
+                            .execute();
+            Futures.addCallback(future, new FutureCallback<JsonElement>() {
+                @Override
+                public void onSuccess(JsonElement result) {
+
+                    List<ExerciseSet> exerciseSetList
+                            = parser.parseExerciseSets(result);
+
+                    GetExerciseSetInfoTask.instance(mMobileServiceClient)
+                            .setOnFinishedListener(new OnFinishedListener<ExerciseSet>() {
+                                @Override
+                                public void onFinished(List<ExerciseSet> resultList) {
+
+                                    for (ExercisePlanRecordSuggested record : records) {
+                                        for (ExerciseSet set : resultList) {
+                                            if (set.getExercisePlanRecordID().equals(record.getID()))
+                                                record.addExerciseSet(set);
+                                        }
+                                        onFetched(record);
+                                    }
+                                }
+                            }).executeOnExecutor(
+                            AsyncTask.THREAD_POOL_EXECUTOR,
+                            exerciseSetList.toArray(
+                                    new ExerciseSet[exerciseSetList.size()]));
+                }
+
+                @Override
+                public void onFailure(@NonNull Throwable t) {
+                    Log.e(TAG, "Error Fetching ExercisePlanReports: " + t.getMessage());
+
+                    for (ExercisePlanRecordSuggested record : records) {
+                        onFetched(record);
+                    }
+                }
+            });
+        }
+    }
+
     private static class GetExercisePlanRecordInfoTask extends BaseTask<ExercisePlanRecord> {
 
         public static GetExercisePlanRecordInfoTask instance(MobileServiceClient mobileServiceClient) {
@@ -1000,8 +1328,8 @@ public class MobileClientService extends LifecycleLoggingService {
                             getExercisePlanRecordInfo(records);
                         }
                     }).executeOnExecutor(
-                            AsyncTask.THREAD_POOL_EXECUTOR,
-                            users.toArray(new User[users.size()]));
+                    AsyncTask.THREAD_POOL_EXECUTOR,
+                    users.toArray(new User[users.size()]));
         }
 
         private void getExercisePlanRecordInfo(final ExercisePlanRecord[] records) {

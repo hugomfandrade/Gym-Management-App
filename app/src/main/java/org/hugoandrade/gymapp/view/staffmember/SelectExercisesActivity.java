@@ -1,4 +1,4 @@
-package org.hugoandrade.gymapp.view.member;
+package org.hugoandrade.gymapp.view.staffmember;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,10 +8,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.data.Exercise;
 import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.view.adapter.ExerciseSetListAdapter;
 import org.hugoandrade.gymapp.view.dialog.ExercisePlanBuilderDialog;
 
@@ -22,6 +22,12 @@ import java.util.List;
 public class SelectExercisesActivity extends AppCompatActivity  {
 
     @SuppressWarnings("unused") private final String TAG = getClass().getSimpleName();
+
+    /**
+     * Constant that represents the name of the intent extra that is paired
+     * with a User object that represents the selected user.
+     */
+    private static final String INTENT_EXTRA_USER = "intent_extract_user";
 
     /**
      * Constant that represents the name of the intent extra that is paired
@@ -38,7 +44,12 @@ public class SelectExercisesActivity extends AppCompatActivity  {
     /**
      * The Exercise Plan of this instance
      */
-    private ExercisePlanRecord mExercisePlan = ExercisePlanRecord.empty(GlobalData.getUser(), Calendar.getInstance());
+    private ExercisePlanRecord mExercisePlan;
+
+    /**
+     * The selected user
+     */
+    private User mMember;
 
     /**
      * List of all exercises
@@ -56,8 +67,9 @@ public class SelectExercisesActivity extends AppCompatActivity  {
      *
      * @param context The context of the calling component.
      */
-    public static Intent makeIntent(Context context, List<Exercise> exerciseList) {
+    public static Intent makeIntent(Context context, List<Exercise> exerciseList, User member) {
         return new Intent(context, SelectExercisesActivity.class)
+                .putExtra(INTENT_EXTRA_USER, member)
                 .putParcelableArrayListExtra(INTENT_EXTRA_EXERCISE_LIST, new ArrayList<>(exerciseList));
     }
 
@@ -75,12 +87,25 @@ public class SelectExercisesActivity extends AppCompatActivity  {
         return data.getParcelableArrayListExtra(INTENT_EXTRA_EXERCISE_LIST);
     }
 
+    /**
+     * Method used to extract the selected User from an Intent
+     */
+    public static User extractUserFromIntent(Intent data) {
+        return data.getParcelableExtra(INTENT_EXTRA_USER);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // extract the list of exercises used in the build of exercises
         mExerciseList = extractExerciseListFromIntent(getIntent());
+
+        // extract the selected User
+        mMember = extractUserFromIntent(getIntent());
+
+        // build empty exercise plan
+        mExercisePlan = ExercisePlanRecord.empty(mMember, Calendar.getInstance());
 
         setResult(RESULT_CANCELED);
 

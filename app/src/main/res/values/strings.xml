@@ -38,6 +38,12 @@
     <string name="action_cancel">cancel</string>
     <string name="action_set">set</string>
     <string name="exercise_plan">Exercise Plan</string>
+    <string name="action_click_to_start">Click to Start</string>
+    <string name="action_suggest">Suggest</string>
+    <string name="action_check_suggested_plans">Suggested Plans</string>
+    <string name="no_suggested_plans">no suggested plans</string>
+    <string name="action_done">done</string>
+    <string name="action_dismiss">dismiss</string>
 
 
 </resources>

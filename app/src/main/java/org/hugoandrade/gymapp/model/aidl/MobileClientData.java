@@ -6,6 +6,7 @@ import android.support.annotation.IntDef;
 
 import org.hugoandrade.gymapp.data.Exercise;
 import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.data.WaitingUser;
 
@@ -27,8 +28,10 @@ public class MobileClientData implements Parcelable {
     private Exercise mExercise;
     private List<Exercise> mExerciseList;
     private WaitingUser mWaitingUser;
+    private ExercisePlanRecordSuggested mExercisePlanRecordSuggested;
     private ExercisePlanRecord mExercisePlanRecord;
     private List<ExercisePlanRecord> mExercisePlanRecordList;
+    private List<ExercisePlanRecordSuggested> mExercisePlanRecordSuggestedList;
     private String mErrorMessage;
 
     public static final int OPERATION_LOGIN = 3;
@@ -44,6 +47,9 @@ public class MobileClientData implements Parcelable {
     public static final int OPERATION_CREATE_EXERCISE = 13;
     public static final int OPERATION_CREATE_EXERCISE_PLAN = 14;
     public static final int OPERATION_GET_HISTORY = 15;
+    public static final int OPERATION_CREATE_SUGGESTED_EXERCISE_PLAN = 16;
+    public static final int OPERATION_GET_HISTORY_SUGGESTED = 17;
+    public static final int OPERATION_DISMISS_SUGGESTED_PLAN = 18;
 
     public static final int OPERATION_SUCCESS = 1;
     public static final int OPERATION_FAILURE = 2;
@@ -53,7 +59,9 @@ public class MobileClientData implements Parcelable {
             OPERATION_VALIDATE, OPERATION_SIGN_UP, OPERATION_GET_MY_MEMBERS,
             OPERATION_GET_MEMBERS_EXCEPT_MINE, OPERATION_ADD_MEMBER_TO_MY_MEMBERS,
             OPERATION_GET_MY_STAFF, OPERATION_GET_ALL_EXERCISES, OPERATION_CREATE_EXERCISE,
-            OPERATION_CREATE_EXERCISE_PLAN, OPERATION_GET_HISTORY
+            OPERATION_CREATE_EXERCISE_PLAN, OPERATION_GET_HISTORY,
+            OPERATION_CREATE_SUGGESTED_EXERCISE_PLAN, OPERATION_GET_HISTORY_SUGGESTED,
+            OPERATION_DISMISS_SUGGESTED_PLAN
     })
     @interface OpType {}
 
@@ -119,12 +127,20 @@ public class MobileClientData implements Parcelable {
         mExerciseList = exerciseList;
     }
 
-    public ExercisePlanRecord getExercisePlan() {
+    public ExercisePlanRecord getExerciseRecordPlan() {
         return mExercisePlanRecord;
     }
 
-    public void setExercisePlan(ExercisePlanRecord exercisePlanRecord) {
+    public void setExerciseRecordPlan(ExercisePlanRecord exercisePlanRecord) {
         mExercisePlanRecord = exercisePlanRecord;
+    }
+
+    public ExercisePlanRecordSuggested getExercisePlanRecordSuggested() {
+        return mExercisePlanRecordSuggested;
+    }
+
+    public void setExercisePlanRecordSuggested(ExercisePlanRecordSuggested exercisePlanRecordSuggested) {
+        mExercisePlanRecordSuggested = exercisePlanRecordSuggested;
     }
 
     public List<ExercisePlanRecord> getExercisePlanRecordList() {
@@ -133,6 +149,14 @@ public class MobileClientData implements Parcelable {
 
     public void setExercisePlanRecordList(List<ExercisePlanRecord> exercisePlanRecordList) {
         mExercisePlanRecordList = exercisePlanRecordList;
+    }
+
+    public List<ExercisePlanRecordSuggested> getExercisePlanRecordSuggestedList() {
+        return mExercisePlanRecordSuggestedList;
+    }
+
+    public void setExercisePlanRecordSuggestedList(List<ExercisePlanRecordSuggested> exercisePlanRecordSuggestedList) {
+        mExercisePlanRecordSuggestedList = exercisePlanRecordSuggestedList;
     }
 
     public String getErrorMessage() {
@@ -165,8 +189,10 @@ public class MobileClientData implements Parcelable {
         dest.writeParcelable(mExercise, flags);
         dest.writeTypedList(mExerciseList);
         dest.writeParcelable(mWaitingUser, flags);
+        dest.writeParcelable(mExercisePlanRecordSuggested, flags);
         dest.writeParcelable(mExercisePlanRecord, flags);
         dest.writeTypedList(mExercisePlanRecordList);
+        dest.writeTypedList(mExercisePlanRecordSuggestedList);
         dest.writeString(mErrorMessage);
     }
 
@@ -190,9 +216,12 @@ public class MobileClientData implements Parcelable {
         mExerciseList = new ArrayList<>();
         in.readTypedList(mExerciseList, Exercise.CREATOR);
         mWaitingUser = in.readParcelable(WaitingUser.class.getClassLoader());
+        mExercisePlanRecordSuggested = in.readParcelable(ExercisePlanRecordSuggested.class.getClassLoader());
         mExercisePlanRecord = in.readParcelable(ExercisePlanRecord.class.getClassLoader());
         mExercisePlanRecordList = new ArrayList<>();
         in.readTypedList(mExercisePlanRecordList, ExercisePlanRecord.CREATOR);
+        mExercisePlanRecordSuggestedList = new ArrayList<>();
+        in.readTypedList(mExercisePlanRecordSuggestedList, ExercisePlanRecordSuggested.CREATOR);
         mErrorMessage = in.readString();
     }
 

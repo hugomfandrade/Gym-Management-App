@@ -1,4 +1,4 @@
-package org.hugoandrade.gymapp.view.member;
+package org.hugoandrade.gymapp.view.staffmember;
 
 import android.content.Context;
 import android.content.Intent;

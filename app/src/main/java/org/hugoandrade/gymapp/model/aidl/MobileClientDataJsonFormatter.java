@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 
 import org.hugoandrade.gymapp.data.Exercise;
 import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
 import org.hugoandrade.gymapp.data.ExerciseRecord;
 import org.hugoandrade.gymapp.data.ExerciseSet;
 import org.hugoandrade.gymapp.data.StaffMember;
@@ -57,6 +58,18 @@ public class MobileClientDataJsonFormatter {
         return JsonObjectBuilder.instance()
                 .addProperty(ExercisePlanRecord.Entry.Cols.MEMBER_ID, exercisePlanRecord.getMemberID())
                 .addProperty(ExercisePlanRecord.Entry.Cols.DATETIME, ISO8601Utils.fromCalendar(exercisePlanRecord.getDatetime()))
+                .create();
+    }
+
+    /**
+     * Parses an ExercisePlanRecordSuggested object to a JsonObject
+     */
+    public JsonObject getAsJsonObject(ExercisePlanRecordSuggested exercisePlanRecordSuggested) {
+
+        return JsonObjectBuilder.instance()
+                .addProperty(ExercisePlanRecordSuggested.Entry.Cols.MEMBER_ID, exercisePlanRecordSuggested.getMemberID())
+                .addProperty(ExercisePlanRecordSuggested.Entry.Cols.STAFF_ID, exercisePlanRecordSuggested.getStaffID())
+                .addProperty(ExercisePlanRecordSuggested.Entry.Cols.DATETIME, ISO8601Utils.fromCalendar(exercisePlanRecordSuggested.getDatetime()))
                 .create();
     }
 
