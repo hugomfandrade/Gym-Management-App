@@ -8,10 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.hugoandrade.gymapp.GlobalData;
@@ -24,7 +21,6 @@ import org.hugoandrade.gymapp.view.ActivityBase;
 import org.hugoandrade.gymapp.view.adapter.UserListAdapter;
 import org.hugoandrade.gymapp.view.dialog.SimpleBuilderDialog;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AddGymMemberActivity extends ActivityBase<MVP.RequiredAddGymMemberViewOps,
@@ -106,7 +102,7 @@ public class AddGymMemberActivity extends ActivityBase<MVP.RequiredAddGymMemberV
                         + " to your 'My Members' Lost?";
                 SimpleBuilderDialog builderDialog =
                         new SimpleBuilderDialog(getActivityContext(), title, message);
-                builderDialog.setOnDialogResultListener(new SimpleBuilderDialog.OnDialogResult() {
+                builderDialog.setOnDialogResultListener(new SimpleBuilderDialog.OnDialogResultListener() {
                     @Override
                     public void onResult(DialogInterface dialog, @SimpleBuilderDialog.Result int result) {
                         if (result == SimpleBuilderDialog.YES) {

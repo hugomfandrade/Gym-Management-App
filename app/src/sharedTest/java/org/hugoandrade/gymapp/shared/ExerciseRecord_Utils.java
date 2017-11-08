@@ -24,6 +24,10 @@ public class ExerciseRecord_Utils {
         return new ExerciseRecord(id, TEST_EXERCISE_SET_ID, TEST_EXERCISE_SET_ORDER, TEST_NUMBER_OF_REPETITIONS);
     }
 
+    static public ExerciseRecord newExerciseRecord(String id, String exerciseSetID) {
+        return new ExerciseRecord(id, exerciseSetID, TEST_EXERCISE_SET_ORDER, TEST_NUMBER_OF_REPETITIONS);
+    }
+
     static public void checkExerciseRecord(ExerciseRecord testExerciseRecord, String id) {
         assertThat(testExerciseRecord.getID(), is(id));
         assertThat(testExerciseRecord.getExerciseSetID(), is(TEST_EXERCISE_SET_ID));

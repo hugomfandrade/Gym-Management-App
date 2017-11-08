@@ -6,7 +6,17 @@ import android.os.Parcelable;
 
 import org.hugoandrade.gymapp.provider.StorageProvider;
 
+import java.util.Objects;
+
 public class User implements Parcelable {
+
+    private String mID;
+    private String mUsername;
+    private String mPassword;
+    private String mCredential;
+
+    private String mUserID;
+    private String mToken;
 
     public static class Credential {
 
@@ -63,15 +73,6 @@ public class User implements Parcelable {
         public static final Uri CONTENT_URI = StorageProvider.BASE_URI.buildUpon()
                 .appendPath(PATH).build();
     }
-
-    private String mID;
-    private String mUsername;
-    private String mPassword;
-    private String mCredential;
-
-    private String mUserID;
-    private String mToken;
-
     public User() {
     }
 
@@ -79,9 +80,10 @@ public class User implements Parcelable {
         mID = id;
     }
 
-    public User(String id, String username, String userID, String token) {
+    public User(String id, String username, String password, String userID, String token) {
         mID = id;
         mUsername = username;
+        mPassword = password;
         mUserID = userID;
         mToken = token;
     }
@@ -125,6 +127,25 @@ public class User implements Parcelable {
 
     public String getToken() {
         return mToken;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof User) {
+            User u = (User) obj;
+            return Objects.equals(mID, u.mID) &&
+                    Objects.equals(mUserID, u.mUserID) &&
+                    Objects.equals(mCredential, u.mCredential) &&
+                    Objects.equals(mUsername, u.mUsername) &&
+                    Objects.equals(mPassword, u.mPassword) &&
+                    Objects.equals(mToken, u.mToken);
+        }
+        return false;
     }
 
     protected User(Parcel in) {

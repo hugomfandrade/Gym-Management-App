@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
 import org.hugoandrade.gymapp.data.User;
 
@@ -109,7 +108,7 @@ public class StorageProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
         case User.Entry.PATH_TOKEN:
             returnUri = insertUser(uri,
-                                         cvs);
+                                   cvs);
             break;
         default:
             throw new UnsupportedOperationException("Unknown uri: "
@@ -127,6 +126,11 @@ public class StorageProvider extends ContentProvider {
         final SQLiteDatabase db =
             mOpenHelper.getWritableDatabase();
 
+        // delete all before inserting
+        db.delete(User.Entry.TABLE_NAME,
+                null,
+                null);
+
         long id =
             db.insert(User.Entry.TABLE_NAME,
                       null,
@@ -143,7 +147,8 @@ public class StorageProvider extends ContentProvider {
 
     /**
      * Method called to handle query requests from client
-     * applications.
+     * applications. Query operations only available for querying
+     * all table.
      */
     @Override
     public Cursor query(@NonNull Uri uri,
@@ -177,7 +182,7 @@ public class StorageProvider extends ContentProvider {
 
     /**
      * Method called to handle query requests from client
-     * applications.  
+     * applications.
      */
     private Cursor queryUsers(Uri uri,
                               String[] projection,
@@ -188,19 +193,19 @@ public class StorageProvider extends ContentProvider {
         selection = addSelectionArgs(selection, 
                                      selectionArgs,
                                      "OR");
-        return mOpenHelper.getReadableDatabase().query
-            (User.Entry.TABLE_NAME,
-             projection,
-             selection,
-             selectionArgs,
-             null,
-             null,
-             sortOrder);
+        return mOpenHelper.getReadableDatabase().query(
+                User.Entry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
     }
 
     /**
      * Method called to handle update requests from client
-     * applications.
+     * applications. Update operations not available.
      */
     @Override
     public int update(@NonNull Uri uri,
@@ -219,16 +224,11 @@ public class StorageProvider extends ContentProvider {
         default:
             throw new UnsupportedOperationException();
         }
-
-        /*if (returnCount > 0)
-            // Notifies registered observers that row(s) were
-            // updated.
-            mContext.getContentResolver().notifyChange(uri, null);
-        return returnCount;/**/
     }
     /**
      * Method called to handle delete requests from client
-     * applications.
+     * applications. Delete operations only available for querying
+     * all table.
      */
     @Override
     public int delete(@NonNull Uri uri,
@@ -246,10 +246,6 @@ public class StorageProvider extends ContentProvider {
                                       selectionArgs);
             break;
         case User.Entry.PATH_FOR_ID_TOKEN:
-            returnCount = deleteUser(uri,
-                                     selection,
-                                     selectionArgs);
-            break;
         default:
             throw new UnsupportedOperationException();
         }
@@ -277,25 +273,6 @@ public class StorageProvider extends ContentProvider {
         return mOpenHelper.getWritableDatabase().delete
             (User.Entry.TABLE_NAME,
              selection,
-             selectionArgs);
-    }
-
-    /**
-     * Method called to handle delete requests from client
-     * applications.  
-     */
-    private int deleteUser(Uri uri,
-                           String selection,
-                           String[] selectionArgs) {
-        // Expand the selection if necessary.
-        selection = addSelectionArgs(selection, 
-                                     selectionArgs,
-                                     " OR ");
-        // Just delete a single row in the database.
-        return mOpenHelper.getWritableDatabase().delete
-            (User.Entry.TABLE_NAME,
-             addKeyIdCheckToWhereStatement(selection,
-                                           ContentUris.parseId(uri)),
              selectionArgs);
     }
 
@@ -329,26 +306,5 @@ public class StorageProvider extends ContentProvider {
 
             return selectionResult;
         }
-    }        
-
-    /**
-     * Helper method that appends a given key id to the end of the
-     * WHERE statement parameter.
-     */
-    private static String addKeyIdCheckToWhereStatement(String whereStatement,
-                                                        long id) {
-        String newWhereStatement;
-        if (TextUtils.isEmpty(whereStatement))
-            newWhereStatement = "";
-        else 
-            newWhereStatement = whereStatement + " AND ";
-
-        // Append the key id to the end of the WHERE statement.
-        return newWhereStatement 
-            + "_"
-            + User.Entry.Cols.ID
-            + " = '"
-            + id 
-            + "'";
     }
 }

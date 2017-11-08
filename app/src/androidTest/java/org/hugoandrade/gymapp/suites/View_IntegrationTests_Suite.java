@@ -1,18 +1,18 @@
 package org.hugoandrade.gymapp.suites;
 
-import org.hugoandrade.gymapp.provider.StorageProvider_AndroidTest;
+import org.hugoandrade.gymapp.view.Login_Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
  *
  */
-
+// Runs all unit tests.
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        StorageProvider_AndroidTest.class
+        Login_Test.class
 })
 
 
-public class Provider_IntegrationTests_Suite {
+public class View_IntegrationTests_Suite {
 }

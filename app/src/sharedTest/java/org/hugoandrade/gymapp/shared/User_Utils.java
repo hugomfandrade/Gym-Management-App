@@ -20,7 +20,7 @@ public class User_Utils {
     static final public String TEST_TOKEN = "token";
 
     static public User newUser() {
-        return new User(TEST_ID, TEST_USERNAME, TEST_USER_ID, TEST_TOKEN);
+        return new User(TEST_ID, TEST_USERNAME, TEST_PASSWORD, TEST_USER_ID, TEST_TOKEN);
     }
 
     static public User newSimpleUser() {

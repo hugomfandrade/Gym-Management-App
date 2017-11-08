@@ -1,9 +1,9 @@
 package org.hugoandrade.gymapp;
 
-import org.hugoandrade.gymapp.misc.SanityTest_InstrumentedTest;
 import org.hugoandrade.gymapp.suites.Data_IntegrationTests_Suite;
 import org.hugoandrade.gymapp.suites.Provider_IntegrationTests_Suite;
-import org.hugoandrade.gymapp.view.Login_Test;
+import org.hugoandrade.gymapp.suites.Sanity_IntegrationTests_Suite;
+import org.hugoandrade.gymapp.suites.View_IntegrationTests_Suite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -15,10 +15,10 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         // just a sanity check to make sure integration tests running properly
-        SanityTest_InstrumentedTest.class,
+        Sanity_IntegrationTests_Suite.class,
         Data_IntegrationTests_Suite.class,
         Provider_IntegrationTests_Suite.class,
-        Login_Test.class,
+        View_IntegrationTests_Suite.class,
 })
 
 

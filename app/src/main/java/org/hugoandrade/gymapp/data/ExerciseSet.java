@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 public class ExerciseSet implements Parcelable {
 
@@ -32,6 +33,7 @@ public class ExerciseSet implements Parcelable {
 
     public ExerciseSet(String id, String exerciseID, String exercisePlanRecordID, int exercisePlanRecordOrder) {
         mID = id;
+        mExercise = new Exercise(exerciseID);
         mExerciseID = exerciseID;
         mExercisePlanRecordID = exercisePlanRecordID;
         mExercisePlanRecordOrder = exercisePlanRecordOrder;
@@ -51,6 +53,7 @@ public class ExerciseSet implements Parcelable {
 
     public void setExercise(Exercise exercise) {
         mExercise = exercise;
+        mExerciseID = exercise.getID();
     }
 
     public Exercise getExercise() {
@@ -92,6 +95,18 @@ public class ExerciseSet implements Parcelable {
 
     public String getExercisePlanRecordID() {
         return mExercisePlanRecordID;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof ExerciseSet) {
+            ExerciseSet u = (ExerciseSet) obj;
+            return Objects.equals(mID, u.mID) &&
+                    Objects.equals(mExerciseID, u.mExerciseID) &&
+                    Objects.equals(mExercisePlanRecordID, u.mExercisePlanRecordID) &&
+                    Objects.equals(mExercisePlanRecordOrder, u.mExercisePlanRecordOrder) ;
+        }
+        return false;
     }
 
     protected ExerciseSet(Parcel in) {

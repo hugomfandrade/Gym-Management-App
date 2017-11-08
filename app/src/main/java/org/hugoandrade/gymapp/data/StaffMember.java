@@ -1,6 +1,11 @@
 package org.hugoandrade.gymapp.data;
 
-public class StaffMember {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.Objects;
+
+public class StaffMember implements Parcelable {
 
     private final String mStaffID;
     private final String mMemberID;
@@ -21,11 +26,49 @@ public class StaffMember {
         mMemberID = memberID;
     }
 
+    protected StaffMember(Parcel in) {
+        mStaffID = in.readString();
+        mMemberID = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mStaffID);
+        dest.writeString(mMemberID);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<StaffMember> CREATOR = new Creator<StaffMember>() {
+        @Override
+        public StaffMember createFromParcel(Parcel in) {
+            return new StaffMember(in);
+        }
+
+        @Override
+        public StaffMember[] newArray(int size) {
+            return new StaffMember[size];
+        }
+    };
+
     public String getStaffID() {
         return mStaffID;
     }
 
     public String getMemberID() {
         return mMemberID;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof StaffMember) {
+            StaffMember u = (StaffMember) obj;
+            return Objects.equals(mStaffID, u.mStaffID) &&
+                    Objects.equals(mMemberID, u.mMemberID) ;
+        }
+        return false;
     }
 }

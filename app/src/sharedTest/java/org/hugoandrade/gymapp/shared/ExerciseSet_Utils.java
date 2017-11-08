@@ -23,6 +23,10 @@ public class ExerciseSet_Utils {
         return new ExerciseSet(id, TEST_EXERCISE_ID, TEST_EXERCISE_PLAN_RECORD_ID, TEST_EXERCISE_PLAN_RECORD_ORDER);
     }
 
+    static public ExerciseSet newExerciseSet(String id, String exerciseID) {
+        return new ExerciseSet(id, exerciseID, TEST_EXERCISE_PLAN_RECORD_ID, TEST_EXERCISE_PLAN_RECORD_ORDER);
+    }
+
     static public void checkExerciseSet(ExerciseSet testExerciseSet, String id) {
         assertThat(testExerciseSet.getID(), is(id));
         assertThat(testExerciseSet.getExerciseID(), is(TEST_EXERCISE_ID));

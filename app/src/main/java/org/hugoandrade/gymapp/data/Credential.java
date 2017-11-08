@@ -3,6 +3,8 @@ package org.hugoandrade.gymapp.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Objects;
+
 /**
  * Created by Hugo Andrade on 22/10/2017.
  */
@@ -44,6 +46,17 @@ public class Credential implements Parcelable {
 
     public String getCredential() {
         return mCredential;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof Credential) {
+            Credential u = (Credential) obj;
+            return Objects.equals(mID, u.mID) &&
+                    Objects.equals(mCredential, u.mCredential) &&
+                    Objects.equals(mUsername, u.mUsername);
+        }
+        return false;
     }
 
     protected Credential(Parcel in) {

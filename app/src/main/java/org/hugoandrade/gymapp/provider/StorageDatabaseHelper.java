@@ -52,9 +52,9 @@ public class StorageDatabaseHelper
      */
     public StorageDatabaseHelper(Context context) {
         super(context, 
-              context.getCacheDir()
-              + File.separator
-              + DATABASE_NAME, 
+              //context.getCacheDir()
+              //+ File.separator
+              /*+/**/ DATABASE_NAME,
               null,
               DATABASE_VERSION);
     }

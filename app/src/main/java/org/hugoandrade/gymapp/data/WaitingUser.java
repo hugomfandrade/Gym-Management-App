@@ -3,6 +3,8 @@ package org.hugoandrade.gymapp.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Objects;
+
 /**
  * Created by Hugo Andrade on 22/10/2017.
  */
@@ -59,6 +61,18 @@ public class WaitingUser implements Parcelable {
 
     public String getCode() {
         return mCode;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof WaitingUser) {
+            WaitingUser u = (WaitingUser) obj;
+            return Objects.equals(mID, u.mID) &&
+                    Objects.equals(mCode, u.mCode) &&
+                    Objects.equals(mCredential, u.mCredential) &&
+                    Objects.equals(mUsername, u.mUsername);
+        }
+        return false;
     }
 
     protected WaitingUser(Parcel in) {

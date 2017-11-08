@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 public class ExercisePlanRecordSuggested implements Parcelable {
 
@@ -114,6 +115,19 @@ public class ExercisePlanRecordSuggested implements Parcelable {
                 return o1.getExercisePlanRecordOrder() - o2.getExercisePlanRecordOrder();
             }
         });
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof ExercisePlanRecordSuggested) {
+            ExercisePlanRecordSuggested u = (ExercisePlanRecordSuggested) obj;
+            return Objects.equals(mID, u.mID) &&
+                    Objects.equals(mMember, u.mMember) &&
+                    Objects.equals(mMemberID, u.mMemberID) &&
+                    Objects.equals(mStaff, u.mStaff) &&
+                    Objects.equals(mStaffID, u.mStaffID);// && Objects.equals(mDatetime, u.mDatetime) ;
+        }
+        return false;
     }
 
     protected ExercisePlanRecordSuggested(Parcel in) {

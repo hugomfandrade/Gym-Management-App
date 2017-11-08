@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
@@ -91,7 +90,7 @@ public class SuggestedPlanDetailsActivity extends ActivityBase<MVP.RequiredSugge
                 String message = "Are you sure you want to dismiss this plan?";
                 SimpleBuilderDialog builderDialog =
                         new SimpleBuilderDialog(getActivityContext(), title, message);
-                builderDialog.setOnDialogResultListener(new SimpleBuilderDialog.OnDialogResult() {
+                builderDialog.setOnDialogResultListener(new SimpleBuilderDialog.OnDialogResultListener() {
                     @Override
                     public void onResult(DialogInterface dialog, @SimpleBuilderDialog.Result int result) {
                         if (result == SimpleBuilderDialog.YES) {
@@ -110,7 +109,7 @@ public class SuggestedPlanDetailsActivity extends ActivityBase<MVP.RequiredSugge
                 String message = "Are you sure you want to mark this plan as done?";
                 SimpleBuilderDialog builderDialog =
                         new SimpleBuilderDialog(getActivityContext(), title, message);
-                builderDialog.setOnDialogResultListener(new SimpleBuilderDialog.OnDialogResult() {
+                builderDialog.setOnDialogResultListener(new SimpleBuilderDialog.OnDialogResultListener() {
                     @Override
                     public void onResult(DialogInterface dialog, @SimpleBuilderDialog.Result int result) {
                         if (result == SimpleBuilderDialog.YES) {

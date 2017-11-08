@@ -24,6 +24,10 @@ public class ExercisePlanRecord_Utils {
         return new ExercisePlanRecord(id, TEST_MEMBER_ID, TEST_DATETIME);
     }
 
+    static public ExercisePlanRecord newExercisePlanRecord(String id, String memberID) {
+        return new ExercisePlanRecord(id, memberID, TEST_DATETIME);
+    }
+
     static public void checkExercisePlanRecord(ExercisePlanRecord testExercisePlanRecord, String id) {
         assertThat(testExercisePlanRecord.getID(), is(id));
         assertThat(testExercisePlanRecord.getMemberID(), is(TEST_MEMBER_ID));

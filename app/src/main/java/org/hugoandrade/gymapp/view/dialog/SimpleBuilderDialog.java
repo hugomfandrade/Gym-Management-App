@@ -1,5 +1,6 @@
 package org.hugoandrade.gymapp.view.dialog;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.IntDef;
@@ -13,125 +14,99 @@ public class SimpleBuilderDialog {
 
     @SuppressWarnings("unused")
     private static final String TAG = SimpleBuilderDialog.class.getSimpleName();
-    public static final int YES = 1;
-    public static final int NO = 2;
-    public static final int BACK = 3;
-    public static final int CANCEL = 4;
+
+    @SuppressWarnings("WeakerAccess") public static final int YES = 1;
+    @SuppressWarnings("WeakerAccess") public static final int NO = 2;
+    @SuppressWarnings("WeakerAccess") public static final int BACK = 3;
+    @SuppressWarnings("WeakerAccess") public static final int CANCEL = 4;
 
     @Retention(RetentionPolicy.SOURCE) @IntDef({YES, NO, BACK, CANCEL})
     public @interface Result {}
 
-    private OnDialogResult mOnDialogResult;
-    private Context context;
-    private String title;
-    private String message;
-    private View view;
-
+    private OnDialogResultListener mOnDialogResultListener;
+    private Context mContext;
+    private String mTitle;
+    private String mMessage;
+    private View mView;
 
     public SimpleBuilderDialog(Context context, String title, String message) {
-        this.context = context;
-        this.title = title;
-        this.message = message;
+        mContext = context;
+        mTitle = title;
+        mMessage = message;
 
         buildPlan();
     }
 
+    @SuppressWarnings("unused")
     public SimpleBuilderDialog(Context context, View view) {
-        this.context = context;
-        this.view = view;
+        mContext = context;
+        mView = view;
 
         buildPlanWithView();
     }
 
-    private void buildPlanWithView() {
-
-        // Initialize and build the AlertBuilderDialog
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
-        builder.setView(view)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (mOnDialogResult != null)
-                            mOnDialogResult.onResult(dialog, YES);
-
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (mOnDialogResult != null)
-                            mOnDialogResult.onResult(dialog, NO);
-                    }
-                })
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        if (mOnDialogResult != null)
-                            mOnDialogResult.onResult(dialog, CANCEL);
-                    }
-                })
-                .setOnKeyListener(new DialogInterface.OnKeyListener() {
-                    @Override
-                    public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-                            if (mOnDialogResult != null)
-                                mOnDialogResult.onResult(dialog, BACK);
-                        }
-                        return false;
-                    }
-                });
-        android.app.AlertDialog alert = builder.create();
-        alert.show();
-    }
-
-
     private void buildPlan() {
         // Initialize and build the AlertBuilderDialog
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
-        builder.setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(mContext);
+        builder.setTitle(mTitle)
+                .setMessage(mMessage);
+
+        setupListeners(builder);
+
+        android.app.AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void buildPlanWithView() {
+        // Initialize and build the AlertBuilderDialog
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(mContext);
+        builder.setView(mView);
+
+        setupListeners(builder);
+
+        android.app.AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void setupListeners(AlertDialog.Builder builder) {
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (mOnDialogResult != null)
-                            mOnDialogResult.onResult(dialog, YES);
-
+                        if (mOnDialogResultListener != null)
+                            mOnDialogResultListener.onResult(dialog, YES);
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (mOnDialogResult != null)
-                            mOnDialogResult.onResult(dialog, NO);
+                        if (mOnDialogResultListener != null)
+                            mOnDialogResultListener.onResult(dialog, NO);
                     }
                 })
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {
-                        if (mOnDialogResult != null)
-                            mOnDialogResult.onResult(dialog, CANCEL);
+                        if (mOnDialogResultListener != null)
+                            mOnDialogResultListener.onResult(dialog, CANCEL);
                     }
                 })
                 .setOnKeyListener(new DialogInterface.OnKeyListener() {
                     @Override
                     public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
                         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-                            if (mOnDialogResult != null)
-                                mOnDialogResult.onResult(dialog, BACK);
+                            if (mOnDialogResultListener != null)
+                                mOnDialogResultListener.onResult(dialog, BACK);
                         }
                         return false;
                     }
                 });
-        android.app.AlertDialog alert = builder.create();
-        alert.show();
     }
 
-
-    public void setOnDialogResultListener(OnDialogResult onDialogResultListener) {
-        this.mOnDialogResult = onDialogResultListener;
+    public void setOnDialogResultListener(OnDialogResultListener onDialogResultListener) {
+        mOnDialogResultListener = onDialogResultListener;
     }
 
-    public interface OnDialogResult {
+    public interface OnDialogResultListener {
         void onResult(DialogInterface dialog, @SimpleBuilderDialog.Result int result);
     }
 }

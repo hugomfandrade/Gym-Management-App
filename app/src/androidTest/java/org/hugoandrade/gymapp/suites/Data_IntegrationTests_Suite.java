@@ -7,6 +7,7 @@ import org.hugoandrade.gymapp.data.ExerciseSet_AndroidTest;
 import org.hugoandrade.gymapp.data.Exercise_AndroidTest;
 import org.hugoandrade.gymapp.data.User_AndroidTest;
 import org.hugoandrade.gymapp.data.WaitingUser_AndroidTest;
+import org.hugoandrade.gymapp.webservice.JsonParserFormatter_AndroidTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -22,7 +23,8 @@ import org.junit.runners.Suite;
         ExerciseRecord_AndroidTest.class,
         ExerciseSet_AndroidTest.class,
         User_AndroidTest.class,
-        WaitingUser_AndroidTest.class
+        WaitingUser_AndroidTest.class,
+        JsonParserFormatter_AndroidTest.class
 })
 
 

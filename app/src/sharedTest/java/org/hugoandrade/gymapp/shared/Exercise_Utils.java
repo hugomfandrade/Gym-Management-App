@@ -22,6 +22,10 @@ public class Exercise_Utils {
         return new Exercise(id, TEST_NAME);
     }
 
+    static public Exercise newExercise(String id, String name) {
+        return new Exercise(id, name);
+    }
+
     static public void checkExercise(Exercise testExercise, String id) {
         assertThat(testExercise.getID(), is(id));
         assertThat(testExercise.getName(), is(TEST_NAME));

@@ -3,6 +3,8 @@ package org.hugoandrade.gymapp.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Objects;
+
 public class ExerciseRecord implements Parcelable {
 
     private String mID;
@@ -60,6 +62,18 @@ public class ExerciseRecord implements Parcelable {
 
     public void setExerciseSetOrder(int exerciseSetOrder) {
         mExerciseSetOrder = exerciseSetOrder;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof ExerciseRecord) {
+            ExerciseRecord u = (ExerciseRecord) obj;
+            return Objects.equals(mID, u.mID) &&
+                    Objects.equals(mExerciseSetID, u.mExerciseSetID) &&
+                    Objects.equals(mNumberOfRepetitions, u.mNumberOfRepetitions) &&
+                    Objects.equals(mExerciseSetOrder, u.mExerciseSetOrder) ;
+        }
+        return false;
     }
 
     protected ExerciseRecord(Parcel in) {

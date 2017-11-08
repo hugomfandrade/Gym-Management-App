@@ -23,6 +23,10 @@ public class WaitingUser_Utils {
         return new WaitingUser(id, TEST_USERNAME, TEST_CREDENTIAL, TEST_CODE);
     }
 
+    static public WaitingUser newWaitingUser(String id, String username) {
+        return new WaitingUser(id, username, TEST_CREDENTIAL, TEST_CODE);
+    }
+
     static public void checkWaitingUser(WaitingUser testWaitingUser, String id) {
         assertThat(testWaitingUser.getID(), is(id));
         assertThat(testWaitingUser.getUsername(), is(TEST_USERNAME));
