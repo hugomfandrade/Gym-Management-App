@@ -2,23 +2,12 @@ ar azureMobileApps = require('azure-mobile-apps');
 
 // Create a new table definition
 var table = azureMobileApps.table();
-//var table = module.exports = require('azure-mobile-apps').table();
-
-// table.read(function (context) {
-//     return context.execute();
-// });
-
-// table.read.use(customMiddleware, table.operation);
-//table.read(function (context) {
-//	context.query.where({ userId: context.user.id });
-//	return context.execute();
-//});
 
 var crypto = require('crypto');
-var iterations = 1000;
+var iterations = 100;
 var bytes = 32;
 var aud = "Custom";
-var masterKey = "JXmkcbiadxLTrrKIvyxZDBLnEmvOyM30";
+var masterKey = "master-key";
 var queries = require('azure-mobile-apps/src/query');
 
 var insertMiddleware = function(request, response, next){
