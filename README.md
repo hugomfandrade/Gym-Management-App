@@ -58,7 +58,7 @@ This Android app will be accessing the web service http://gym-management-app.azu
 
 The figure displays the Relational Model Diagram that represents how the data of this app is structured.
 
-![relational model diagram](https://gitlab.com/hugomfandrade/gym-management-app/blob/master/img/gymapp_diagram.png)
+![relational model diagram](/img/gymapp_diagram.png?raw=true)
 
 Succintly, the structured data is described as having:
 
