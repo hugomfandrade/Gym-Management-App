@@ -16,7 +16,6 @@ import android.widget.TextView;
 import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
-import org.hugoandrade.gymapp.data.Credential;
 import org.hugoandrade.gymapp.data.Exercise;
 import org.hugoandrade.gymapp.data.ExercisePlanRecord;
 import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
@@ -127,11 +126,11 @@ public class BuildWorkoutActivity extends ActivityBase<MVP.RequiredBuildWorkoutV
         switch (item.getItemId()) {
             case R.id.action_save_workout: {
                 // The way it is saved depends on the logged in User
-                if (GlobalData.getUser().getCredential().equals(Credential.STAFF))
+                if (GlobalData.getUser().getCredential().equals(User.Credential.STAFF))
                     // save the suggested exercise plan
                     getPresenter().createSuggestedWorkout(
                             new ExercisePlanRecordSuggested(GlobalData.getUser(), mExercisePlan));
-                else if (GlobalData.getUser().getCredential().equals(Credential.MEMBER))
+                else if (GlobalData.getUser().getCredential().equals(User.Credential.MEMBER))
                     // save the exercise plan
                     getPresenter().createWorkout(mExercisePlan);
                 return true;

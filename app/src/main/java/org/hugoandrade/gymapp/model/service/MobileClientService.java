@@ -291,37 +291,6 @@ public class MobileClientService extends LifecycleLoggingService {
         }
 
         /**
-         * Get the User object of all ids provided and call back the result
-         */
-        private void getUsers(List<String> idList, final int operationType) {
-            // initialize the appropriate AsyncTask and callback the returned Users(s)
-            List<User> userList = new ArrayList<>();
-            for (String id : idList)
-                userList.add(new User(id));
-
-            GetUserInfoTask.instance(mMobileServiceClient)
-                    .setOnFinishedListener(new BaseTask.OnFinishedListener<User>() {
-                        @Override
-                        public void onFinished(List<User> userList) {
-
-                            MobileClientData m = new MobileClientData(
-                                    operationType,
-                                    MobileClientData.OPERATION_SUCCESS);
-                            m.setUserList(userList);
-
-                            try {
-                                if (mCallback != null)
-                                    mCallback.sendResults(m);
-                            } catch (RemoteException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    })
-                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                            userList.toArray(new User[userList.size()]));
-        }
-
-        /**
          * Create Gym Users Operation. Returns false if MobileServiceClient is null (no network
          * connection). Insert the WaitingUser object into WaitingUser table in the Web Service
          * and, if successful, callback the resultingWaitingUser object which now has a code
@@ -1032,6 +1001,37 @@ public class MobileClientService extends LifecycleLoggingService {
             });
 
             return true;
+        }
+
+        /**
+         * Get the User object of all ids provided and call back the result
+         */
+        private void getUsers(List<String> idList, final int operationType) {
+            // initialize the appropriate AsyncTask and callback the returned Users(s)
+            List<User> userList = new ArrayList<>();
+            for (String id : idList)
+                userList.add(new User(id));
+
+            GetUserInfoTask.instance(mMobileServiceClient)
+                    .setOnFinishedListener(new BaseTask.OnFinishedListener<User>() {
+                        @Override
+                        public void onFinished(List<User> userList) {
+
+                            MobileClientData m = new MobileClientData(
+                                    operationType,
+                                    MobileClientData.OPERATION_SUCCESS);
+                            m.setUserList(userList);
+
+                            try {
+                                if (mCallback != null)
+                                    mCallback.sendResults(m);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    })
+                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                            userList.toArray(new User[userList.size()]));
         }
 
         /**

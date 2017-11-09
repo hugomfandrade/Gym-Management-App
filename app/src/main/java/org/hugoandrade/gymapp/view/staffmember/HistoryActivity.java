@@ -15,7 +15,6 @@ import android.widget.TextView;
 import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
-import org.hugoandrade.gymapp.data.Credential;
 import org.hugoandrade.gymapp.data.ExercisePlanRecord;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.presenter.HistoryPresenter;
@@ -94,7 +93,7 @@ public class HistoryActivity extends ActivityBase<MVP.RequiredHistoryViewOps,
 
         // show menu item only if logged in user is a Staff
         menu.findItem(R.id.action_suggest).setVisible(
-                GlobalData.getUser().getCredential().equals(Credential.STAFF));
+                GlobalData.getUser().getCredential().equals(User.Credential.STAFF));
         return true;
     }
 
