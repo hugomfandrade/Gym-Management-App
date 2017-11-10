@@ -4,7 +4,7 @@ This is the Android app for the Capstone project course in the Coursera Android 
 
 ## Project Description
 
-This Android app is designed for gym use and supports three types of users: Administrators, Gym Staff (Personal Trainers, Instructor) and Gym members. Each one has its own account and can log in to the app. The user will interact with different components of the app, depending on the user's credential.
+This Android app is designed for gym use and supports three types of users: Administrators, Gym Staff (Personal Trainers, Instructor) and Gym members. Each one has its own account and can log in to the app. The user will interact with different components of the app, depending on the user's credential. The Android program is structured with the Model-View-Presenter (MVP) pattern to help alleviate various complexities associated with concurrency.
 
 This app can be watched [here](https://www.youtube.com/playlist?list=PLuERM-U4AtnnfP6aC1H5wwm5zGNTV-5fn).
 
@@ -58,7 +58,7 @@ This Android app will be accessing the web service http://gym-management-app.azu
 
 The figure displays the Relational Model Diagram that represents how the data of this app is structured.
 
-![relational model diagram](https://gitlab.com/hugomfandrade/gym-management-app/blob/master/img/gymapp_diagram.png)
+![relational model diagram](/img/gymapp_diagram.png?raw=true)
 
 Succintly, the structured data is described as having:
 
