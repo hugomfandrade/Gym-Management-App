@@ -6,9 +6,13 @@ import android.os.Parcel;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.hugoandrade.gymapp.shared.ExercisePlanRecord_Utils;
+import org.hugoandrade.gymapp.shared.ExerciseSet_Utils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -46,9 +50,6 @@ public class ExercisePlanRecord_AndroidTest {
         // Read the data.
         ExercisePlanRecord resultingExercisePlanRecord = ExercisePlanRecord.CREATOR.createFromParcel(parcel);
 
-        System.out.println(mExercisePlanRecordA);
-        System.out.println(resultingExercisePlanRecord);
-
         // Verify that the received data is correct.
         ExercisePlanRecord_Utils.checkExercisePlanRecord(resultingExercisePlanRecord, ExercisePlanRecord_Utils.TEST_ID_1);
     }
@@ -76,8 +77,6 @@ public class ExercisePlanRecord_AndroidTest {
         ExercisePlanRecord_Utils.checkExercisePlanRecord(resultingArray[0], ExercisePlanRecord_Utils.TEST_ID_1);
         ExercisePlanRecord_Utils.checkExercisePlanRecord(resultingArray[1], ExercisePlanRecord_Utils.TEST_ID_2);
     }
-
-
 }
 
 
