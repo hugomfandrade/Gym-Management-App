@@ -73,6 +73,7 @@ public class User implements Parcelable {
         public static final Uri CONTENT_URI = StorageProvider.BASE_URI.buildUpon()
                 .appendPath(PATH).build();
     }
+
     public User() {
     }
 

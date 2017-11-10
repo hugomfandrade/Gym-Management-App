@@ -12,7 +12,6 @@ import java.util.Objects;
 public class ExerciseSet implements Parcelable {
 
     private String mID;
-    private String mExerciseID;
     private String mExercisePlanRecordID;
     private int mExercisePlanRecordOrder;
 
@@ -34,14 +33,12 @@ public class ExerciseSet implements Parcelable {
     public ExerciseSet(String id, String exerciseID, String exercisePlanRecordID, int exercisePlanRecordOrder) {
         mID = id;
         mExercise = new Exercise(exerciseID);
-        mExerciseID = exerciseID;
         mExercisePlanRecordID = exercisePlanRecordID;
         mExercisePlanRecordOrder = exercisePlanRecordOrder;
     }
 
     public ExerciseSet(Exercise exercise, int exercisePlanRecordOrder) {
         mExercise = exercise;
-        mExerciseID = exercise.getID();
         mExercisePlanRecordOrder = exercisePlanRecordOrder;
         mExerciseRecordList = new ArrayList<>();
         mExerciseRecordList.add(new ExerciseRecord(10, 1));
@@ -53,7 +50,6 @@ public class ExerciseSet implements Parcelable {
 
     public void setExercise(Exercise exercise) {
         mExercise = exercise;
-        mExerciseID = exercise.getID();
     }
 
     public Exercise getExercise() {
@@ -61,7 +57,7 @@ public class ExerciseSet implements Parcelable {
     }
 
     public String getExerciseID() {
-        return mExerciseID;
+        return mExercise.getID();
     }
 
     public void addExerciseRecord(ExerciseRecord exerciseRecord) {
@@ -102,7 +98,7 @@ public class ExerciseSet implements Parcelable {
         if (obj != null && obj instanceof ExerciseSet) {
             ExerciseSet u = (ExerciseSet) obj;
             return Objects.equals(mID, u.mID) &&
-                    Objects.equals(mExerciseID, u.mExerciseID) &&
+                    Objects.equals(mExercise, u.mExercise) &&
                     Objects.equals(mExercisePlanRecordID, u.mExercisePlanRecordID) &&
                     Objects.equals(mExercisePlanRecordOrder, u.mExercisePlanRecordOrder) ;
         }
@@ -111,7 +107,6 @@ public class ExerciseSet implements Parcelable {
 
     protected ExerciseSet(Parcel in) {
         mID = in.readString();
-        mExerciseID = in.readString();
         mExercisePlanRecordID = in.readString();
         mExercisePlanRecordOrder = in.readInt();
         mExercise = in.readParcelable(Exercise.class.getClassLoader());
@@ -123,7 +118,6 @@ public class ExerciseSet implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mID);
-        dest.writeString(mExerciseID);
         dest.writeString(mExercisePlanRecordID);
         dest.writeInt(mExercisePlanRecordOrder);
         dest.writeParcelable(mExercise, flags);

@@ -13,9 +13,7 @@ import java.util.Objects;
 public class ExercisePlanRecord implements Parcelable {
 
     private String mID;
-    private String mMemberID;
     private Calendar mDatetime;
-
     private User mMember;
     private List<ExerciseSet> mExerciseSetList;
 
@@ -40,13 +38,12 @@ public class ExercisePlanRecord implements Parcelable {
 
     private ExercisePlanRecord() {
         mID = null;
-        mMemberID = null;
+        mMember = new User((String) null);
     }
 
     public ExercisePlanRecord(String id, String memberID, Calendar datetime) {
         mID = id;
         mMember = new User(memberID);
-        mMemberID = memberID;
         mDatetime = datetime;
     }
 
@@ -55,7 +52,7 @@ public class ExercisePlanRecord implements Parcelable {
     }
 
     public String getMemberID() {
-        return mMemberID;
+        return mMember.getID();
     }
 
     public User getMember() {
@@ -80,7 +77,6 @@ public class ExercisePlanRecord implements Parcelable {
 
     public void setMember(User member) {
         mMember = member;
-        mMemberID = member.getID();
     }
 
     public void addExercises(List<Exercise> exerciseList) {
@@ -107,15 +103,13 @@ public class ExercisePlanRecord implements Parcelable {
         if (obj != null && obj instanceof ExercisePlanRecord) {
             ExercisePlanRecord u = (ExercisePlanRecord) obj;
             return Objects.equals(mID, u.mID) &&
-                    Objects.equals(mMember, u.mMember) &&
-                    Objects.equals(mMemberID, u.mMemberID);// && Objects.equals(mDatetime, u.mDatetime) ;
+                    Objects.equals(mMember, u.mMember);// && Objects.equals(mDatetime, u.mDatetime) ;
         }
         return false;
     }
 
     protected ExercisePlanRecord(Parcel in) {
         mID = in.readString();
-        mMemberID = in.readString();
         mMember = in.readParcelable(User.class.getClassLoader());
         mDatetime = (Calendar) in.readSerializable();
 
@@ -126,7 +120,6 @@ public class ExercisePlanRecord implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mID);
-        dest.writeString(mMemberID);
         dest.writeParcelable(mMember, flags);
         dest.writeSerializable(mDatetime);
         dest.writeTypedList(mExerciseSetList);

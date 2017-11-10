@@ -5,18 +5,12 @@ import android.os.Parcelable;
 
 import java.util.Objects;
 
-/**
- * Created by Hugo Andrade on 22/10/2017.
- */
-
 public class WaitingUser implements Parcelable {
 
-    public static class Credential {
-
-        public static final String ADMIN = "Admin";
-        public static final String STAFF = "Staff";
-        public static final String MEMBER = "Member";
-    }
+    private String mID;
+    private String mUsername;
+    private String mCredential;
+    private String mCode;
 
     public static class Entry {
 
@@ -29,11 +23,6 @@ public class WaitingUser implements Parcelable {
             public static final String CODE       = "Code";
         }
     }
-
-    private String mID;
-    private String mUsername;
-    private String mCredential;
-    private String mCode;
 
     public WaitingUser(String id, String username, String credential, String code) {
         mID = id;

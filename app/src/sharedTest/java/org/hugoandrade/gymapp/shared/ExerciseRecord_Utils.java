@@ -11,7 +11,6 @@ import static org.junit.Assert.assertThat;
 /**
  * Shared ExerciseRecord testing Utils class
  */
-@SuppressWarnings("SameParameterValue")
 public class ExerciseRecord_Utils {
 
     static final public String TEST_ID_1 = "id_1";

@@ -13,12 +13,9 @@ import java.util.Objects;
 public class ExercisePlanRecordSuggested implements Parcelable {
 
     private String mID;
-    private String mMemberID;
-    private String mStaffID;
-    private Calendar mDatetime;
-
     private User mMember;
     private User mStaff;
+    private Calendar mDatetime;
     private List<ExerciseSet> mExerciseSetList;
 
     public static class Entry {
@@ -35,11 +32,9 @@ public class ExercisePlanRecordSuggested implements Parcelable {
 
     public ExercisePlanRecordSuggested(User staff, ExercisePlanRecord exercisePlanRecord) {
         mStaff = staff;
-        mStaffID = staff.getID();
 
         mID = exercisePlanRecord.getID();
         mMember = exercisePlanRecord.getMember();
-        mMemberID = exercisePlanRecord.getMemberID();
         mDatetime = exercisePlanRecord.getDatetime();
         mExerciseSetList = exercisePlanRecord.getExerciseSetList();
     }
@@ -48,15 +43,13 @@ public class ExercisePlanRecordSuggested implements Parcelable {
 
         mID = id;
         mMember = new User(memberID);
-        mMemberID = memberID;
         mStaff = new User(staffID);
-        mStaffID = staffID;
         mDatetime = datetime;
         mExerciseSetList = new ArrayList<>();
     }
 
     public ExercisePlanRecord getAsExercisePlan() {
-        ExercisePlanRecord exercisePlanRecord = new ExercisePlanRecord(mID, mMemberID, mDatetime);
+        ExercisePlanRecord exercisePlanRecord = new ExercisePlanRecord(mID, mMember.getID(), mDatetime);
         exercisePlanRecord.setMember(mMember);
         exercisePlanRecord.setExerciseSetList(mExerciseSetList);
         return exercisePlanRecord;
@@ -67,11 +60,11 @@ public class ExercisePlanRecordSuggested implements Parcelable {
     }
 
     public String getMemberID() {
-        return mMemberID;
+        return mMember.getID();
     }
 
     public String getStaffID() {
-        return mStaffID;
+        return mStaff.getID();
     }
 
     public User getStaff() {
@@ -96,12 +89,10 @@ public class ExercisePlanRecordSuggested implements Parcelable {
 
     public void setMember(User member) {
         mMember = member;
-        mMemberID = member.getID();
     }
 
     public void setStaff(User staff) {
         mStaff = staff;
-        mStaffID = staff.getID();
     }
 
     public void addExerciseSet(ExerciseSet exerciseSet) {
@@ -123,18 +114,14 @@ public class ExercisePlanRecordSuggested implements Parcelable {
             ExercisePlanRecordSuggested u = (ExercisePlanRecordSuggested) obj;
             return Objects.equals(mID, u.mID) &&
                     Objects.equals(mMember, u.mMember) &&
-                    Objects.equals(mMemberID, u.mMemberID) &&
-                    Objects.equals(mStaff, u.mStaff) &&
-                    Objects.equals(mStaffID, u.mStaffID);// && Objects.equals(mDatetime, u.mDatetime) ;
+                    Objects.equals(mStaff, u.mStaff);// && Objects.equals(mDatetime, u.mDatetime) ;
         }
         return false;
     }
 
     protected ExercisePlanRecordSuggested(Parcel in) {
         mID = in.readString();
-        mMemberID = in.readString();
         mMember = in.readParcelable(User.class.getClassLoader());
-        mStaffID = in.readString();
         mStaff = in.readParcelable(User.class.getClassLoader());
         mDatetime = (Calendar) in.readSerializable();
 
@@ -145,9 +132,7 @@ public class ExercisePlanRecordSuggested implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mID);
-        dest.writeString(mMemberID);
         dest.writeParcelable(mMember, flags);
-        dest.writeString(mStaffID);
         dest.writeParcelable(mStaff, flags);
         dest.writeSerializable(mDatetime);
         dest.writeTypedList(mExerciseSetList);
