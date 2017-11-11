@@ -8,13 +8,14 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
-import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
+import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.presenter.SuggestedPlanDetailsPresenter;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;
@@ -29,7 +30,7 @@ public class SuggestedPlanDetailsActivity extends ActivityBase<MVP.RequiredSugge
 
     /**
      * Constant that represents the name of the intent extra that is paired
-     * with a ExercisePlanRecordSuggested object.
+     * with a ExercisePlanSuggested object.
      */
     private static final String INTENT_EXTRA_SUGGESTED_EXERCISE_PLAN = "intent_extra_suggested_exercise_plan";
 
@@ -42,7 +43,7 @@ public class SuggestedPlanDetailsActivity extends ActivityBase<MVP.RequiredSugge
     /**
      * The Suggested Exercise Plan of this instance
      */
-    private ExercisePlanRecordSuggested mExercisePlanSuggested;
+    private ExercisePlanSuggested mExercisePlanSuggested;
 
     /**
      * Factory method that makes an Intent used to start this Activity
@@ -50,15 +51,15 @@ public class SuggestedPlanDetailsActivity extends ActivityBase<MVP.RequiredSugge
      *
      * @param context The context of the calling component.
      */
-    public static Intent makeIntent(Context context, ExercisePlanRecordSuggested suggestedPlan) {
+    public static Intent makeIntent(Context context, ExercisePlanSuggested suggestedPlan) {
         return new Intent(context, SuggestedPlanDetailsActivity.class)
                 .putExtra(INTENT_EXTRA_SUGGESTED_EXERCISE_PLAN, suggestedPlan);
     }
 
     /**
-     * Method used to extract a ExercisePlanRecord object from an Intent
+     * Method used to extract a ExerciseRecord object from an Intent
      */
-    public static ExercisePlanRecordSuggested extractExercisePlanSuggestedFromIntent(Intent data) {
+    public static ExercisePlanSuggested extractExercisePlanSuggestedFromIntent(Intent data) {
         return data.getParcelableExtra(INTENT_EXTRA_SUGGESTED_EXERCISE_PLAN);
     }
 
@@ -136,10 +137,11 @@ public class SuggestedPlanDetailsActivity extends ActivityBase<MVP.RequiredSugge
 
         vProgressBar = findViewById(R.id.progressBar_waiting);
 
+        Log.e(TAG, Integer.toString(mExercisePlanSuggested.getExerciseSetList().size()));
         // set up recycler view and adapter to display the exercise plan record
         ExerciseSetListAdapter mExerciseSetListAdapter = new ExerciseSetListAdapter(
                 ExerciseSetListAdapter.MODE_DISPLAY,
-                mExercisePlanSuggested.getAsExercisePlan());
+                mExercisePlanSuggested);//.getAsExercisePlan());
         RecyclerView rvExercisePlan = (RecyclerView) findViewById(R.id.rv_exercise_plan);
         rvExercisePlan.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         rvExercisePlan.setAdapter(mExerciseSetListAdapter);
@@ -156,7 +158,7 @@ public class SuggestedPlanDetailsActivity extends ActivityBase<MVP.RequiredSugge
     }
 
     @Override
-    public void suggestedPlanDismissed(ExercisePlanRecordSuggested suggestedPlan) {
+    public void suggestedPlanDismissed(ExercisePlanSuggested suggestedPlan) {
         setResult(Activity.RESULT_OK, new Intent().putExtra(INTENT_EXTRA_SUGGESTED_EXERCISE_PLAN, suggestedPlan));
         finish();
     }

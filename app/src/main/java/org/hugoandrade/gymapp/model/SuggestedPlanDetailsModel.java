@@ -4,7 +4,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import org.hugoandrade.gymapp.MVP;
-import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
+import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
 public class SuggestedPlanDetailsModel extends MobileClientModelBase<MVP.RequiredSuggestedPlanDetailsPresenterOps>
@@ -15,14 +15,14 @@ public class SuggestedPlanDetailsModel extends MobileClientModelBase<MVP.Require
     public void sendResults(MobileClientData data) {
         if (data.getOperationType() == MobileClientData.OPERATION_DISMISS_SUGGESTED_PLAN) {
             if (data.getOperationResult() == MobileClientData.OPERATION_SUCCESS)
-                dismissingSuggestedPlanRequestResultSuccess(data.getExercisePlanRecordSuggested());
+                dismissingSuggestedPlanRequestResultSuccess(data.getExercisePlanSuggested());
             else
                 dismissingSuggestedPlanRequestResultFailure(data.getErrorMessage());
         }
     }
 
     @Override
-    public void dismissSuggestedPlan(ExercisePlanRecordSuggested suggestedPlan, boolean wasDone) {
+    public void dismissSuggestedPlan(ExercisePlanSuggested suggestedPlan, boolean wasDone) {
         if (getService() == null) {
             Log.w(TAG, "Service is still not bound");
             dismissingSuggestedPlanRequestResultFailure("Not bound to the service");
@@ -44,7 +44,7 @@ public class SuggestedPlanDetailsModel extends MobileClientModelBase<MVP.Require
         getPresenter().dismissingSuggestedPlanOperationResult(false, errorMessage, null);
     }
 
-    private void dismissingSuggestedPlanRequestResultSuccess(ExercisePlanRecordSuggested suggestedPlan) {
+    private void dismissingSuggestedPlanRequestResultSuccess(ExercisePlanSuggested suggestedPlan) {
         getPresenter().dismissingSuggestedPlanOperationResult(true, null, suggestedPlan);
     }
 }

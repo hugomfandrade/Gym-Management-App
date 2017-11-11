@@ -11,12 +11,11 @@ import android.widget.TextView;
 
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
-import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
+import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.presenter.SuggestedPlansPresenter;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;
-import org.hugoandrade.gymapp.view.adapter.ExercisePlanReportSuggestedListAdapter;
-import org.hugoandrade.gymapp.view.adapter.UserListAdapter;
+import org.hugoandrade.gymapp.view.adapter.ExercisePlanSuggestedListAdapter;
 
 import java.util.List;
 
@@ -40,7 +39,7 @@ public class SuggestedPlansActivity extends ActivityBase<MVP.RequiredSuggestedPl
     /**
      * Adapter used to display the suggested plans
      */
-    private ExercisePlanReportSuggestedListAdapter mSuggestedPlanListAdapter;
+    private ExercisePlanSuggestedListAdapter mSuggestedPlanListAdapter;
 
     /**
      * Message to be displayed when no suggested plan was retrieved
@@ -77,13 +76,13 @@ public class SuggestedPlansActivity extends ActivityBase<MVP.RequiredSuggestedPl
         vProgressBar = findViewById(R.id.progressBar_waiting);
 
         // set up recycler view and adapter
-        mSuggestedPlanListAdapter = new ExercisePlanReportSuggestedListAdapter();
-        mSuggestedPlanListAdapter.setOnItemClickedListener(new ExercisePlanReportSuggestedListAdapter.OnItemClickListener() {
+        mSuggestedPlanListAdapter = new ExercisePlanSuggestedListAdapter();
+        mSuggestedPlanListAdapter.setOnItemClickedListener(new ExercisePlanSuggestedListAdapter.OnItemClickListener() {
             @Override
-            public void onItemClicked(ExercisePlanRecordSuggested exercisePlanRecordSuggested) {
+            public void onItemClicked(ExercisePlanSuggested exercisePlanSuggested) {
                 startActivityForResult(SuggestedPlanDetailsActivity
                                 .makeIntent(SuggestedPlansActivity.this,
-                                            exercisePlanRecordSuggested),
+                                        exercisePlanSuggested),
                         SEE_DETAILS_REQUEST_CODE);
             }
         });
@@ -107,7 +106,7 @@ public class SuggestedPlansActivity extends ActivityBase<MVP.RequiredSuggestedPl
     }
 
     @Override
-    public void displaySuggestedPlansList(List<ExercisePlanRecordSuggested> suggestedList) {
+    public void displaySuggestedPlansList(List<ExercisePlanSuggested> suggestedList) {
         mSuggestedPlanListAdapter.setAll(suggestedList);
 
         // if list is empty, show "no my gym staff" message
@@ -121,9 +120,9 @@ public class SuggestedPlansActivity extends ActivityBase<MVP.RequiredSuggestedPl
                 // Successfully built a exercise plan.
                 // Extract the new exercise plan and display it
 
-                ExercisePlanRecordSuggested exercisePlanRecordSuggested
+                ExercisePlanSuggested exercisePlanSuggested
                         = SuggestedPlanDetailsActivity.extractExercisePlanSuggestedFromIntent(data);
-                mSuggestedPlanListAdapter.remove(exercisePlanRecordSuggested);
+                mSuggestedPlanListAdapter.remove(exercisePlanSuggested);
 
                 // hide "start building" message
                 tvNoSuggestedPlansMessage.setVisibility(mSuggestedPlanListAdapter.getItemCount() != 0?

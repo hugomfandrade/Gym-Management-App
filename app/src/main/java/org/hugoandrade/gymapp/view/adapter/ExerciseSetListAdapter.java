@@ -4,6 +4,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.hugoandrade.gymapp.R;
-import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.ExercisePlan;
 import org.hugoandrade.gymapp.data.ExerciseSet;
 import org.hugoandrade.gymapp.view.helper.ItemTouchHelperAdapter;
 import org.hugoandrade.gymapp.view.helper.SimpleItemTouchHelperCallback;
@@ -31,11 +32,12 @@ public class ExerciseSetListAdapter extends RecyclerView.Adapter<ExerciseSetList
 
     private final int mMode;
 
-    private ExercisePlanRecord mExercisePlan;
+    private ExercisePlan mExercisePlan;
 
-    public ExerciseSetListAdapter(int mode, ExercisePlanRecord exercisePlan) {
+    public ExerciseSetListAdapter(int mode, ExercisePlan exercisePlan) {
         mMode = mode;
         mExercisePlan = exercisePlan;
+        Log.e(TAG, Integer.toString(mExercisePlan.getExerciseSetList().size()));
     }
 
     @Override
@@ -54,10 +56,10 @@ public class ExerciseSetListAdapter extends RecyclerView.Adapter<ExerciseSetList
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final ExerciseSet exerciseSet = mExercisePlan.getExerciseSetList().get(holder.getAdapterPosition());
-        exerciseSet.setExercisePlanRecordOrder(holder.getAdapterPosition() + 1);
+        exerciseSet.setExercisePlanOrder(holder.getAdapterPosition() + 1);
 
         holder.tvExerciseName.setText(TextUtils.concat(
-                String.valueOf(exerciseSet.getExercisePlanRecordOrder()),
+                String.valueOf(exerciseSet.getExercisePlanOrder()),
                 ". ",
                 exerciseSet.getExercise().getName()));
 
@@ -105,7 +107,7 @@ public class ExerciseSetListAdapter extends RecyclerView.Adapter<ExerciseSetList
         return mExercisePlan.getExerciseSetList().size();
     }
 
-    public void set(ExercisePlanRecord exercisePlan) {
+    public void set(ExercisePlan exercisePlan) {
         mExercisePlan = exercisePlan;
         notifyDataSetChanged();
     }

@@ -12,8 +12,8 @@ import java.util.Objects;
 public class ExerciseSet implements Parcelable {
 
     private String mID;
-    private String mExercisePlanRecordID;
-    private int mExercisePlanRecordOrder;
+    private String mExercisePlanID;
+    private int mExercisePlanOrder;
 
     private Exercise mExercise;
     private List<ExerciseRecord> mExerciseRecordList;
@@ -30,16 +30,16 @@ public class ExerciseSet implements Parcelable {
         }
     }
 
-    public ExerciseSet(String id, String exerciseID, String exercisePlanRecordID, int exercisePlanRecordOrder) {
+    public ExerciseSet(String id, String exerciseID, String exercisePlanID, int exercisePlanOrder) {
         mID = id;
         mExercise = new Exercise(exerciseID);
-        mExercisePlanRecordID = exercisePlanRecordID;
-        mExercisePlanRecordOrder = exercisePlanRecordOrder;
+        mExercisePlanID = exercisePlanID;
+        mExercisePlanOrder = exercisePlanOrder;
     }
 
-    public ExerciseSet(Exercise exercise, int exercisePlanRecordOrder) {
+    public ExerciseSet(Exercise exercise, int exercisePlanOrder) {
         mExercise = exercise;
-        mExercisePlanRecordOrder = exercisePlanRecordOrder;
+        mExercisePlanOrder = exercisePlanOrder;
         mExerciseRecordList = new ArrayList<>();
         mExerciseRecordList.add(new ExerciseRecord(10, 1));
     }
@@ -77,20 +77,20 @@ public class ExerciseSet implements Parcelable {
         return mExerciseRecordList;
     }
 
-    public void setExercisePlanRecordID(String exercisePlanRecordID) {
-        mExercisePlanRecordID = exercisePlanRecordID;
+    public void setExercisePlanID(String exercisePlanID) {
+        mExercisePlanID = exercisePlanID;
     }
 
-    public void setExercisePlanRecordOrder(int exercisePlanRecordOrder) {
-        mExercisePlanRecordOrder = exercisePlanRecordOrder;
+    public void setExercisePlanOrder(int exercisePlanOrder) {
+        mExercisePlanOrder = exercisePlanOrder;
     }
 
-    public int getExercisePlanRecordOrder() {
-        return mExercisePlanRecordOrder;
+    public int getExercisePlanOrder() {
+        return mExercisePlanOrder;
     }
 
-    public String getExercisePlanRecordID() {
-        return mExercisePlanRecordID;
+    public String getExercisePlanID() {
+        return mExercisePlanID;
     }
 
     @Override
@@ -99,16 +99,16 @@ public class ExerciseSet implements Parcelable {
             ExerciseSet u = (ExerciseSet) obj;
             return Objects.equals(mID, u.mID) &&
                     Objects.equals(mExercise, u.mExercise) &&
-                    Objects.equals(mExercisePlanRecordID, u.mExercisePlanRecordID) &&
-                    Objects.equals(mExercisePlanRecordOrder, u.mExercisePlanRecordOrder) ;
+                    Objects.equals(mExercisePlanID, u.mExercisePlanID) &&
+                    Objects.equals(mExercisePlanOrder, u.mExercisePlanOrder) ;
         }
         return false;
     }
 
     protected ExerciseSet(Parcel in) {
         mID = in.readString();
-        mExercisePlanRecordID = in.readString();
-        mExercisePlanRecordOrder = in.readInt();
+        mExercisePlanID = in.readString();
+        mExercisePlanOrder = in.readInt();
         mExercise = in.readParcelable(Exercise.class.getClassLoader());
 
         mExerciseRecordList = new ArrayList<>();
@@ -118,8 +118,8 @@ public class ExerciseSet implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mID);
-        dest.writeString(mExercisePlanRecordID);
-        dest.writeInt(mExercisePlanRecordOrder);
+        dest.writeString(mExercisePlanID);
+        dest.writeInt(mExercisePlanOrder);
         dest.writeParcelable(mExercise, flags);
 
         dest.writeTypedList(mExerciseRecordList);

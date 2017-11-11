@@ -3,12 +3,8 @@ package org.hugoandrade.gymapp.shared;
 // imports
 
 import org.hamcrest.core.IsNull;
-import org.hugoandrade.gymapp.data.ExercisePlanRecord;
 import org.hugoandrade.gymapp.data.ExerciseRecord;
 import org.hugoandrade.gymapp.data.ExerciseSet;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -46,8 +42,8 @@ public class ExerciseSet_Utils {
     static public void checkExerciseSet(ExerciseSet testExerciseSet, String id) {
         assertThat(testExerciseSet.getID(), is(id));
         assertThat(testExerciseSet.getExerciseID(), is(TEST_EXERCISE_ID));
-        assertThat(testExerciseSet.getExercisePlanRecordID(), is(TEST_EXERCISE_PLAN_RECORD_ID));
-        assertThat(testExerciseSet.getExercisePlanRecordOrder(), is(TEST_EXERCISE_PLAN_RECORD_ORDER));
+        assertThat(testExerciseSet.getExercisePlanID(), is(TEST_EXERCISE_PLAN_RECORD_ID));
+        assertThat(testExerciseSet.getExercisePlanOrder(), is(TEST_EXERCISE_PLAN_RECORD_ORDER));
 
         assertThat(testExerciseSet.getExerciseRecordList(), is(IsNull.notNullValue()));
         assertThat(testExerciseSet.getExerciseRecordList().size(), is(2));

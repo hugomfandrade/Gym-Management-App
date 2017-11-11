@@ -6,8 +6,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.hugoandrade.gymapp.data.Exercise;
-import org.hugoandrade.gymapp.data.ExercisePlanRecord;
-import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
+import org.hugoandrade.gymapp.data.ExercisePlan;
+import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.data.ExerciseRecord;
 import org.hugoandrade.gymapp.data.ExerciseSet;
 import org.hugoandrade.gymapp.data.StaffMember;
@@ -178,47 +178,47 @@ public class MobileClientDataJsonParser {
                 getJsonPrimitive(jsonObject, ExerciseSet.Entry.Cols.EXERCISE_PLAN_RECORD_ORDER, -1));
     }
 
-    public List<ExercisePlanRecord> parseExercisePlanRecords(JsonElement jsonElement) {
-        List<ExercisePlanRecord> exercisePlanRecordList = new ArrayList<>();
+    public List<ExercisePlan> parseExercisePlans(JsonElement jsonElement) {
+        List<ExercisePlan> exercisePlanList = new ArrayList<>();
 
         for (JsonElement item : jsonElement.getAsJsonArray()) {
             try {
-                exercisePlanRecordList.add(parseExercisePlanRecord(item.getAsJsonObject()));
+                exercisePlanList.add(parseExercisePlan(item.getAsJsonObject()));
             } catch (ClassCastException e) {
-                Log.e(TAG, "Exception caught when parsing ExercisePlanRecord" +
+                Log.e(TAG, "Exception caught when parsing ExercisePlan" +
                         " data from azure table: " + e.getMessage());
             }
         }
-        return exercisePlanRecordList;
+        return exercisePlanList;
     }
 
-    public ExercisePlanRecord parseExercisePlanRecord(JsonObject jsonObject) {
-        return new ExercisePlanRecord(
-                getJsonPrimitive(jsonObject, ExercisePlanRecord.Entry.Cols.ID, null),
-                getJsonPrimitive(jsonObject, ExercisePlanRecord.Entry.Cols.MEMBER_ID, null),
-                ISO8601Utils.toCalendar(getJsonPrimitive(jsonObject, ExercisePlanRecord.Entry.Cols.DATETIME, null)));
+    public ExercisePlan parseExercisePlan(JsonObject jsonObject) {
+        return new ExercisePlan(
+                getJsonPrimitive(jsonObject, ExercisePlan.Entry.Cols.ID, null),
+                getJsonPrimitive(jsonObject, ExercisePlan.Entry.Cols.MEMBER_ID, null),
+                ISO8601Utils.toCalendar(getJsonPrimitive(jsonObject, ExercisePlan.Entry.Cols.DATETIME, null)));
     }
 
-    public List<ExercisePlanRecordSuggested> parseExercisePlanRecordSuggesteds(JsonElement jsonElement) {
-        List<ExercisePlanRecordSuggested> exercisePlanRecordSuggestedList = new ArrayList<>();
+    public List<ExercisePlanSuggested> parseExercisePlanSuggesteds(JsonElement jsonElement) {
+        List<ExercisePlanSuggested> exercisePlanSuggestedList = new ArrayList<>();
 
         for (JsonElement item : jsonElement.getAsJsonArray()) {
             try {
-                exercisePlanRecordSuggestedList.add(parseExercisePlanRecordSuggested(item.getAsJsonObject()));
+                exercisePlanSuggestedList.add(parseExercisePlanSuggested(item.getAsJsonObject()));
             } catch (ClassCastException e) {
-                Log.e(TAG, "Exception caught when parsing ExercisePlanRecordSuggested" +
+                Log.e(TAG, "Exception caught when parsing ExercisePlanSuggested" +
                         " data from azure table: " + e.getMessage());
             }
         }
-        return exercisePlanRecordSuggestedList;
+        return exercisePlanSuggestedList;
     }
 
-    public ExercisePlanRecordSuggested parseExercisePlanRecordSuggested(JsonObject jsonObject) {
-        return new ExercisePlanRecordSuggested(
-                getJsonPrimitive(jsonObject, ExercisePlanRecordSuggested.Entry.Cols.ID, null),
-                getJsonPrimitive(jsonObject, ExercisePlanRecordSuggested.Entry.Cols.MEMBER_ID, null),
-                getJsonPrimitive(jsonObject, ExercisePlanRecordSuggested.Entry.Cols.STAFF_ID, null),
-                ISO8601Utils.toCalendar(getJsonPrimitive(jsonObject, ExercisePlanRecordSuggested.Entry.Cols.DATETIME, null)));
+    public ExercisePlanSuggested parseExercisePlanSuggested(JsonObject jsonObject) {
+        return new ExercisePlanSuggested(
+                getJsonPrimitive(jsonObject, ExercisePlanSuggested.Entry.Cols.ID, null),
+                getJsonPrimitive(jsonObject, ExercisePlanSuggested.Entry.Cols.MEMBER_ID, null),
+                getJsonPrimitive(jsonObject, ExercisePlanSuggested.Entry.Cols.STAFF_ID, null),
+                ISO8601Utils.toCalendar(getJsonPrimitive(jsonObject, ExercisePlanSuggested.Entry.Cols.DATETIME, null)));
     }
 
     private int getJsonPrimitive(JsonObject jsonObject, String jsonMemberName, int defaultValue) {

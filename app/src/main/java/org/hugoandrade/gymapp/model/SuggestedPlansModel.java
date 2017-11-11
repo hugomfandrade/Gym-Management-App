@@ -4,9 +4,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import org.hugoandrade.gymapp.MVP;
-import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
-import org.hugoandrade.gymapp.data.User;
-import org.hugoandrade.gymapp.model.MobileClientModelBase;
+import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
 import java.util.List;
@@ -19,7 +17,7 @@ public class SuggestedPlansModel extends MobileClientModelBase<MVP.RequiredSugge
     public void sendResults(MobileClientData data) {
         if (data.getOperationType() == MobileClientData.OPERATION_GET_HISTORY_SUGGESTED) {
             if (data.getOperationResult() == MobileClientData.OPERATION_SUCCESS)
-                gettingSuggestedPlansRequestResultSuccess(data.getExercisePlanRecordSuggestedList());
+                gettingSuggestedPlansRequestResultSuccess(data.getExercisePlanSuggestedList());
             else
                 gettingSuggestedPlansRequestResultFailure(data.getErrorMessage());
         }
@@ -34,7 +32,7 @@ public class SuggestedPlansModel extends MobileClientModelBase<MVP.RequiredSugge
         }
 
         try {
-            boolean isGetting = getService().getExercisePlanRecordSuggestedList(userID);
+            boolean isGetting = getService().getExercisePlanSuggestedList(userID);
             if (!isGetting) {
                 gettingSuggestedPlansRequestResultFailure("No Network Connection");
             }
@@ -48,7 +46,7 @@ public class SuggestedPlansModel extends MobileClientModelBase<MVP.RequiredSugge
         getPresenter().gettingSuggestedPlansOperationResult(false, errorMessage, null);
     }
 
-    private void gettingSuggestedPlansRequestResultSuccess(List<ExercisePlanRecordSuggested> suggestedPlanList) {
+    private void gettingSuggestedPlansRequestResultSuccess(List<ExercisePlanSuggested> suggestedPlanList) {
         getPresenter().gettingSuggestedPlansOperationResult(true, null, suggestedPlanList);
     }
 }

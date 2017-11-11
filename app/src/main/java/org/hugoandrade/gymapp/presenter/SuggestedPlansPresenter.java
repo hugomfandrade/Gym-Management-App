@@ -4,7 +4,7 @@ import android.content.Context;
 
 import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
-import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
+import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.model.SuggestedPlansModel;
 
 import java.util.List;
@@ -69,7 +69,7 @@ public class SuggestedPlansPresenter extends PresenterBase<MVP.RequiredSuggested
     @Override
     public void gettingSuggestedPlansOperationResult(boolean wasOperationSuccessful,
                                                  String errorMessage,
-                                                     List<ExercisePlanRecordSuggested> suggestedPlanList) {
+                                                     List<ExercisePlanSuggested> suggestedPlanList) {
 
         if (wasOperationSuccessful) {
 

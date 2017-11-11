@@ -9,21 +9,21 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
 import org.hugoandrade.gymapp.R;
-import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.ExercisePlan;
 import org.hugoandrade.gymapp.view.adapter.ExerciseSetListAdapter;
 
 public class WorkoutActivity extends AppCompatActivity {
 
     /**
      * Constant that represents the name of the intent extra that is paired
-     * with a ExercisePlanRecord object.
+     * with a ExercisePlan object.
      */
-    private static final String INTENT_EXTRA_EXERCISE_PLAN_RECORD = "intent_extra_exercise_plan_record";
+    private static final String INTENT_EXTRA_EXERCISE_PLAN = "intent_extra_exercise_plan";
 
     /**
      * The Exercise Plan of this instance
      */
-    private ExercisePlanRecord mExercisePlan;
+    private ExercisePlan mExercisePlan;
 
     /**
      * Factory method that makes an Intent used to start this Activity
@@ -31,16 +31,16 @@ public class WorkoutActivity extends AppCompatActivity {
      *
      * @param context The context of the calling component.
      */
-    public static Intent makeIntent(Context context, ExercisePlanRecord exercisePlanRecord) {
+    public static Intent makeIntent(Context context, ExercisePlan exercisePlan) {
         return new Intent(context, WorkoutActivity.class)
-                .putExtra(INTENT_EXTRA_EXERCISE_PLAN_RECORD, exercisePlanRecord);
+                .putExtra(INTENT_EXTRA_EXERCISE_PLAN, exercisePlan);
     }
 
     /**
-     * Method used to extract a ExercisePlanRecord object from an Intent
+     * Method used to extract a ExercisePlan object from an Intent
      */
-    public static ExercisePlanRecord extractExercisePlanFromIntent(Intent data) {
-        return data.getParcelableExtra(INTENT_EXTRA_EXERCISE_PLAN_RECORD);
+    public static ExercisePlan extractExercisePlanFromIntent(Intent data) {
+        return data.getParcelableExtra(INTENT_EXTRA_EXERCISE_PLAN);
     }
 
     @Override

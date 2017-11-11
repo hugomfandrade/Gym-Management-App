@@ -17,8 +17,8 @@ import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.data.Exercise;
-import org.hugoandrade.gymapp.data.ExercisePlanRecord;
-import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
+import org.hugoandrade.gymapp.data.ExercisePlan;
+import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.presenter.BuildWorkoutPresenter;
 import org.hugoandrade.gymapp.utils.UIUtils;
@@ -54,7 +54,7 @@ public class BuildWorkoutActivity extends ActivityBase<MVP.RequiredBuildWorkoutV
     /**
      * The Exercise Plan of this instance
      */
-    private ExercisePlanRecord mExercisePlan;
+    private ExercisePlan mExercisePlan;
 
     /**
      * The selected user
@@ -103,7 +103,7 @@ public class BuildWorkoutActivity extends ActivityBase<MVP.RequiredBuildWorkoutV
         mMember = extractUserFromIntent(getIntent());
 
         // build empty exercise plan
-        mExercisePlan = ExercisePlanRecord.empty(mMember, Calendar.getInstance());
+        mExercisePlan = ExercisePlan.empty(mMember, Calendar.getInstance());
 
         initializeUI();
 
@@ -129,7 +129,7 @@ public class BuildWorkoutActivity extends ActivityBase<MVP.RequiredBuildWorkoutV
                 if (GlobalData.getUser().getCredential().equals(User.Credential.STAFF))
                     // save the suggested exercise plan
                     getPresenter().createSuggestedWorkout(
-                            new ExercisePlanRecordSuggested(GlobalData.getUser(), mExercisePlan));
+                            new ExercisePlanSuggested(GlobalData.getUser(), mExercisePlan));
                 else if (GlobalData.getUser().getCredential().equals(User.Credential.MEMBER))
                     // save the exercise plan
                     getPresenter().createWorkout(mExercisePlan);
@@ -197,7 +197,7 @@ public class BuildWorkoutActivity extends ActivityBase<MVP.RequiredBuildWorkoutV
     }
 
     @Override
-    public void exercisePlanCreated(ExercisePlanRecord exercisePlanRecord) {
+    public void exercisePlanCreated(ExercisePlan exercisePlan) {
         finish();
     }
 

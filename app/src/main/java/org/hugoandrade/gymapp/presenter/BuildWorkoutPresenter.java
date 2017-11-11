@@ -4,8 +4,8 @@ import android.content.Context;
 
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.Exercise;
-import org.hugoandrade.gymapp.data.ExercisePlanRecord;
-import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
+import org.hugoandrade.gymapp.data.ExercisePlan;
+import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.model.BuildWorkoutModel;
 
 import java.util.List;
@@ -58,21 +58,21 @@ public class BuildWorkoutPresenter extends PresenterBase<MVP.RequiredBuildWorkou
     }
 
     @Override
-    public void createWorkout(ExercisePlanRecord exercisePlanRecord) {
+    public void createWorkout(ExercisePlan exercisePlan) {
         // disable UI while waiting for web service response
         getView().disableUI();
 
         // save exercise plan record in web service
-        getModel().createWorkout(exercisePlanRecord);
+        getModel().createWorkout(exercisePlan);
     }
 
     @Override
-    public void createSuggestedWorkout(ExercisePlanRecordSuggested exercisePlanRecordSuggested) {
+    public void createSuggestedWorkout(ExercisePlanSuggested exercisePlanSuggested) {
         // disable UI while waiting for web service response
         getView().disableUI();
 
         // save suggested exercise plan record in web service
-        getModel().createSuggestedWorkout(exercisePlanRecordSuggested);
+        getModel().createSuggestedWorkout(exercisePlanSuggested);
     }
 
     @Override
@@ -108,12 +108,12 @@ public class BuildWorkoutPresenter extends PresenterBase<MVP.RequiredBuildWorkou
     }
 
     @Override
-    public void creatingExercisePlanOperationResult(boolean wasOperationSuccessful, String errorMessage, ExercisePlanRecord exercisePlanRecord) {
+    public void creatingExercisePlanOperationResult(boolean wasOperationSuccessful, String errorMessage, ExercisePlan exercisePlan) {
 
         if (wasOperationSuccessful) {
 
             // operation was successful, return to previous activity
-            getView().exercisePlanCreated(exercisePlanRecord);
+            getView().exercisePlanCreated(exercisePlan);
         }
         else {
             // operation failed, show error message
@@ -128,7 +128,7 @@ public class BuildWorkoutPresenter extends PresenterBase<MVP.RequiredBuildWorkou
     @Override
     public void creatingExercisePlanSuggestedOperationResult(boolean wasOperationSuccessful,
                                                              String errorMessage,
-                                                             ExercisePlanRecordSuggested exercisePlanRecordSuggested) {
+                                                             ExercisePlanSuggested exercisePlanSuggested) {
 
         if (wasOperationSuccessful) {
 

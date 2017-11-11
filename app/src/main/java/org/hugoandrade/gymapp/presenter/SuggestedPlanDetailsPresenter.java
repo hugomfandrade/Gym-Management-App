@@ -2,13 +2,11 @@ package org.hugoandrade.gymapp.presenter;
 
 import android.content.Context;
 
-import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
-import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
+import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.model.SuggestedPlanDetailsModel;
 
 import java.util.Calendar;
-import java.util.List;
 
 public class SuggestedPlanDetailsPresenter extends PresenterBase<MVP.RequiredSuggestedPlanDetailsViewOps,
                                                                  MVP.RequiredSuggestedPlanDetailsPresenterOps,
@@ -50,7 +48,7 @@ public class SuggestedPlanDetailsPresenter extends PresenterBase<MVP.RequiredSug
 
 
     @Override
-    public void dismissSuggestedPlan(ExercisePlanRecordSuggested suggestedPlan, boolean wasDone) {
+    public void dismissSuggestedPlan(ExercisePlanSuggested suggestedPlan, boolean wasDone) {
         // disable UI while waiting for web service response
         getView().disableUI();
 
@@ -62,7 +60,7 @@ public class SuggestedPlanDetailsPresenter extends PresenterBase<MVP.RequiredSug
     @Override
     public void dismissingSuggestedPlanOperationResult(boolean wasOperationSuccessful,
                                                        String errorMessage,
-                                                       ExercisePlanRecordSuggested suggestedPlan) {
+                                                       ExercisePlanSuggested suggestedPlan) {
 
         if (wasOperationSuccessful) {
 

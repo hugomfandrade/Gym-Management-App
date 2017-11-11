@@ -14,14 +14,7 @@ public class MobileServiceJsonTableBuilder {
         return new MobileServiceJsonTableBuilder(name, client);
     }
 
-    public static MobileServiceJsonTableBuilder instance() {
-        return new MobileServiceJsonTableBuilder();
-    }
-
     private MobileServiceJsonTable mMobileServiceJsonTable;
-
-    private MobileServiceJsonTableBuilder() {
-    }
 
     private MobileServiceJsonTableBuilder(String name, MobileServiceClient client) {
         mMobileServiceJsonTable = new MobileServiceJsonTable(name, client);

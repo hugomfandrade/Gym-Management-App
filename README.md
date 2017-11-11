@@ -65,11 +65,11 @@ Succintly, the structured data is described as having:
 * Gym **User**(s) which can have **Admin**, **Staff** or **Member** credential
 * **WaitingUser**(s) which are temporary gym users created by the **Admin** that are waiting to sign up
 * **StaffMember**(s) which are associations between gym members and gym staff
-* **ExercisePlanRecord**(s) which are built by the gym members and have multiple **ExerciseSet**(s)
+* **ExercisePlan**(s) which are built by the gym members and have multiple **ExerciseSet**(s)
 * **ExerciseSet**(s) which are described by an **Exercise** and a list of **ExerciseRecord**
 * **ExerciseRecord**(s) which are described by the number of repetitions that the **Exercise** of the parent **ExerciseSet** was done.
 * **Exercise** which are built by the **Admin**
-* **ExercisePlanRecordSuggested**(s) which are built by the gym staff for a specific gym member and have the samre child structure as the **ExercisePlanRecordSuggested**(s)
+* **ExercisePlanSuggested**(s) which are built by the gym staff for a specific gym member and have the samre child structure as the **ExercisePlanSuggested**(s)
 
 ### REST APIs
 
@@ -91,9 +91,9 @@ Acccording to data structure and the design of the Android App, the following RE
 * **StaffMember**:
     * GET: by Staff and Member
     * POST: by Staff
-* **ExercisePlanRecord**:
+* **ExercisePlan**:
     * GET: by Staff and Member
-* **ExercisePlanRecord**/(id):
+* **ExercisePlan**/(id):
     * PUT: by Member
 * **ExerciseSet**:
     * GET: by Staff and Member
@@ -108,9 +108,9 @@ Acccording to data structure and the design of the Android App, the following RE
 * **Exercise**/(id):
     * GET: by Staff and Member
     * PUT: by Admin
-* **ExercisePlanRecordSuggested**:
+* **ExercisePlanSuggested**:
     * GET: by Member
-* **ExercisePlanRecordSuggested**/(id):
+* **ExercisePlanSuggested**/(id):
     * PUT: by Staff
     * DELETE: by Member
 

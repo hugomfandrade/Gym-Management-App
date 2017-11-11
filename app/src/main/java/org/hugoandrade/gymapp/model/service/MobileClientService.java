@@ -31,8 +31,8 @@ import com.squareup.okhttp.OkHttpClient;
 
 import org.hugoandrade.gymapp.DevConstants;
 import org.hugoandrade.gymapp.data.Exercise;
-import org.hugoandrade.gymapp.data.ExercisePlanRecord;
-import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
+import org.hugoandrade.gymapp.data.ExercisePlan;
+import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.data.ExerciseRecord;
 import org.hugoandrade.gymapp.data.ExerciseSet;
 import org.hugoandrade.gymapp.data.StaffMember;
@@ -67,6 +67,8 @@ public class MobileClientService extends LifecycleLoggingService {
 
     private MobileClientDataJsonParser parser = new MobileClientDataJsonParser();
     private MobileClientDataJsonFormatter formatter = new MobileClientDataJsonFormatter();
+
+    static final int numberOfItemsInWhereClause = 10;
 
     /**
      * Factory method that returns an explicit Intent this Service
@@ -639,29 +641,29 @@ public class MobileClientService extends LifecycleLoggingService {
 
         /**
          * Create Exercise Plan Operation. Returns false if MobileServiceClient is null (no network
-         * connection). Insert into the table ExercisePlanRecord in the Web Service
-         * the ExercisePlanRecord object. This requires to then insert the child ExerciseSet objects
+         * connection). Insert into the table ExercisePlan in the Web Service
+         * the ExercisePlan object. This requires to then insert the child ExerciseSet objects
          * and the child ExerciseRecord object of each ExerciseSet
          */
         @Override
-        public boolean createWorkout(final ExercisePlanRecord exercisePlanRecord) throws RemoteException {
+        public boolean createWorkout(final ExercisePlan exercisePlan) throws RemoteException {
             if (mMobileServiceClient == null)
                 return false;
 
-            // Insert ExercisePlanRecord object
+            // Insert ExercisePlan object
             ListenableFuture<JsonObject> future
-                    = new MobileServiceJsonTable(ExercisePlanRecord.Entry.TABLE_NAME, mMobileServiceClient)
-                    .insert(formatter.getAsJsonObject(exercisePlanRecord));
+                    = new MobileServiceJsonTable(ExercisePlan.Entry.TABLE_NAME, mMobileServiceClient)
+                    .insert(formatter.getAsJsonObject(exercisePlan));
             Futures.addCallback(future, new FutureCallback<JsonObject>() {
                 @Override
                 public void onSuccess(JsonObject jsonObject) {
                     // Extract resulting ID, and to each child ExerciseSet
-                    // set the id of the parent ExercisePlanRecord and
+                    // set the id of the parent ExercisePlan and
                     // insert them into the ExerciseSet table.
-                    String exercisePlanRecordID = parser.parseString(jsonObject, ExercisePlanRecord.Entry.Cols.ID);
+                    String exercisePlanID = parser.parseString(jsonObject, ExercisePlan.Entry.Cols.ID);
 
-                    for (final ExerciseSet exerciseSet : exercisePlanRecord.getExerciseSetList()) {
-                        exerciseSet.setExercisePlanRecordID(exercisePlanRecordID);
+                    for (final ExerciseSet exerciseSet : exercisePlan.getExerciseSetList()) {
+                        exerciseSet.setExercisePlanID(exercisePlanID);
 
                         ListenableFuture<JsonObject> future
                                 = new MobileServiceJsonTable(ExerciseSet.Entry.TABLE_NAME, mMobileServiceClient)
@@ -725,30 +727,30 @@ public class MobileClientService extends LifecycleLoggingService {
 
         /**
          * Create Suggested Exercise Plan Operation. Returns false if MobileServiceClient is null
-         * (no network connection). Insert into the table ExercisePlanRecordSuggested in the Web Service
-         * the ExercisePlanRecordSuggested object. This requires to then insert the child ExerciseSet objects
+         * (no network connection). Insert into the table ExercisePlanSuggested in the Web Service
+         * the ExercisePlanSuggested object. This requires to then insert the child ExerciseSet objects
          * and the child ExerciseRecord object of each ExerciseSet
          */
         @Override
-        public boolean createSuggestedWorkout(final ExercisePlanRecordSuggested exercisePlanRecordSuggested) throws RemoteException {
+        public boolean createSuggestedWorkout(final ExercisePlanSuggested exercisePlanSuggested) throws RemoteException {
             if (mMobileServiceClient == null)
                 return false;
 
-            // Insert ExercisePlanRecordSuggested object
+            // Insert ExercisePlanSuggested object
             ListenableFuture<JsonObject> future
-                    = new MobileServiceJsonTable(ExercisePlanRecordSuggested.Entry.TABLE_NAME, mMobileServiceClient)
-                    .insert(formatter.getAsJsonObject(exercisePlanRecordSuggested));
+                    = new MobileServiceJsonTable(ExercisePlanSuggested.Entry.TABLE_NAME, mMobileServiceClient)
+                    .insert(formatter.getAsJsonObject(exercisePlanSuggested));
             Futures.addCallback(future, new FutureCallback<JsonObject>() {
                 @Override
                 public void onSuccess(JsonObject jsonObject) {
 
                     // Extract resulting ID, and to each child ExerciseSet
-                    // set the id of the parent ExercisePlanRecordSuggested and
+                    // set the id of the parent ExercisePlanSuggested and
                     // insert them into the ExerciseSet table.
-                    String exercisePlanRecordID = parser.parseString(jsonObject, ExercisePlanRecord.Entry.Cols.ID);
+                    String exercisePlanID = parser.parseString(jsonObject, ExercisePlan.Entry.Cols.ID);
 
-                    for (final ExerciseSet exerciseSet : exercisePlanRecordSuggested.getExerciseSetList()) {
-                        exerciseSet.setExercisePlanRecordID(exercisePlanRecordID);
+                    for (final ExerciseSet exerciseSet : exercisePlanSuggested.getExerciseSetList()) {
+                        exerciseSet.setExercisePlanID(exercisePlanID);
 
                         ListenableFuture<JsonObject> future
                                 = new MobileServiceJsonTable(ExerciseSet.Entry.TABLE_NAME, mMobileServiceClient)
@@ -813,38 +815,38 @@ public class MobileClientService extends LifecycleLoggingService {
 
         /**
          * Get Exercise Plans Operation. Returns false if MobileServiceClient is null (no network
-         * connection). Query the table ExercisePlanRecord in the Web Service in order to get
+         * connection). Query the table ExercisePlan in the Web Service in order to get
          * all exercise plans associated with the Gym Member whose id is 'userID'.
          */
         @Override
-        public boolean getExercisePlanRecordList(String userID) throws RemoteException {
+        public boolean getExercisePlanList(String userID) throws RemoteException {
             if (mMobileServiceClient == null)
                 return false;
 
             // Get all exercise plan records whose ID is associated with the Member
             // whose id is userID
             ListenableFuture<JsonElement> future
-                    = new MobileServiceJsonTable(ExercisePlanRecord.Entry.TABLE_NAME, mMobileServiceClient)
-                    .where().field(ExercisePlanRecord.Entry.Cols.MEMBER_ID).eq(userID)
+                    = new MobileServiceJsonTable(ExercisePlan.Entry.TABLE_NAME, mMobileServiceClient)
+                    .where().field(ExercisePlan.Entry.Cols.MEMBER_ID).eq(userID)
                     .execute();
             Futures.addCallback(future, new FutureCallback<JsonElement>() {
                 @Override
                 public void onSuccess(JsonElement result) {
                     // Parse the resulting JsonElement into a list of ExercisePlans
-                    List<ExercisePlanRecord> exercisePlanRecordList
-                            = parser.parseExercisePlanRecords(result);
+                    List<ExercisePlan> exercisePlanList
+                            = parser.parseExercisePlans(result);
 
                     // Get all the Exercise Plans info (the gym member username, and the complete
                     // info of its child list of Exercise Sets) by calling this AsyncTask
-                    GetExercisePlanRecordInfoTask.instance(mMobileServiceClient)
-                            .setOnFinishedListener(new BaseTask.OnFinishedListener<ExercisePlanRecord>() {
+                    GetExercisePlanInfoTask.instance(mMobileServiceClient)
+                            .setOnFinishedListener(new BaseTask.OnFinishedListener<ExercisePlan>() {
                                 @Override
-                                public void onFinished(List<ExercisePlanRecord> resultList) {
+                                public void onFinished(List<ExercisePlan> resultList) {
 
                                     // Sort the list in order of their respective datetimes
-                                    Collections.sort(resultList, new Comparator<ExercisePlanRecord>() {
+                                    Collections.sort(resultList, new Comparator<ExercisePlan>() {
                                         @Override
-                                        public int compare(ExercisePlanRecord o1, ExercisePlanRecord o2) {
+                                        public int compare(ExercisePlan o1, ExercisePlan o2) {
                                             return o1.getDatetime().before(o2.getDatetime())? 1 : -1;
                                         }
                                     });
@@ -853,7 +855,7 @@ public class MobileClientService extends LifecycleLoggingService {
                                     MobileClientData m = new MobileClientData(
                                             MobileClientData.OPERATION_GET_HISTORY,
                                             MobileClientData.OPERATION_SUCCESS);
-                                    m.setExercisePlanRecordList(resultList);
+                                    m.setExercisePlanList(resultList);
 
                                     try {
                                         if (mCallback != null)
@@ -864,8 +866,8 @@ public class MobileClientService extends LifecycleLoggingService {
                                 }
                             }).executeOnExecutor(
                             AsyncTask.THREAD_POOL_EXECUTOR,
-                            exercisePlanRecordList.toArray(
-                                    new ExercisePlanRecord[exercisePlanRecordList.size()]));
+                            exercisePlanList.toArray(
+                                    new ExercisePlan[exercisePlanList.size()]));
 
                 }
 
@@ -881,41 +883,41 @@ public class MobileClientService extends LifecycleLoggingService {
 
         /**
          * Get Suggested Exercise Plans Operation. Returns false if MobileServiceClient is null
-         * (no network connection). Query the table ExercisePlanRecordSuggested in the Web Service
+         * (no network connection). Query the table ExercisePlanSuggested in the Web Service
          * in order to get all suggested exercise plans associated with the Gym Member
          * whose id is 'userID'.
          */
         @Override
-        public boolean getExercisePlanRecordSuggestedList(String userID) throws RemoteException {
+        public boolean getExercisePlanSuggestedList(String userID) throws RemoteException {
             if (mMobileServiceClient == null)
                 return false;
 
             // Get all suggested exercise plan records whose ID is associated with the Member
             // whose id is userID
             ListenableFuture<JsonElement> future
-                    = new MobileServiceJsonTable(ExercisePlanRecordSuggested.Entry.TABLE_NAME, mMobileServiceClient)
-                    .where().field(ExercisePlanRecordSuggested.Entry.Cols.MEMBER_ID).eq(userID)
+                    = new MobileServiceJsonTable(ExercisePlanSuggested.Entry.TABLE_NAME, mMobileServiceClient)
+                    .where().field(ExercisePlanSuggested.Entry.Cols.MEMBER_ID).eq(userID)
                     .execute();
             Futures.addCallback(future, new FutureCallback<JsonElement>() {
                 @Override
                 public void onSuccess(JsonElement result) {
 
                     // Parse the resulting JsonElement into a list of suggested ExercisePlans
-                    List<ExercisePlanRecordSuggested> exercisePlanRecordSuggestedList
-                            = parser.parseExercisePlanRecordSuggesteds(result);
+                    List<ExercisePlanSuggested> exercisePlanSuggestedList
+                            = parser.parseExercisePlanSuggesteds(result);
 
                     // Get all the suggested Exercise Plans info (the gym member username,
                     // and the complete info of its child list of Exercise Sets)
                     // by calling this AsyncTask
-                    GetExercisePlanRecordSuggestedInfoTask.instance(mMobileServiceClient)
-                            .setOnFinishedListener(new BaseTask.OnFinishedListener<ExercisePlanRecordSuggested>() {
+                    GetExercisePlanSuggestedInfoTask.instance(mMobileServiceClient)
+                            .setOnFinishedListener(new BaseTask.OnFinishedListener<ExercisePlanSuggested>() {
                                 @Override
-                                public void onFinished(List<ExercisePlanRecordSuggested> resultList) {
+                                public void onFinished(List<ExercisePlanSuggested> resultList) {
 
                                     // Sort the list in order of their respective datetimes
-                                    Collections.sort(resultList, new Comparator<ExercisePlanRecordSuggested>() {
+                                    Collections.sort(resultList, new Comparator<ExercisePlanSuggested>() {
                                         @Override
-                                        public int compare(ExercisePlanRecordSuggested o1, ExercisePlanRecordSuggested o2) {
+                                        public int compare(ExercisePlanSuggested o1, ExercisePlanSuggested o2) {
                                             return o1.getDatetime().before(o2.getDatetime())? 1 : -1;
                                         }
                                     });
@@ -924,7 +926,7 @@ public class MobileClientService extends LifecycleLoggingService {
                                     MobileClientData m = new MobileClientData(
                                             MobileClientData.OPERATION_GET_HISTORY_SUGGESTED,
                                             MobileClientData.OPERATION_SUCCESS);
-                                    m.setExercisePlanRecordSuggestedList(resultList);
+                                    m.setExercisePlanSuggestedList(resultList);
 
                                     try {
                                         if (mCallback != null)
@@ -935,8 +937,8 @@ public class MobileClientService extends LifecycleLoggingService {
                                 }
                             }).executeOnExecutor(
                             AsyncTask.THREAD_POOL_EXECUTOR,
-                            exercisePlanRecordSuggestedList.toArray(
-                                    new ExercisePlanRecordSuggested[exercisePlanRecordSuggestedList.size()]));
+                            exercisePlanSuggestedList.toArray(
+                                    new ExercisePlanSuggested[exercisePlanSuggestedList.size()]));
 
                 }
 
@@ -953,37 +955,37 @@ public class MobileClientService extends LifecycleLoggingService {
         /**
          * Dismiss Suggested Exercise Plan Operation. Returns false if MobileServiceClient is null
          * (no network connection). Delete the suggested exercise plan from the table
-         * ExercisePlanRecordSuggested in the Web Service and, if the Member set the suggested plan
-         * as done, insert a copy of the suggested plan into the ExercisePlanRecord table.
+         * ExercisePlanSuggested in the Web Service and, if the Member set the suggested plan
+         * as done, insert a copy of the suggested plan into the ExercisePlan table.
          */
         @Override
-        public boolean dismissSuggestedPlan(final ExercisePlanRecordSuggested exercisePlanRecordSuggested,
+        public boolean dismissSuggestedPlan(final ExercisePlanSuggested exercisePlanSuggested,
                                             final boolean wasDone) throws RemoteException {
             if (mMobileServiceClient == null)
                 return false;
 
             // get the suggested exercise plan as a JsonObject and make sure the ID is added
-            JsonObject jsonObject = formatter.getAsJsonObject(exercisePlanRecordSuggested);
-            jsonObject.addProperty(ExercisePlanRecordSuggested.Entry.Cols.ID, exercisePlanRecordSuggested.getID());
+            JsonObject jsonObject = formatter.getAsJsonObject(exercisePlanSuggested);
+            jsonObject.addProperty(ExercisePlanSuggested.Entry.Cols.ID, exercisePlanSuggested.getID());
 
-            // delete it from the ExercisePlanRecordSuggested table
+            // delete it from the ExercisePlanSuggested table
             ListenableFuture<Void> future
-                    = new MobileServiceJsonTable(ExercisePlanRecordSuggested.Entry.TABLE_NAME, mMobileServiceClient)
+                    = new MobileServiceJsonTable(ExercisePlanSuggested.Entry.TABLE_NAME, mMobileServiceClient)
                     .delete(jsonObject);
             Futures.addCallback(future, new FutureCallback<Void>() {
                 @Override
                 public void onSuccess(@Nullable Void result) {
                     // if the Member set the suggested plan as done,
                     // insert a copy of the suggested plan into the
-                    // ExercisePlanRecord table
+                    // ExercisePlan table
                     if (wasDone)
-                        createWorkout(exercisePlanRecordSuggested);
+                        createWorkout(exercisePlanSuggested);
 
                     // Callback the original suggested exercise plan
                     MobileClientData m = new MobileClientData(
                             MobileClientData.OPERATION_DISMISS_SUGGESTED_PLAN,
                             MobileClientData.OPERATION_SUCCESS);
-                    m.setExercisePlanRecordSuggested(exercisePlanRecordSuggested);
+                    m.setExercisePlanSuggested(exercisePlanSuggested);
 
                     try {
                         if (mCallback != null)
@@ -1093,53 +1095,63 @@ public class MobileClientService extends LifecycleLoggingService {
         }
 
         /**
-         * Insert a copy of the suggested plan into the ExercisePlanRecord table
+         * Insert a copy of the suggested plan into the ExercisePlan table.
+         * This method splits the items in buffers of 'numberOfItemsInWhereClause'
+         * in order to avoid error of where clause being to long.
          */
-        private void createWorkout(ExercisePlanRecordSuggested exercisePlanRecordSuggested) {
-            // Get the ExercisePlanRecordSuggested object as an ExercisePlanRecord object
-            final ExercisePlanRecord planRecord = exercisePlanRecordSuggested.getAsExercisePlan();
+        private void createWorkout(ExercisePlanSuggested exercisePlanSuggested) {
+            // Get the ExercisePlanSuggested object as an ExercisePlan object
+            final ExercisePlan plan = exercisePlanSuggested;
 
-            // Insert ExercisePlanRecord object
+            // Insert ExercisePlan object
             ListenableFuture<JsonObject> future
-                    = new MobileServiceJsonTable(ExercisePlanRecord.Entry.TABLE_NAME, mMobileServiceClient)
-                    .insert(formatter.getAsJsonObject(planRecord));
+                    = new MobileServiceJsonTable(ExercisePlan.Entry.TABLE_NAME, mMobileServiceClient)
+                    .insert(formatter.getAsJsonObject(plan));
             Futures.addCallback(future, new FutureCallback<JsonObject>() {
                 @Override
                 public void onSuccess(JsonObject jsonObject) {
                     // Extract resulting ID, and to each child ExerciseSet
-                    // set the id of the parent ExercisePlanRecord and
-                    // insert them into the ExerciseSet table.
-                    String exercisePlanRecordID = parser.parseString(jsonObject, ExercisePlanRecord.Entry.Cols.ID);
+                    // set the id of the parent ExercisePlan and update the
+                    // the ExercisePlanID column into the ExerciseSet table.
+                    final String exercisePlanID = parser.parseString(jsonObject, ExercisePlan.Entry.Cols.ID);
 
-                    for (final ExerciseSet exerciseSet : planRecord.getExerciseSetList()) {
-                        exerciseSet.setExercisePlanRecordID(exercisePlanRecordID);
+                    List<ExerciseSet> setList = plan.getExerciseSetList();
+                    List<SplitPair> splitPairList = getSplitPairList(setList.size(), numberOfItemsInWhereClause);
 
-                        ListenableFuture<JsonObject> future
-                                = new MobileServiceJsonTable(ExerciseSet.Entry.TABLE_NAME, mMobileServiceClient)
-                                .insert(formatter.getAsJsonObject(exerciseSet));
-                        Futures.addCallback(future, new FutureCallback<JsonObject>() {
+                    for (SplitPair s : splitPairList) {
+                        List<ExerciseSet> exerciseSetList = setList.subList(s.init, s.end);
+
+                        String[] ids = MobileClientServiceHelper.getIDsOfExerciseSets(exerciseSetList);
+
+                        ListenableFuture<JsonElement> future =
+                                MobileServiceJsonTableBuilder.instance(ExerciseSet.Entry.TABLE_NAME, mMobileServiceClient)
+                                        .where(ExerciseSet.Entry.Cols.ID, ids)
+                                        .execute();
+                        Futures.addCallback(future, new FutureCallback<JsonElement>() {
                             @Override
-                            public void onSuccess(JsonObject jsonObject) {
-                                // Extract resulting ID, and to each child ExerciseRecord
-                                // set the id of the parent ExerciseSet and
-                                // insert them into the ExerciseRecord table.
-                                String exerciseSetID = parser.parseString(jsonObject, ExerciseSet.Entry.Cols.ID);
+                            public void onSuccess(@Nullable JsonElement result) {
+                                if (result == null) {
+                                    Log.e(TAG, "Error getting ExerciseSets: none found");
+                                    return;
+                                }
+                                for (JsonElement jsonElement : result.getAsJsonArray()) {
+                                    JsonObject jsonObject = jsonElement.getAsJsonObject();
+                                    jsonObject.addProperty(
+                                            ExerciseSet.Entry.Cols.EXERCISE_PLAN_RECORD_ID,
+                                            exercisePlanID);
 
-                                for (final ExerciseRecord exerciseRecord : exerciseSet.getExerciseRecordList()) {
-                                    exerciseRecord.setExerciseSetID(exerciseSetID);
-
-                                    ListenableFuture<JsonObject> future
-                                            = new MobileServiceJsonTable(ExerciseRecord.Entry.TABLE_NAME, mMobileServiceClient)
-                                            .insert(formatter.getAsJsonObject(exerciseRecord));
+                                    ListenableFuture<JsonObject> future =
+                                            new MobileServiceJsonTable(ExerciseSet.Entry.TABLE_NAME, mMobileServiceClient)
+                                                    .update(jsonObject);
                                     Futures.addCallback(future, new FutureCallback<JsonObject>() {
                                         @Override
                                         public void onSuccess(JsonObject jsonObject) {
-                                            Log.d(TAG, "Successfully inserted ExerciseRecord");
+                                            Log.d(TAG, "Successfully updated ExerciseSet");
                                         }
 
                                         @Override
                                         public void onFailure(@NonNull Throwable t) {
-                                            Log.e(TAG, "Error inserting ExerciseRecord: " + t.getMessage());
+                                            Log.e(TAG, "Error updating ExerciseSet: " + t.getMessage());
                                         }
                                     });
                                 }
@@ -1147,15 +1159,16 @@ public class MobileClientService extends LifecycleLoggingService {
 
                             @Override
                             public void onFailure(@NonNull Throwable t) {
-                                Log.e(TAG, "Error inserting ExerciseSet: " + t.getMessage());
+                                Log.e(TAG, "Error getting ExerciseSets: " + t.getMessage());
                             }
                         });
+
                     }
                 }
 
                 @Override
                 public void onFailure(@NonNull Throwable t) {
-                    Log.e(TAG, "Error inserting ExercisePlanRecord: " + t.getMessage());
+                    Log.e(TAG, "Error inserting ExercisePlan: " + t.getMessage());
                 }
             });
         }
@@ -1294,26 +1307,26 @@ public class MobileClientService extends LifecycleLoggingService {
     }
 
     /**
-     * Async Task class which fetches all the info of the list of ExercisePlanRecordSuggested(s)
+     * Async Task class which fetches all the info of the list of ExercisePlanSuggested(s)
      * (the gym member username and credential, and the complete info of its child list of
      * Exercise Sets)  asynchronously.
      */
-    private static class GetExercisePlanRecordSuggestedInfoTask extends BaseTask<ExercisePlanRecordSuggested> {
+    private static class GetExercisePlanSuggestedInfoTask extends BaseTask<ExercisePlanSuggested> {
 
-        public static GetExercisePlanRecordSuggestedInfoTask instance(MobileServiceClient mobileServiceClient) {
-            return new GetExercisePlanRecordSuggestedInfoTask(mobileServiceClient);
+        public static GetExercisePlanSuggestedInfoTask instance(MobileServiceClient mobileServiceClient) {
+            return new GetExercisePlanSuggestedInfoTask(mobileServiceClient);
         }
 
-        GetExercisePlanRecordSuggestedInfoTask(MobileServiceClient mobileServiceClient) {
+        GetExercisePlanSuggestedInfoTask(MobileServiceClient mobileServiceClient) {
             super(mobileServiceClient);
         }
 
         @Override
-        protected void doProcessing(final ExercisePlanRecordSuggested[] records) {
+        protected void doProcessing(final ExercisePlanSuggested[] records) {
 
-            // Extract the ids of the all User objects of all ExercisePlanRecord(s)
+            // Extract the ids of the all User objects of all ExercisePlan(s)
             final List<String> ids = new ArrayList<>();
-            for (ExercisePlanRecordSuggested record : records) {
+            for (ExercisePlanSuggested record : records) {
                 if (!ids.contains(record.getMemberID()))
                     ids.add(record.getMemberID());
                 if (!ids.contains(record.getStaffID()))
@@ -1331,9 +1344,9 @@ public class MobileClientService extends LifecycleLoggingService {
                         @Override
                         public void onFinished(List<User> resultList) {
 
-                            // Set the resulting User object into the ExercisePlanRecord(s)
+                            // Set the resulting User object into the ExercisePlan(s)
                             // accordingly
-                            for (ExercisePlanRecordSuggested record : records) {
+                            for (ExercisePlanSuggested record : records) {
                                 for (User user : resultList) {
                                     if (user.getID().equals(record.getMemberID()))
                                         record.setMember(user);
@@ -1343,7 +1356,7 @@ public class MobileClientService extends LifecycleLoggingService {
                             }
 
                             // Get all the complete info of their child list of Exercise Sets
-                            getExercisePlanRecordSuggestedInfo(records);
+                            getExercisePlanSuggestedInfo(records);
                         }
                     }).executeOnExecutor(
                     AsyncTask.THREAD_POOL_EXECUTOR,
@@ -1351,86 +1364,93 @@ public class MobileClientService extends LifecycleLoggingService {
         }
 
         /**
-         * Get the complete info of the list of Exercise Sets of all ExercisePlanRecordSuggested(s)
+         * Get the complete info of the list of Exercise Sets of all ExercisePlanSuggested(s).
+         * This method splits the items in buffers of 'numberOfItemsInWhereClause'
+         * in order to avoid error of where clause being to long.
          */
-        private void getExercisePlanRecordSuggestedInfo(final ExercisePlanRecordSuggested[] records) {
-            final List<String> ids = new ArrayList<>();
+        private void getExercisePlanSuggestedInfo(ExercisePlanSuggested[] plans) {
 
-            // Extract the ids of the all ExercisePlanRecord(s)
-            for (ExercisePlanRecordSuggested record : records)
-                if (!ids.contains(record.getID()))
-                    ids.add(record.getID());
+            List<ExercisePlanSuggested> planList = Arrays.asList(plans);
+            List<SplitPair> splitPairList = getSplitPairList(planList.size(), numberOfItemsInWhereClause);
 
-            // Get all ExerciseSet(s) which are associated with the extracted ids
-            ListenableFuture<JsonElement> future =
-                    MobileServiceJsonTableBuilder.instance(ExerciseSet.Entry.TABLE_NAME, mMobileServiceClient)
-                            .where(ExerciseSet.Entry.Cols.EXERCISE_PLAN_RECORD_ID, ids.toArray(new String[ids.size()]))
-                            .execute();
-            Futures.addCallback(future, new FutureCallback<JsonElement>() {
-                @Override
-                public void onSuccess(JsonElement result) {
+            for (SplitPair s : splitPairList) {
 
-                    // Get list of ExerciseSet(s) by parsing the resulting JsonElement
-                    List<ExerciseSet> exerciseSetList
-                            = parser.parseExerciseSets(result);
+                final List<ExercisePlanSuggested> exercisePlanList = planList.subList(s.init, s.end);
+                String[] ids = MobileClientServiceHelper.getIDsOfExercisePlans(exercisePlanList);
 
-                    // Get all the Exercise Sets info (the info of its child list of
-                    // ExerciseRecords) by calling this AsyncTask
-                    GetExerciseSetInfoTask.instance(mMobileServiceClient)
-                            .setOnFinishedListener(new OnFinishedListener<ExerciseSet>() {
-                                @Override
-                                public void onFinished(List<ExerciseSet> resultList) {
+                // Get all ExerciseSet(s) which are associated with the extracted ids
+                ListenableFuture<JsonElement> future =
+                        MobileServiceJsonTableBuilder.instance(ExerciseSet.Entry.TABLE_NAME, mMobileServiceClient)
+                                .where(ExerciseSet.Entry.Cols.EXERCISE_PLAN_RECORD_ID, ids)
+                                .execute();
+                Futures.addCallback(future, new FutureCallback<JsonElement>() {
+                    @Override
+                    public void onSuccess(JsonElement result) {
 
-                                    // Set the resulting list of ExerciseSet(s) into
-                                    // the ExercisePlanRecord(s) accordingly
-                                    for (ExercisePlanRecordSuggested record : records) {
-                                        for (ExerciseSet set : resultList) {
-                                            if (set.getExercisePlanRecordID().equals(record.getID()))
-                                                record.addExerciseSet(set);
+                        // Get list of ExerciseSet(s) by parsing the resulting JsonElement
+                        List<ExerciseSet> exerciseSetList
+                                = parser.parseExerciseSets(result);
+
+                        // Get all the Exercise Sets info (the info of its child list of
+                        // ExerciseRecords) by calling this AsyncTask
+                        GetExerciseSetInfoTask.instance(mMobileServiceClient)
+                                .setOnFinishedListener(new OnFinishedListener<ExerciseSet>() {
+                                    @Override
+                                    public void onFinished(List<ExerciseSet> resultList) {
+
+                                        // Set the resulting list of ExerciseSet(s) into
+                                        // the ExercisePlan(s) accordingly
+                                        for (ExercisePlanSuggested plan : exercisePlanList) {
+                                            for (ExerciseSet set : resultList) {
+                                                if (set.getExercisePlanID().equals(plan.getID()))
+                                                    plan.addExerciseSet(set);
+                                            }
+
+                                            onFetched(plan);
                                         }
-                                        onFetched(record);
+
                                     }
-                                }
-                            }).executeOnExecutor(
-                            AsyncTask.THREAD_POOL_EXECUTOR,
-                            exerciseSetList.toArray(
-                                    new ExerciseSet[exerciseSetList.size()]));
-                }
-
-                @Override
-                public void onFailure(@NonNull Throwable t) {
-                    Log.e(TAG, "Error Fetching ExercisePlanReports: " + t.getMessage());
-
-                    // Error fetching. Callback as they are
-                    for (ExercisePlanRecordSuggested record : records) {
-                        onFetched(record);
+                                }).executeOnExecutor(
+                                AsyncTask.THREAD_POOL_EXECUTOR,
+                                exerciseSetList.toArray(
+                                        new ExerciseSet[exerciseSetList.size()]));
                     }
-                }
-            });
+
+                    @Override
+                    public void onFailure(@NonNull Throwable t) {
+                        Log.e(TAG, "Error Fetching ExercisePlanReports: " + t.getMessage());
+
+                        // Error fetching. Callback as they are
+                        for (ExercisePlanSuggested plan : exercisePlanList) {
+                            onFetched(plan);
+                        }
+                    }
+                });
+            }
         }
     }
 
     /**
-     * Async Task class which fetches all the info of the list of ExercisePlanRecords (the gym
+     * Async Task class which fetches all the info of the list of ExercisePlans (the gym
      * member username and credential, and the complete info of its child list of Exercise Sets)
      * asynchronously.
      */
-    private static class GetExercisePlanRecordInfoTask extends BaseTask<ExercisePlanRecord> {
+    private static class GetExercisePlanInfoTask extends BaseTask<ExercisePlan> {
 
-        public static GetExercisePlanRecordInfoTask instance(MobileServiceClient mobileServiceClient) {
-            return new GetExercisePlanRecordInfoTask(mobileServiceClient);
+        public static GetExercisePlanInfoTask instance(MobileServiceClient mobileServiceClient) {
+            return new GetExercisePlanInfoTask(mobileServiceClient);
         }
 
-        GetExercisePlanRecordInfoTask(MobileServiceClient mobileServiceClient) {
+        GetExercisePlanInfoTask(MobileServiceClient mobileServiceClient) {
             super(mobileServiceClient);
         }
 
         @Override
-        protected void doProcessing(final ExercisePlanRecord[] records) {
+        protected void doProcessing(final ExercisePlan[] records) {
 
-            // Extract the ids of the all User objects of all ExercisePlanRecord(s)
+            // Extract the ids of the all User objects of all ExercisePlan(s)
             final List<String> ids = new ArrayList<>();
-            for (ExercisePlanRecord record : records)
+            for (ExercisePlan record : records)
                 if (!ids.contains(record.getMemberID()))
                     ids.add(record.getMemberID());
 
@@ -1444,9 +1464,9 @@ public class MobileClientService extends LifecycleLoggingService {
                     .setOnFinishedListener(new OnFinishedListener<User>() {
                         @Override
                         public void onFinished(List<User> resultList) {
-                            // Set the resulting User object into the ExercisePlanRecord(s)
+                            // Set the resulting User object into the ExercisePlan(s)
                             // accordingly
-                            for (ExercisePlanRecord record : records) {
+                            for (ExercisePlan record : records) {
                                 for (User user : resultList) {
                                     if (user.getID().equals(record.getMemberID()))
                                         record.setMember(user);
@@ -1454,7 +1474,7 @@ public class MobileClientService extends LifecycleLoggingService {
                             }
 
                             // Get all the complete info of their child list of Exercise Sets
-                            getExercisePlanRecordInfo(records);
+                            getExercisePlanInfo(records);
                         }
                     }).executeOnExecutor(
                     AsyncTask.THREAD_POOL_EXECUTOR,
@@ -1462,60 +1482,65 @@ public class MobileClientService extends LifecycleLoggingService {
         }
 
         /**
-         * Get the complete info of the list of Exercise Sets of all ExercisePlanRecord(s)
+         * Get the complete info of the list of Exercise Sets of all ExercisePlan(s).
+         * This method splits the items in buffers of 'numberOfItemsInWhereClause'
+         * in order to avoid error of where clause being to long.
          */
-        private void getExercisePlanRecordInfo(final ExercisePlanRecord[] records) {
-            final List<String> ids = new ArrayList<>();
+        private void getExercisePlanInfo(ExercisePlan[] plans) {
 
-            // Extract the ids of the all ExercisePlanRecord(s)
-            for (ExercisePlanRecord record : records)
-                if (!ids.contains(record.getID()))
-                    ids.add(record.getID());
+            List<ExercisePlan> planList = Arrays.asList(plans);
+            List<SplitPair> splitPairList = getSplitPairList(planList.size(), numberOfItemsInWhereClause);
 
-            // Get all ExerciseSet(s) which are associated with the extracted ids
-            ListenableFuture<JsonElement> future =
-                    MobileServiceJsonTableBuilder.instance(ExerciseSet.Entry.TABLE_NAME, mMobileServiceClient)
-                            .where(ExerciseSet.Entry.Cols.EXERCISE_PLAN_RECORD_ID, ids.toArray(new String[ids.size()]))
-                            .execute();
-            Futures.addCallback(future, new FutureCallback<JsonElement>() {
-                @Override
-                public void onSuccess(JsonElement result) {
-                    // Get list of ExerciseSet(s) by parsing the resulting JsonElement
-                    List<ExerciseSet> exerciseSetList
-                            = parser.parseExerciseSets(result);
+            for (SplitPair s : splitPairList) {
 
-                    // Get all the Exercise Sets info (the info of its child list of
-                    // ExerciseRecords) by calling this AsyncTask
-                    GetExerciseSetInfoTask.instance(mMobileServiceClient)
-                            .setOnFinishedListener(new OnFinishedListener<ExerciseSet>() {
-                                @Override
-                                public void onFinished(List<ExerciseSet> resultList) {
+                final List<ExercisePlan> exercisePlanList = planList.subList(s.init, s.end);
+                String[] ids = MobileClientServiceHelper.getIDsOfExercisePlans(exercisePlanList);
 
-                                    // Set the resulting list of ExerciseSet(s) into
-                                    // the ExercisePlanRecord(s) accordingly
-                                    for (ExercisePlanRecord record : records) {
-                                        for (ExerciseSet set : resultList) {
-                                            if (set.getExercisePlanRecordID().equals(record.getID()))
-                                                record.addExerciseSet(set);
+                // Get all ExerciseSet(s) which are associated with the extracted ids
+                ListenableFuture<JsonElement> future =
+                        MobileServiceJsonTableBuilder.instance(ExerciseSet.Entry.TABLE_NAME, mMobileServiceClient)
+                                .where(ExerciseSet.Entry.Cols.EXERCISE_PLAN_RECORD_ID, ids)
+                                .execute();
+                Futures.addCallback(future, new FutureCallback<JsonElement>() {
+                    @Override
+                    public void onSuccess(JsonElement result) {
+                        // Get list of ExerciseSet(s) by parsing the resulting JsonElement
+                        List<ExerciseSet> exerciseSetList
+                                = parser.parseExerciseSets(result);
+
+                        // Get all the Exercise Sets info (the info of its child list of
+                        // ExerciseRecords) by calling this AsyncTask
+                        GetExerciseSetInfoTask.instance(mMobileServiceClient)
+                                .setOnFinishedListener(new OnFinishedListener<ExerciseSet>() {
+                                    @Override
+                                    public void onFinished(List<ExerciseSet> resultList) {
+
+                                        // Set the resulting list of ExerciseSet(s) into
+                                        // the ExercisePlan(s) accordingly
+                                        for (ExercisePlan plan : exercisePlanList) {
+                                            for (ExerciseSet set : resultList) {
+                                                if (set.getExercisePlanID().equals(plan.getID()))
+                                                    plan.addExerciseSet(set);
+                                            }
+                                            onFetched(plan);
                                         }
-                                        onFetched(record);
                                     }
-                                }
-                            }).executeOnExecutor(
-                            AsyncTask.THREAD_POOL_EXECUTOR,
-                            exerciseSetList.toArray(
-                                    new ExerciseSet[exerciseSetList.size()]));
-                }
-
-                @Override
-                public void onFailure(@NonNull Throwable t) {
-                    Log.e(TAG, "Error Fetching ExercisePlanReports: " + t.getMessage());
-                    // Error fetching. Callback as they are
-                    for (ExercisePlanRecord record : records) {
-                        onFetched(record);
+                                }).executeOnExecutor(
+                                AsyncTask.THREAD_POOL_EXECUTOR,
+                                exerciseSetList.toArray(
+                                        new ExerciseSet[exerciseSetList.size()]));
                     }
-                }
-            });
+
+                    @Override
+                    public void onFailure(@NonNull Throwable t) {
+                        Log.e(TAG, "Error Fetching ExercisePlanReports: " + t.getMessage());
+                        // Error fetching. Callback as they are
+                        for (ExercisePlan plan : exercisePlanList) {
+                            onFetched(plan);
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -1571,49 +1596,54 @@ public class MobileClientService extends LifecycleLoggingService {
         }
 
         /**
-         * Get all the complete info of their child list of Exercise Recordss
+         * Get all the complete info of their child list of Exercise Records.
+         * This method splits the number in buffers of 'numberOfItemsInWhereClause'
+         * in order to avoid error of where clause being to long.
          */
-        private void getExerciseSetInfo(final ExerciseSet[] sets) {
+        private void getExerciseSetInfo(ExerciseSet[] sets) {
 
             // Extract the ids of all ExerciseSet(s)
-            final List<String> ids = new ArrayList<>();
+            List<ExerciseSet> setList = Arrays.asList(sets);
+            List<SplitPair> splitPairList = getSplitPairList(setList.size(), numberOfItemsInWhereClause);
 
-            for (ExerciseSet set : sets)
-                ids.add(set.getID());
+            for (SplitPair s : splitPairList) {
+                final List<ExerciseSet> exerciseSetList = setList.subList(s.init, s.end);
+                String[] ids = MobileClientServiceHelper.getIDsOfExerciseSets(exerciseSetList);
 
-            // Get all ExerciseRecords(s) which are associated with the extracted ids
-            ListenableFuture<JsonElement> future =
-                    MobileServiceJsonTableBuilder.instance(ExerciseRecord.Entry.TABLE_NAME, mMobileServiceClient)
-                            .where(ExerciseRecord.Entry.Cols.EXERCISE_SET_ID, ids.toArray(new String[ids.size()]))
-                            .execute();
-            Futures.addCallback(future, new FutureCallback<JsonElement>() {
-                @Override
-                public void onSuccess(JsonElement result) {
-                    // Get list of ExerciseRecord(s) by parsing the resulting JsonElement
-                    List<ExerciseRecord> exerciseRecords
-                            = parser.parseExerciseRecords(result);
+                // Get all ExerciseRecords(s) which are associated with the extracted ids
+                ListenableFuture<JsonElement> future =
+                        MobileServiceJsonTableBuilder.instance(ExerciseRecord.Entry.TABLE_NAME, mMobileServiceClient)
+                                .where(ExerciseRecord.Entry.Cols.EXERCISE_SET_ID, ids)
+                                .execute();
+                Futures.addCallback(future, new FutureCallback<JsonElement>() {
+                    @Override
+                    public void onSuccess(JsonElement result) {
+                        // Get list of ExerciseRecord(s) by parsing the resulting JsonElement
+                        List<ExerciseRecord> exerciseRecords
+                                = parser.parseExerciseRecords(result);
 
-                    // Set the resulting list of ExerciseRecord(s) into
-                    // the ExerciseSet(s) accordingly
-                    for (ExerciseSet set : sets) {
-                        for (ExerciseRecord record : exerciseRecords) {
-                            if (record.getExerciseSetID().equals(set.getID()))
-                                set.addExerciseRecord(record);
+                        // Set the resulting list of ExerciseRecord(s) into
+                        // the ExerciseSet(s) accordingly
+                        for (ExerciseSet set : exerciseSetList) {
+                            for (ExerciseRecord record : exerciseRecords) {
+                                if (record.getExerciseSetID().equals(set.getID()))
+                                    set.addExerciseRecord(record);
+                            }
+                            onFetched(set);
                         }
-                        onFetched(set);
                     }
-                }
 
-                @Override
-                public void onFailure(@NonNull Throwable t) {
-                    Log.e(TAG, "Error Fetching ExerciseRecords: " + t.getMessage());
+                    @Override
+                    public void onFailure(@NonNull Throwable t) {
+                        Log.e(TAG, "Error Fetching ExerciseRecords: " + t.getMessage());
 
-                    // Error fetching. Callback as they are
-                    for (ExerciseSet set : sets) {
-                        onFetched(set);
+                        // Error fetching. Callback as they are
+                        for (ExerciseSet set : exerciseSetList) {
+                            onFetched(set);
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
 
@@ -1648,46 +1678,55 @@ public class MobileClientService extends LifecycleLoggingService {
 
         }
 
-        private void getUserInfo(final List<User> userList) {
+        /**
+         * This method splits the items in buffers of 'numberOfItemsInWhereClause'
+         * in order to avoid error of where clause being to long.
+         */
+        private void getUserInfo(List<User> userList) {
 
             // Extract the ids of the all User(s)
-            final List<String> ids = new ArrayList<>();
+            List<SplitPair> splitPairList = getSplitPairList(userList.size(), numberOfItemsInWhereClause);
 
-            for (User user : userList)
-                ids.add(user.getID());
+            for (SplitPair s : splitPairList) {
+                final List<User> users = userList.subList(s.init, s.end);
+                String[] ids = MobileClientServiceHelper.getIDsOfUsers(users);
 
-            // Get all User(s), particularly the username, which are associated with the extracted ids
-            ListenableFuture<JsonElement> future =
-                    MobileServiceJsonTableBuilder.instance(User.Entry.TABLE_NAME, mMobileServiceClient)
-                            .where(User.Entry.Cols.ID, ids.toArray(new String[ids.size()]))
-                            .select(User.Entry.Cols.ID, User.Entry.Cols.USERNAME)
-                            .execute();
-            Futures.addCallback(future, new FutureCallback<JsonElement>() {
-                @Override
-                public void onSuccess(JsonElement result) {
-                    // Parse resulting JsonElement into list of User(s)
-                    List<User> resultList = parser.parseUsers(result);
 
-                    // Set the resulting usernames into the original list of User(s) accordingly
-                    for (User user : userList) {
-                        for (User r : resultList) {
-                            if (user.getID().equals(r.getID()))
-                                user.setUsername(r.getUsername());
+                // Get all User(s), particularly the username, which are associated with the extracted ids
+                ListenableFuture<JsonElement> future =
+                        MobileServiceJsonTableBuilder.instance(User.Entry.TABLE_NAME, mMobileServiceClient)
+                                .where(User.Entry.Cols.ID, ids)
+                                .select(User.Entry.Cols.ID, User.Entry.Cols.USERNAME)
+                                .execute();
+                Futures.addCallback(future, new FutureCallback<JsonElement>() {
+                    @Override
+                    public void onSuccess(JsonElement result) {
+                        // Parse resulting JsonElement into list of User(s)
+                        List<User> resultList = parser.parseUsers(result);
+
+                        // Set the resulting usernames into the original list of User(s) accordingly
+                        for (User user : users) {
+                            for (User r : resultList) {
+                                if (user.getID().equals(r.getID()))
+                                    user.setUsername(r.getUsername());
+                            }
+                            onFetched(user);
                         }
-                        onFetched(user);
                     }
-                }
 
-                @Override
-                public void onFailure(@NonNull Throwable t) {
-                    Log.e(TAG, "Error Fetching User: " + t.getMessage());
+                    @Override
+                    public void onFailure(@NonNull Throwable t) {
+                        Log.e(TAG, "Error Fetching User: " + t.getMessage());
 
-                    // Error fetching. Callback as they are
-                    for (User user : userList) {
-                        onFetched(user);
+                        // Error fetching. Callback as they are
+                        for (User user : users) {
+                            onFetched(user);
+                        }
                     }
-                }
-            });
+                });
+
+            }
+
         }
     }
 
@@ -1708,24 +1747,28 @@ public class MobileClientService extends LifecycleLoggingService {
 
 
         @Override
-        protected void doProcessing(final User[] users) {
+        protected void doProcessing(User[] users) {
 
-            getAdminCredential(users);
+            // This method splits the items in buffers of 'numberOfItemsInWhereClause'
+            // in order to avoid error of where clause being to long.
+            List<User> userList = Arrays.asList(users);
+            List<SplitPair> splitPairList = getSplitPairList(userList.size(), numberOfItemsInWhereClause);
+
+            for (SplitPair s : splitPairList) {
+                getAdminCredential(userList.subList(s.init, s.end));
+            }
 
         }
 
-        private void getAdminCredential(final User[] users) {
+        private void getAdminCredential(List<User> users) {
 
             // Extract the ids of the all User(s) that do not have a credential
-            final List<String> ids = new ArrayList<>();
-
-            for (User user : users)
-                if (user.getCredential() == null)
-                    ids.add(user.getID());
+            final List<User> userList = MobileClientServiceHelper.getUsersWithoutCredential(users);
+            String[] ids = MobileClientServiceHelper.getIDsOfUsers(userList);
 
             ListenableFuture<JsonElement> future =
                     MobileServiceJsonTableBuilder.instance(User.Credential.ADMIN, mMobileServiceClient)
-                            .where(User.Credential.Cols.USER_ID, ids.toArray(new String[ids.size()]))
+                            .where(User.Credential.Cols.USER_ID, ids)
                             .execute();
             Futures.addCallback(future, new FutureCallback<JsonElement>() {
                 @Override
@@ -1734,39 +1777,41 @@ public class MobileClientService extends LifecycleLoggingService {
                     List<String> resultList = parser.parseStrings(result, User.Credential.Cols.USER_ID);
 
                     // Set the admin credential the original list of User(s) accordingly
-                    for (User user : users) {
+                    boolean doAllUsersHaveCredential = true;
+                    for (User user : userList) {
                         for (String r : resultList) {
                             if (user.getID().equals(r))
                                 user.setCredential(User.Credential.ADMIN);
                         }
                         if (user.getCredential() != null)
                             onFetched(user);
+                        else
+                            doAllUsersHaveCredential = false;
 
+                        if (doAllUsersHaveCredential)
+                            return;
                     }
-                    getStaffCredential(users);
+                    getStaffCredential(userList);
                 }
 
                 @Override
                 public void onFailure(@NonNull Throwable t) {
                     Log.e(TAG, "Error Fetching Credential: " + t.getMessage());
 
-                    getStaffCredential(users);
+                    getStaffCredential(userList);
                 }
             });
         }
 
-        private void getStaffCredential(final User[] users) {
+        private void getStaffCredential(List<User>users) {
 
             // Extract the ids of the all User(s) that do not have a credential
-            final List<String> ids = new ArrayList<>();
-
-            for (User user : users)
-                if (user.getCredential() == null)
-                    ids.add(user.getID());
+            final List<User> userList = MobileClientServiceHelper.getUsersWithoutCredential(users);
+            String[] ids = MobileClientServiceHelper.getIDsOfUsers(userList);
 
             ListenableFuture<JsonElement> future =
                     MobileServiceJsonTableBuilder.instance(User.Credential.STAFF, mMobileServiceClient)
-                            .where(User.Credential.Cols.USER_ID, ids.toArray(new String[ids.size()]))
+                            .where(User.Credential.Cols.USER_ID, ids)
                             .execute();
             Futures.addCallback(future, new FutureCallback<JsonElement>() {
                 @Override
@@ -1775,39 +1820,42 @@ public class MobileClientService extends LifecycleLoggingService {
                     List<String> resultList = parser.parseStrings(result, User.Credential.Cols.USER_ID);
 
                     // Set the admin credential the original list of User(s) accordingly
-                    for (User user : users) {
+                    boolean doAllUsersHaveCredential = true;
+                    for (User user : userList) {
                         for (String r : resultList) {
                             if (user.getID().equals(r))
                                 user.setCredential(User.Credential.STAFF);
                         }
+
                         if (user.getCredential() != null)
                             onFetched(user);
+                        else
+                            doAllUsersHaveCredential = false;
 
+                        if (doAllUsersHaveCredential)
+                            return;
                     }
-                    getMemberCredential(users);
+                    getMemberCredential(userList);
                 }
 
                 @Override
                 public void onFailure(@NonNull Throwable t) {
                     Log.e(TAG, "Error Fetching User: " + t.getMessage());
 
-                    getMemberCredential(users);
+                    getMemberCredential(userList);
                 }
             });
         }
 
-        private void getMemberCredential(final User[] users) {
+        private void getMemberCredential(List<User> users) {
 
             // Extract the ids of the all User(s) that do not have a credential
-            final List<String> ids = new ArrayList<>();
-
-            for (User user : users)
-                if (user.getCredential() == null)
-                    ids.add(user.getID());
+            final List<User> userList = MobileClientServiceHelper.getUsersWithoutCredential(users);
+            String[] ids = MobileClientServiceHelper.getIDsOfUsers(userList);
 
             ListenableFuture<JsonElement> future =
                     MobileServiceJsonTableBuilder.instance(User.Credential.MEMBER, mMobileServiceClient)
-                            .where(User.Credential.Cols.USER_ID, ids.toArray(new String[ids.size()]))
+                            .where(User.Credential.Cols.USER_ID, ids)
                             .execute();
             Futures.addCallback(future, new FutureCallback<JsonElement>() {
                 @Override
@@ -1816,28 +1864,34 @@ public class MobileClientService extends LifecycleLoggingService {
                     List<String> resultList = parser.parseStrings(result, User.Credential.Cols.USER_ID);
 
                     // Set the admin credential the original list of User(s) accordingly
-                    for (User user : users) {
+                    boolean doAllUsersHaveCredential = true;
+                    for (User user : userList) {
                         for (String r : resultList) {
                             if (user.getID().equals(r))
                                 user.setCredential(User.Credential.MEMBER);
                         }
+
                         if (user.getCredential() != null)
                             onFetched(user);
+                        else
+                            doAllUsersHaveCredential = false;
 
+                        if (doAllUsersHaveCredential)
+                            return;
                     }
-                    getDefaultCredential(users);
+                    getDefaultCredential(userList);
                 }
 
                 @Override
                 public void onFailure(@NonNull Throwable t) {
                     Log.e(TAG, "Error Fetching User: " + t.getMessage());
 
-                    getDefaultCredential(users);
+                    getDefaultCredential(userList);
                 }
             });
         }
 
-        private void getDefaultCredential(final User[] users) {
+        private void getDefaultCredential(final List<User> users) {
 
             for (User user : users)
                 if (user.getCredential() == null)
@@ -1860,48 +1914,53 @@ public class MobileClientService extends LifecycleLoggingService {
         }
 
         @Override
-        protected void doProcessing(final Exercise[] exercises) {
+        protected void doProcessing(Exercise[] exercises) {
 
             // Extract the ids of the all Exercise(s)
-            final List<String> ids = new ArrayList<>();
+            List<Exercise> eList = Arrays.asList(exercises);
 
-            for (Exercise exercise : exercises)
-                ids.add(exercise.getID());
+            // This method splits the items in buffers of 'numberOfItemsInWhereClause'
+            // in order to avoid error of where clause being to long.
+            List<SplitPair> splitPairList = getSplitPairList(eList.size(), numberOfItemsInWhereClause);
 
-            // Get all Exercise(s) which are associated with the extracted ids
-            ListenableFuture<JsonElement> future =
-                    MobileServiceJsonTableBuilder.instance(Exercise.Entry.TABLE_NAME, mMobileServiceClient)
-                            .where(Exercise.Entry.Cols.ID, ids.toArray(new String[ids.size()]))
-                            .execute();
-            Futures.addCallback(future, new FutureCallback<JsonElement>() {
-                @Override
-                public void onSuccess(JsonElement result) {
+            for (SplitPair s : splitPairList) {
+                final List<Exercise> exerciseList = eList.subList(s.init, s.end);
+                String[] ids = MobileClientServiceHelper.getIDsOfExercises(exerciseList);
 
-                    // Get list of Exercise(s) by parsing the resulting JsonElement
-                    List<Exercise> resultList = parser.parseExercises(result);
+                // Get all Exercise(s) which are associated with the extracted ids
+                ListenableFuture<JsonElement> future =
+                        MobileServiceJsonTableBuilder.instance(Exercise.Entry.TABLE_NAME, mMobileServiceClient)
+                                .where(Exercise.Entry.Cols.ID, ids)
+                                .execute();
+                Futures.addCallback(future, new FutureCallback<JsonElement>() {
+                    @Override
+                    public void onSuccess(JsonElement result) {
 
-                    // Set the resulting Exercise(s) into the original list of
-                    // Exercise(s) accordingly
-                    for (Exercise exercise : exercises) {
-                        for (Exercise r : resultList) {
-                            if (exercise.getID().equals(r.getID())) {
-                                exercise.setName(r.getName());
+                        // Get list of Exercise(s) by parsing the resulting JsonElement
+                        List<Exercise> resultList = parser.parseExercises(result);
+
+                        // Set the resulting Exercise(s) into the original list of
+                        // Exercise(s) accordingly
+                        for (Exercise exercise : exerciseList) {
+                            for (Exercise r : resultList) {
+                                if (exercise.getID().equals(r.getID())) {
+                                    exercise.setName(r.getName());
+                                }
                             }
+                            onFetched(exercise);
                         }
-                        onFetched(exercise);
                     }
-                }
 
-                @Override
-                public void onFailure(@NonNull Throwable t) {
-                    Log.e(TAG, "Error Fetching Exercise: " + t.getMessage());
-                    // Error fetching. Callback as they are
-                    for (Exercise exercise : exercises) {
-                        onFetched(exercise);
+                    @Override
+                    public void onFailure(@NonNull Throwable t) {
+                        Log.e(TAG, "Error Fetching Exercise: " + t.getMessage());
+                        // Error fetching. Callback as they are
+                        for (Exercise exercise : exerciseList) {
+                            onFetched(exercise);
+                        }
                     }
-                }
-            });
-
+                });
+            }
         }
     }
 
@@ -2000,6 +2059,51 @@ public class MobileClientService extends LifecycleLoggingService {
         interface OnFinishedListener<T> {
             void onFinished(List<T> resultList);
         }
+    }
+
+    /**
+     * Class used in parallel with the 'getSplitPairList' static method in order to
+     * split the the data into buffers of certain size in order to avoid the enetwork error of
+     * the query having a too long where clause
+     */
+    private static class SplitPair {
+        final int init;
+        final int end;
+
+        SplitPair(int init, int end) {
+            this.init = init;
+            this.end = end;
+        }
+
+        @Override
+        public String toString() {
+            return "SplitPair{" +
+                    "init=" + init +
+                    ", end=" + end +
+                    '}';
+        }
+    }
+
+    /**
+     * Method that returns a list of SplitPair objects used to give instructions
+     * (init index and end index) of how to split a list of size 'size' into buffers of
+     * 'numberOfItemsInWhereClause' elements.
+     */
+    private static List<SplitPair> getSplitPairList(int size, int numberOfItemsInWhereClause) {
+
+        int numberOfSplits = size / numberOfItemsInWhereClause;
+        List<SplitPair> sList = new ArrayList<>();
+        for (int i = 0 ; i <= numberOfSplits; i++) {
+            if (i == numberOfSplits)
+                sList.add(new SplitPair(
+                        i * numberOfItemsInWhereClause,
+                        size));
+            else
+                sList.add(new SplitPair(
+                        i * numberOfItemsInWhereClause,
+                        (i + 1 ) * numberOfItemsInWhereClause));
+        }
+        return sList;
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {

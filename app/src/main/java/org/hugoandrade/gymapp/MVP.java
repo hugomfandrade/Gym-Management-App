@@ -4,8 +4,8 @@ import org.hugoandrade.gymapp.common.ContextView;
 import org.hugoandrade.gymapp.common.ModelOps;
 import org.hugoandrade.gymapp.common.PresenterOps;
 import org.hugoandrade.gymapp.data.Exercise;
-import org.hugoandrade.gymapp.data.ExercisePlanRecord;
-import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
+import org.hugoandrade.gymapp.data.ExercisePlan;
+import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.data.WaitingUser;
 
@@ -362,25 +362,25 @@ public interface MVP {
         /*
          * Suggested plan was dismissed. Return to previous activity
          */
-        void suggestedPlanDismissed(ExercisePlanRecordSuggested suggestedPlan);
+        void suggestedPlanDismissed(ExercisePlanSuggested suggestedPlan);
     }
     interface ProvidedSuggestedPlanDetailsPresenterOps extends PresenterOps<RequiredSuggestedPlanDetailsViewOps> {
         /*
          * Member dismisses the suggested plan
          */
-        void dismissSuggestedPlan(ExercisePlanRecordSuggested suggestedPlan, boolean wasDone);
+        void dismissSuggestedPlan(ExercisePlanSuggested suggestedPlan, boolean wasDone);
     }
     interface RequiredSuggestedPlanDetailsPresenterOps extends RequiredMobileClientPresenterBaseOps {
         /*
          * Handle the operation result of dismissing the suggested plan
          */
-        void dismissingSuggestedPlanOperationResult(boolean wasOperationSuccessful, String errorMessage, ExercisePlanRecordSuggested suggestedPlan);
+        void dismissingSuggestedPlanOperationResult(boolean wasOperationSuccessful, String errorMessage, ExercisePlanSuggested suggestedPlan);
     }
     interface ProvidedSuggestedPlanDetailsModelOps extends ProvidedMobileClientModelBaseOps<RequiredSuggestedPlanDetailsPresenterOps> {
         /*
          * Try dismissing the suggested plan via the Service.
          */
-        void dismissSuggestedPlan(ExercisePlanRecordSuggested suggestedPlan, boolean wasDone);
+        void dismissSuggestedPlan(ExercisePlanSuggested suggestedPlan, boolean wasDone);
     }
 
 
@@ -392,7 +392,7 @@ public interface MVP {
         /*
          * Display suggested plans in list
          */
-        void displaySuggestedPlansList(List<ExercisePlanRecordSuggested> suggestedPlanList);
+        void displaySuggestedPlansList(List<ExercisePlanSuggested> suggestedPlanList);
     }
     interface ProvidedSuggestedPlansPresenterOps extends PresenterOps<RequiredSuggestedPlansViewOps> {
     }
@@ -400,7 +400,7 @@ public interface MVP {
         /*
          * Handle the operation result of getting the suggested plans
          */
-        void gettingSuggestedPlansOperationResult(boolean wasOperationSuccessful, String errorMessage, List<ExercisePlanRecordSuggested> suggestedPlanList);
+        void gettingSuggestedPlansOperationResult(boolean wasOperationSuccessful, String errorMessage, List<ExercisePlanSuggested> suggestedPlanList);
     }
     interface ProvidedSuggestedPlansModelOps extends ProvidedMobileClientModelBaseOps<RequiredSuggestedPlansPresenterOps> {
         /*
@@ -447,7 +447,7 @@ public interface MVP {
         /*
          * Display all exercise plan records in list
          */
-        void displayExercisePlanRecordList(List<ExercisePlanRecord> exercisePlanRecordList);
+        void displayExercisePlanList(List<ExercisePlan> exercisePlanList);
 
         /*
          * Returns the ID of the selected user of this activity.
@@ -460,7 +460,7 @@ public interface MVP {
         /*
          * Handle the operation result of getting all exercise plan records of the member
          */
-        void gettingHistoryOperationResult(boolean wasOperationSuccessful, String errorMessage, List<ExercisePlanRecord> exercisePlanRecordList);
+        void gettingHistoryOperationResult(boolean wasOperationSuccessful, String errorMessage, List<ExercisePlan> exercisePlanList);
     }
     interface ProvidedHistoryModelOps extends ProvidedMobileClientModelBaseOps<RequiredHistoryPresenterOps> {
         /*
@@ -483,17 +483,17 @@ public interface MVP {
         /*
          * Notify exercise plan record was successfully created/saved and leave activity
          */
-        void exercisePlanCreated(ExercisePlanRecord exercisePlanRecord);
+        void exercisePlanCreated(ExercisePlan exercisePlan);
     }
     interface ProvidedBuildWorkoutPresenterOps extends PresenterOps<RequiredBuildWorkoutViewOps> {
         /*
          * Member wants to create by saving the built exercise plan record in the Web service.
          */
-        void createWorkout(ExercisePlanRecord exercisePlanRecord);
+        void createWorkout(ExercisePlan exercisePlan);
         /*
          * Staff wants to create by saving the suggested exercise plan record in the Web service.
          */
-        void createSuggestedWorkout(ExercisePlanRecordSuggested exercisePlanRecordSuggested);
+        void createSuggestedWorkout(ExercisePlanSuggested exercisePlanSuggested);
     }
     interface RequiredBuildWorkoutPresenterOps extends RequiredMobileClientPresenterBaseOps {
         /*
@@ -503,21 +503,21 @@ public interface MVP {
         /*
          * Handle the operation result of creating a new exercise plan record.
          */
-        void creatingExercisePlanOperationResult(boolean wasOperationSuccessful, String errorMessage, ExercisePlanRecord exercisePlanRecord);
+        void creatingExercisePlanOperationResult(boolean wasOperationSuccessful, String errorMessage, ExercisePlan exercisePlan);
         /*
          * Handle the operation result of creating a new suggested exercise plan record.
          */
-        void creatingExercisePlanSuggestedOperationResult(boolean wasOperationSuccessful, String errorMessage, ExercisePlanRecordSuggested exercisePlanRecordSuggested);
+        void creatingExercisePlanSuggestedOperationResult(boolean wasOperationSuccessful, String errorMessage, ExercisePlanSuggested exercisePlanSuggested);
     }
     interface ProvidedBuildWorkoutModelOps extends ProvidedMobileClientModelBaseOps<RequiredBuildWorkoutPresenterOps> {
         /*
-         * Try creating a new ExercisePlanRecord by trying to insert this instance via the Service.
+         * Try creating a new ExercisePlan by trying to insert this instance via the Service.
          */
-        void createWorkout(ExercisePlanRecord exercisePlanRecord);
+        void createWorkout(ExercisePlan exercisePlan);
         /*
-         * Try creating a new ExercisePlanRecordSuggested by trying to insert this instance via the Service.
+         * Try creating a new ExercisePlanSuggested by trying to insert this instance via the Service.
          */
-        void createSuggestedWorkout(ExercisePlanRecordSuggested exercisePlanRecordSuggested);
+        void createSuggestedWorkout(ExercisePlanSuggested exercisePlanSuggested);
         /*
          * Try getting all exercises via the Service.
          */

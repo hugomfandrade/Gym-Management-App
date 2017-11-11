@@ -10,7 +10,7 @@ import android.view.View;
 
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.data.Exercise;
-import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.ExercisePlan;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.view.adapter.ExerciseSetListAdapter;
 import org.hugoandrade.gymapp.view.dialog.ExercisePlanBuilderDialog;
@@ -31,9 +31,9 @@ public class SelectExercisesActivity extends AppCompatActivity  {
 
     /**
      * Constant that represents the name of the intent extra that is paired
-     * with a ExercisePlanRecord object.
+     * with a ExercisePlan object.
      */
-    private static final String INTENT_EXTRA_EXERCISE_PLAN = "intent_extract_exercise_plan_record";
+    private static final String INTENT_EXTRA_EXERCISE_PLAN = "intent_extract_exercise_plan";
 
     /**
      * Constant that represents the name of the intent extra that is paired
@@ -44,7 +44,7 @@ public class SelectExercisesActivity extends AppCompatActivity  {
     /**
      * The Exercise Plan of this instance
      */
-    private ExercisePlanRecord mExercisePlan;
+    private ExercisePlan mExercisePlan;
 
     /**
      * The selected user
@@ -74,9 +74,9 @@ public class SelectExercisesActivity extends AppCompatActivity  {
     }
 
     /**
-     * Method used to extract a ExercisePlanRecord object from an Intent
+     * Method used to extract a ExerciseRecord object from an Intent
      */
-    public static ExercisePlanRecord extractExercisePlanFromIntent(Intent data) {
+    public static ExercisePlan extractExercisePlanFromIntent(Intent data) {
         return data.getParcelableExtra(INTENT_EXTRA_EXERCISE_PLAN);
     }
 
@@ -105,7 +105,7 @@ public class SelectExercisesActivity extends AppCompatActivity  {
         mMember = extractUserFromIntent(getIntent());
 
         // build empty exercise plan
-        mExercisePlan = ExercisePlanRecord.empty(mMember, Calendar.getInstance());
+        mExercisePlan = ExercisePlan.empty(mMember, Calendar.getInstance());
 
         setResult(RESULT_CANCELED);
 

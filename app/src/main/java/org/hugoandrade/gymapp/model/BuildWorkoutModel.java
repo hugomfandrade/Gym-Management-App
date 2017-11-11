@@ -5,8 +5,8 @@ import android.util.Log;
 
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.Exercise;
-import org.hugoandrade.gymapp.data.ExercisePlanRecord;
-import org.hugoandrade.gymapp.data.ExercisePlanRecordSuggested;
+import org.hugoandrade.gymapp.data.ExercisePlan;
+import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
 import java.util.List;
@@ -25,20 +25,20 @@ public class BuildWorkoutModel extends MobileClientModelBase<MVP.RequiredBuildWo
         }
         else if (data.getOperationType() == MobileClientData.OPERATION_CREATE_EXERCISE_PLAN) {
             if (data.getOperationResult() == MobileClientData.OPERATION_SUCCESS)
-                creatingExercisePlanRequestResultSuccess(data.getExerciseRecordPlan());
+                creatingExercisePlanRequestResultSuccess(data.getExercisePlan());
             else
                 creatingExercisePlanRequestResultFailure(data.getErrorMessage());
         }
         else if (data.getOperationType() == MobileClientData.OPERATION_CREATE_SUGGESTED_EXERCISE_PLAN) {
             if (data.getOperationResult() == MobileClientData.OPERATION_SUCCESS)
-                creatingExercisePlanSuggestedRequestResultSuccess(data.getExercisePlanRecordSuggested());
+                creatingExercisePlanSuggestedRequestResultSuccess(data.getExercisePlanSuggested());
             else
                 creatingExercisePlanSuggestedRequestResultFailure(data.getErrorMessage());
         }
     }
 
     @Override
-    public void createWorkout(ExercisePlanRecord exercisePlanRecord) {
+    public void createWorkout(ExercisePlan exercisePlan) {
         if (getService() == null) {
             Log.w(TAG, "Service is still not bound");
             creatingExercisePlanRequestResultFailure("Not bound to the service");
@@ -46,7 +46,7 @@ public class BuildWorkoutModel extends MobileClientModelBase<MVP.RequiredBuildWo
         }
 
         try {
-            boolean isCreating = getService().createWorkout(exercisePlanRecord);
+            boolean isCreating = getService().createWorkout(exercisePlan);
             if (!isCreating) {
                 creatingExercisePlanRequestResultFailure("No Network Connection");
             }
@@ -57,7 +57,7 @@ public class BuildWorkoutModel extends MobileClientModelBase<MVP.RequiredBuildWo
     }
 
     @Override
-    public void createSuggestedWorkout(ExercisePlanRecordSuggested exercisePlanRecordSuggested) {
+    public void createSuggestedWorkout(ExercisePlanSuggested exercisePlanSuggested) {
         if (getService() == null) {
             Log.w(TAG, "Service is still not bound");
             creatingExercisePlanRequestResultFailure("Not bound to the service");
@@ -65,7 +65,7 @@ public class BuildWorkoutModel extends MobileClientModelBase<MVP.RequiredBuildWo
         }
 
         try {
-            boolean isCreating = getService().createSuggestedWorkout(exercisePlanRecordSuggested);
+            boolean isCreating = getService().createSuggestedWorkout(exercisePlanSuggested);
             if (!isCreating) {
                 creatingExercisePlanRequestResultFailure("No Network Connection");
             }
@@ -106,15 +106,15 @@ public class BuildWorkoutModel extends MobileClientModelBase<MVP.RequiredBuildWo
         getPresenter().creatingExercisePlanOperationResult(false, errorMessage, null);
     }
 
-    private void creatingExercisePlanRequestResultSuccess(ExercisePlanRecord exercisePlanRecord) {
-        getPresenter().creatingExercisePlanOperationResult(true, null, exercisePlanRecord);
+    private void creatingExercisePlanRequestResultSuccess(ExercisePlan exercisePlan) {
+        getPresenter().creatingExercisePlanOperationResult(true, null, exercisePlan);
     }
 
     private void creatingExercisePlanSuggestedRequestResultFailure(String errorMessage) {
         getPresenter().creatingExercisePlanSuggestedOperationResult(false, errorMessage, null);
     }
 
-    private void creatingExercisePlanSuggestedRequestResultSuccess(ExercisePlanRecordSuggested exercisePlanRecordSuggested) {
-        getPresenter().creatingExercisePlanSuggestedOperationResult(true, null, exercisePlanRecordSuggested);
+    private void creatingExercisePlanSuggestedRequestResultSuccess(ExercisePlanSuggested exercisePlanSuggested) {
+        getPresenter().creatingExercisePlanSuggestedOperationResult(true, null, exercisePlanSuggested);
     }
 }

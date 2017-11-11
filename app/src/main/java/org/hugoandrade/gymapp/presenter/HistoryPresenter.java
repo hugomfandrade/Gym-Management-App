@@ -2,9 +2,8 @@ package org.hugoandrade.gymapp.presenter;
 
 import android.content.Context;
 
-import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
-import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.ExercisePlan;
 import org.hugoandrade.gymapp.model.HistoryModel;
 
 import java.util.List;
@@ -69,12 +68,12 @@ public class HistoryPresenter extends PresenterBase<MVP.RequiredHistoryViewOps,
     @Override
     public void gettingHistoryOperationResult(boolean wasOperationSuccessful,
                                               String errorMessage,
-                                              List<ExercisePlanRecord> exercisePlanRecordList) {
+                                              List<ExercisePlan> exercisePlanList) {
 
         if (wasOperationSuccessful) {
 
             // operation was successful, display exercise plan records
-            getView().displayExercisePlanRecordList(exercisePlanRecordList);
+            getView().displayExercisePlanList(exercisePlanList);
         }
         else {
             // operation failed, show error message

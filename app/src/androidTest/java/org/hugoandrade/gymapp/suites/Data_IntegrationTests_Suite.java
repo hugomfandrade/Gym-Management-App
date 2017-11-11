@@ -1,6 +1,6 @@
 package org.hugoandrade.gymapp.suites;
 
-import org.hugoandrade.gymapp.data.ExercisePlanRecord_AndroidTest;
+import org.hugoandrade.gymapp.data.ExercisePlan_AndroidTest;
 import org.hugoandrade.gymapp.data.ExerciseRecord_AndroidTest;
 import org.hugoandrade.gymapp.data.ExerciseSet_AndroidTest;
 import org.hugoandrade.gymapp.data.Exercise_AndroidTest;
@@ -17,7 +17,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         Exercise_AndroidTest.class,
-        ExercisePlanRecord_AndroidTest.class,
+        ExercisePlan_AndroidTest.class,
         ExerciseRecord_AndroidTest.class,
         ExerciseSet_AndroidTest.class,
         User_AndroidTest.class,

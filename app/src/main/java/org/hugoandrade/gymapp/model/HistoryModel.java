@@ -4,8 +4,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import org.hugoandrade.gymapp.MVP;
-import org.hugoandrade.gymapp.data.ExercisePlanRecord;
-import org.hugoandrade.gymapp.data.User;
+import org.hugoandrade.gymapp.data.ExercisePlan;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
 import java.util.List;
@@ -18,7 +17,7 @@ public class HistoryModel extends MobileClientModelBase<MVP.RequiredHistoryPrese
     public void sendResults(MobileClientData data) {
         if (data.getOperationType() == MobileClientData.OPERATION_GET_HISTORY) {
             if (data.getOperationResult() == MobileClientData.OPERATION_SUCCESS)
-                gettingHistoryRequestResultSuccess(data.getExercisePlanRecordList());
+                gettingHistoryRequestResultSuccess(data.getExercisePlanList());
             else
                 gettingHistoryRequestResultFailure(data.getErrorMessage());
         }
@@ -33,7 +32,7 @@ public class HistoryModel extends MobileClientModelBase<MVP.RequiredHistoryPrese
         }
 
         try {
-            boolean isGetting = getService().getExercisePlanRecordList(userID);
+            boolean isGetting = getService().getExercisePlanList(userID);
             if (!isGetting) {
                 gettingHistoryRequestResultFailure("No Network Connection");
             }
@@ -47,7 +46,7 @@ public class HistoryModel extends MobileClientModelBase<MVP.RequiredHistoryPrese
         getPresenter().gettingHistoryOperationResult(false, errorMessage, null);
     }
 
-    private void gettingHistoryRequestResultSuccess(List<ExercisePlanRecord> exercisePlanRecordList) {
-        getPresenter().gettingHistoryOperationResult(true, null, exercisePlanRecordList);
+    private void gettingHistoryRequestResultSuccess(List<ExercisePlan> exercisePlanList) {
+        getPresenter().gettingHistoryOperationResult(true, null, exercisePlanList);
     }
 }

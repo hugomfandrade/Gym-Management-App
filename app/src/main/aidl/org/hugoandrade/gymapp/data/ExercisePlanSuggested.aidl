@@ -1,5 +1,5 @@
-// ExercisePlanRecord.aidl
+// ExercisePlanSuggested.aidl
 package org.hugoandrade.gymapp.data;
 
 // Declare any non-default types here with import statements
-parcelable ExercisePlanRecord;
+parcelable ExercisePlanSuggested;

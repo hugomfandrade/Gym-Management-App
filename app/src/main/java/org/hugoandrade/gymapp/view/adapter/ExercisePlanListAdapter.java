@@ -7,14 +7,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.hugoandrade.gymapp.R;
-import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.ExercisePlan;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ExercisePlanReportListAdapter extends RecyclerView.Adapter<ExercisePlanReportListAdapter.ViewHolder> {
+public class ExercisePlanListAdapter extends RecyclerView.Adapter<ExercisePlanListAdapter.ViewHolder> {
 
     /**
      * Date format used throughout this instance
@@ -22,50 +22,50 @@ public class ExercisePlanReportListAdapter extends RecyclerView.Adapter<Exercise
     private final static SimpleDateFormat dateFormat
             = new SimpleDateFormat("dd MMM YYYY", Locale.getDefault());
 
-    private final List<ExercisePlanRecord> mExercisePlanRecordList;
+    private final List<ExercisePlan> mExercisePlanList;
 
     private OnItemClickListener mListener;
 
-    public ExercisePlanReportListAdapter() {
-        mExercisePlanRecordList = new ArrayList<>();
+    public ExercisePlanListAdapter() {
+        mExercisePlanList = new ArrayList<>();
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         LayoutInflater vi = LayoutInflater.from(viewGroup.getContext());
-        View v = vi.inflate(R.layout.list_item_exercise_plan_report, viewGroup, false);
-        return new ExercisePlanReportListAdapter.ViewHolder(v);
+        View v = vi.inflate(R.layout.list_item_exercise_plan, viewGroup, false);
+        return new ExercisePlanListAdapter.ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int i) {
-        final ExercisePlanRecord exercisePlanRecord = mExercisePlanRecordList.get(holder.getAdapterPosition());
+        final ExercisePlan exercisePlan = mExercisePlanList.get(holder.getAdapterPosition());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mListener != null)
-                    mListener.onItemClicked(exercisePlanRecord);
+                    mListener.onItemClicked(exercisePlan);
             }
         });
         holder.tvName.setText("Exercise Plan");
-        holder.tvDatetime.setText(dateFormat.format(exercisePlanRecord.getDatetime().getTime()));
+        holder.tvDatetime.setText(dateFormat.format(exercisePlan.getDatetime().getTime()));
     }
 
     @Override
     public int getItemCount() {
-        return mExercisePlanRecordList.size();
+        return mExercisePlanList.size();
     }
 
-    public void setAll(List<ExercisePlanRecord> userList) {
-        mExercisePlanRecordList.clear();
-        mExercisePlanRecordList.addAll(userList);
+    public void setAll(List<ExercisePlan> userList) {
+        mExercisePlanList.clear();
+        mExercisePlanList.addAll(userList);
         notifyDataSetChanged();
     }
 
-    public void add(ExercisePlanRecord exercisePlanRecord) {
-        mExercisePlanRecordList.add(exercisePlanRecord);
-        notifyItemInserted(mExercisePlanRecordList.size() - 1);
+    public void add(ExercisePlan exercisePlan) {
+        mExercisePlanList.add(exercisePlan);
+        notifyItemInserted(mExercisePlanList.size() - 1);
     }
 
     public void setOnItemClickedListener(OnItemClickListener listener) {
@@ -73,7 +73,7 @@ public class ExercisePlanReportListAdapter extends RecyclerView.Adapter<Exercise
     }
 
     public interface OnItemClickListener {
-        void onItemClicked(ExercisePlanRecord exercisePlanRecord);
+        void onItemClicked(ExercisePlan exercisePlan);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

@@ -15,12 +15,12 @@ import android.widget.TextView;
 import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
-import org.hugoandrade.gymapp.data.ExercisePlanRecord;
+import org.hugoandrade.gymapp.data.ExercisePlan;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.presenter.HistoryPresenter;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;
-import org.hugoandrade.gymapp.view.adapter.ExercisePlanReportListAdapter;
+import org.hugoandrade.gymapp.view.adapter.ExercisePlanListAdapter;
 
 import java.util.List;
 
@@ -45,12 +45,12 @@ public class HistoryActivity extends ActivityBase<MVP.RequiredHistoryViewOps,
     /**
      * Adapter used to display all exercise plans of the gym member
      */
-    private ExercisePlanReportListAdapter mExercisePlanRecordListAdapter;
+    private ExercisePlanListAdapter mExercisePlanListAdapter;
 
     /**
      * Message to be displayed when no exercise plans was retrieved
      */
-    private TextView tvNoExercisePlanRecordMessage;
+    private TextView tvNoExercisePlanMessage;
 
     /**
      * The selected member
@@ -128,23 +128,23 @@ public class HistoryActivity extends ActivityBase<MVP.RequiredHistoryViewOps,
         vProgressBar = findViewById(R.id.progressBar_waiting);
 
         // set up recycler view and adapter
-        mExercisePlanRecordListAdapter = new ExercisePlanReportListAdapter();
-        mExercisePlanRecordListAdapter.setOnItemClickedListener(new ExercisePlanReportListAdapter.OnItemClickListener() {
+        mExercisePlanListAdapter = new ExercisePlanListAdapter();
+        mExercisePlanListAdapter.setOnItemClickedListener(new ExercisePlanListAdapter.OnItemClickListener() {
             @Override
-            public void onItemClicked(ExercisePlanRecord exercisePlanRecord) {
+            public void onItemClicked(ExercisePlan exercisePlan) {
                 // Member selected a exercise plan. start activity to display the details
                 startActivity(WorkoutActivity.makeIntent(
                         HistoryActivity.this,
-                        exercisePlanRecord));
+                        exercisePlan));
             }
         });
         RecyclerView rvGymUsers = (RecyclerView) findViewById(R.id.rv_exercise_plan_record);
         rvGymUsers.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        rvGymUsers.setAdapter(mExercisePlanRecordListAdapter);
+        rvGymUsers.setAdapter(mExercisePlanListAdapter);
 
         // set up no gym users message appropriately
-        tvNoExercisePlanRecordMessage = (TextView) findViewById(R.id.tv_no_exercise_plan_record);
-        tvNoExercisePlanRecordMessage.setText(R.string.no_history);
+        tvNoExercisePlanMessage = (TextView) findViewById(R.id.tv_no_exercise_plan_record);
+        tvNoExercisePlanMessage.setText(R.string.no_history);
     }
 
     @Override
@@ -158,11 +158,11 @@ public class HistoryActivity extends ActivityBase<MVP.RequiredHistoryViewOps,
     }
 
     @Override
-    public void displayExercisePlanRecordList(List<ExercisePlanRecord> exercisePlanRecordList) {
-        mExercisePlanRecordListAdapter.setAll(exercisePlanRecordList);
+    public void displayExercisePlanList(List<ExercisePlan> exercisePlanList) {
+        mExercisePlanListAdapter.setAll(exercisePlanList);
 
         // if list is empty, show "no exercise plans" message
-        tvNoExercisePlanRecordMessage.setVisibility(exercisePlanRecordList.size() == 0 ? View.VISIBLE : View.INVISIBLE);
+        tvNoExercisePlanMessage.setVisibility(exercisePlanList.size() == 0 ? View.VISIBLE : View.INVISIBLE);
     }
 
     @Override
