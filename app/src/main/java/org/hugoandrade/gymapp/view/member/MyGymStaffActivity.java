@@ -3,26 +3,19 @@ package org.hugoandrade.gymapp.view.member;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
-import org.hugoandrade.gymapp.common.CustomRecyclerScroll;
 import org.hugoandrade.gymapp.data.User;
-import org.hugoandrade.gymapp.presenter.GymUserListPresenter;
-import org.hugoandrade.gymapp.presenter.MyGymStaffPresenter;
+import org.hugoandrade.gymapp.presenter.member.MyGymStaffPresenter;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;
 import org.hugoandrade.gymapp.view.adapter.UserListAdapter;
-import org.hugoandrade.gymapp.view.admin.CreateGymUserActivity;
 
 import java.util.List;
 

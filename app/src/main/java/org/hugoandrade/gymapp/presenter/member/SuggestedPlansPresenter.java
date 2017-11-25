@@ -1,4 +1,4 @@
-package org.hugoandrade.gymapp.presenter;
+package org.hugoandrade.gymapp.presenter.member;
 
 import android.os.RemoteException;
 import android.util.Log;
@@ -7,6 +7,7 @@ import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
+import org.hugoandrade.gymapp.presenter.MobileClientPresenterBase;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class SuggestedPlansPresenter extends MobileClientPresenterBase<MVP.Requi
     public void onCreate(MVP.RequiredSuggestedPlansViewOps view) {
         // Invoke the special onCreate() method in PresenterBase,
         // passing in the MyGymStaffModel class to instantiate/manage and
-        // "this" to provide MyGymStaffModel with this MVP.RequiredMyGymStaffModelModelOps
+        // "this" to provide MobileClientModel with this MVP.RequiredMobileServicePresenterOps
         // instance.
         super.onCreate(view);
     }
@@ -37,6 +38,9 @@ public class SuggestedPlansPresenter extends MobileClientPresenterBase<MVP.Requi
         doGetSuggestedPlans(GlobalData.getUser().getID());
     }
 
+    /**
+     * Try getting the suggested plans of the member with ID userID via the Service.
+     */
     private void doGetSuggestedPlans(String userID) {
         if (getMobileClientService() == null) {
             Log.w(TAG, "Service is still not bound");
@@ -75,6 +79,9 @@ public class SuggestedPlansPresenter extends MobileClientPresenterBase<MVP.Requi
         }
     }
 
+    /**
+     * Handle the operation result of getting the suggested plans
+     */
     private void gettingSuggestedPlansOperationResult(boolean wasOperationSuccessful,
                                                       String errorMessage,
                                                       List<ExercisePlanSuggested> suggestedPlanList) {

@@ -44,6 +44,9 @@ public class SignUpPresenter extends MobileClientPresenterBase<MVP.RequiredSignU
         doSignUp(username, password);
     }
 
+    /**
+     * Try validating the username-code combo  via the Service.
+     */
     private void doValidateWaitingUser(WaitingUser waitingUser) {
         if (getMobileClientService() == null) {
             Log.w(TAG, "Service is still not bound");
@@ -62,6 +65,9 @@ public class SignUpPresenter extends MobileClientPresenterBase<MVP.RequiredSignU
         }
     }
 
+    /**
+     * Try signing up user with username-password via the Service.
+     */
     private void doSignUp(String username, String password) {
         if (getMobileClientService() == null) {
             Log.w(TAG, "Service is still not bound");
@@ -99,6 +105,9 @@ public class SignUpPresenter extends MobileClientPresenterBase<MVP.RequiredSignU
         }
     }
 
+    /**
+     * Handle the operation result of validating the user with the username-code combo.
+     */
     private void validateWaitingUserOperationResult(boolean wasOperationSuccessful, String message, WaitingUser waitingUser) {
 
         if (wasOperationSuccessful) {
@@ -114,6 +123,9 @@ public class SignUpPresenter extends MobileClientPresenterBase<MVP.RequiredSignU
         getView().enableValidateUI();
     }
 
+    /**
+     * Handle the operation result of signing up.
+     */
     private void signUpOperationResult(boolean wasOperationSuccessful, String message, User user) {
 
         if (wasOperationSuccessful) {

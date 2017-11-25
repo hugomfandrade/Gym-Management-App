@@ -17,7 +17,7 @@ import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.common.CustomRecyclerScroll;
 import org.hugoandrade.gymapp.data.User;
-import org.hugoandrade.gymapp.presenter.GymUserListPresenter;
+import org.hugoandrade.gymapp.presenter.admin.GymUserListPresenter;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;
 import org.hugoandrade.gymapp.view.adapter.UserListAdapter;

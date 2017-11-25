@@ -1,4 +1,4 @@
-package org.hugoandrade.gymapp.presenter;
+package org.hugoandrade.gymapp.presenter.admin;
 
 import android.os.RemoteException;
 import android.util.Log;
@@ -6,6 +6,7 @@ import android.util.Log;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.Exercise;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
+import org.hugoandrade.gymapp.presenter.MobileClientPresenterBase;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class ExerciseListPresenter extends MobileClientPresenterBase<MVP.Require
     public void onCreate(MVP.RequiredExerciseListViewOps view) {
         // Invoke the special onCreate() method in PresenterBase,
         // passing in the ExerciseListModel class to instantiate/manage and
-        // "this" to provide ExerciseListModel with this MVP.RequiredExerciseListModelOps
+        // "this" to provide MobileClientModel with this MVP.RequiredMobileServicePresenterOps
         // instance.
         super.onCreate(view);
     }
@@ -36,6 +37,9 @@ public class ExerciseListPresenter extends MobileClientPresenterBase<MVP.Require
         doGetExercises();
     }
 
+    /**
+     * Try getting all available exercises via the Service.
+     */
     private void doGetExercises() {
         if (getMobileClientService() == null) {
             Log.w(TAG, "Service is still not bound");
@@ -68,6 +72,9 @@ public class ExerciseListPresenter extends MobileClientPresenterBase<MVP.Require
         }
     }
 
+    /**
+     * Handle the operation result of getting exercises.
+     */
     private void gettingAllExercisesOperationResult(boolean wasOperationSuccessful,
                                                    String errorMessage,
                                                    List<Exercise> exerciseList) {

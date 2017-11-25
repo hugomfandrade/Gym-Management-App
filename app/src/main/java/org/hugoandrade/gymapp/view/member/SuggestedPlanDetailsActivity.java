@@ -16,7 +16,7 @@ import android.view.View;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
-import org.hugoandrade.gymapp.presenter.SuggestedPlanDetailsPresenter;
+import org.hugoandrade.gymapp.presenter.member.SuggestedPlanDetailsPresenter;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;
 import org.hugoandrade.gymapp.view.adapter.ExerciseSetListAdapter;

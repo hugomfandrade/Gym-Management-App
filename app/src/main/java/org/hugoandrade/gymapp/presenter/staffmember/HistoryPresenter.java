@@ -1,4 +1,4 @@
-package org.hugoandrade.gymapp.presenter;
+package org.hugoandrade.gymapp.presenter.staffmember;
 
 import android.os.RemoteException;
 import android.util.Log;
@@ -6,6 +6,7 @@ import android.util.Log;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.ExercisePlan;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
+import org.hugoandrade.gymapp.presenter.MobileClientPresenterBase;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class HistoryPresenter extends MobileClientPresenterBase<MVP.RequiredHist
     public void onCreate(MVP.RequiredHistoryViewOps view) {
         // Invoke the special onCreate() method in PresenterBase,
         // passing in the HistoryModel class to instantiate/manage and
-        // "this" to provide HistoryModel with this MVP.RequiredHistoryModelOps
+        // "this" to provide MobileClientModel with this MVP.RequiredMobileServicePresenterOps
         // instance.
         super.onCreate(view);
     }
@@ -36,6 +37,9 @@ public class HistoryPresenter extends MobileClientPresenterBase<MVP.RequiredHist
         doGetHistory(userID);
     }
 
+    /**
+     * Try getting all exercise plan records of the member with ID userID via the Service.
+     */
     private void doGetHistory(String userID) {
         if (getMobileClientService() == null) {
             Log.w(TAG, "Service is still not bound");
@@ -68,6 +72,9 @@ public class HistoryPresenter extends MobileClientPresenterBase<MVP.RequiredHist
         }
     }
 
+    /**
+     * Handle the operation result of getting all exercise plan records of the member
+     */
     private void gettingHistoryOperationResult(boolean wasOperationSuccessful,
                                                String errorMessage,
                                                List<ExercisePlan> exercisePlanList) {

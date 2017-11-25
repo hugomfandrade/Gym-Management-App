@@ -51,6 +51,9 @@ public class LoginPresenter extends MobileClientPresenterBase<MVP.RequiredLoginV
         doLogin(username, password);
     }
 
+    /**
+     * Try logging in via the Service.
+     */
     private void doLogin(String username, String password) {
         if (getMobileClientService() == null) {
             Log.w(TAG, "Service is still not bound");
@@ -69,11 +72,17 @@ public class LoginPresenter extends MobileClientPresenterBase<MVP.RequiredLoginV
         }
     }
 
+    /**
+     * Handle the last logged in username-password
+     */
     @Override
     public void displayLastLogin(User user) {
         getView().displayLastLogin(user);
     }
 
+    /**
+     * Get last logged in username-password stored in the StorageProvider.
+     */
     private void getLastLoginUser() {
         try {
             mStorageOps.getLastLoginUser();
@@ -83,6 +92,9 @@ public class LoginPresenter extends MobileClientPresenterBase<MVP.RequiredLoginV
         }
     }
 
+    /**
+     * Set the successful login attempt in the StorageProvider.
+     */
     private void insertLastLogin(User user) {
         try {
             mStorageOps.deleteAll();
@@ -107,6 +119,9 @@ public class LoginPresenter extends MobileClientPresenterBase<MVP.RequiredLoginV
         }
     }
 
+    /**
+     * Handle the operation result of login.
+     */
     private void loginOperationResult(boolean wasOperationSuccessful, String message, User user) {
         if (wasOperationSuccessful) {
 

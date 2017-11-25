@@ -17,7 +17,7 @@ import android.widget.TextView;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.data.Exercise;
-import org.hugoandrade.gymapp.presenter.ExerciseListPresenter;
+import org.hugoandrade.gymapp.presenter.admin.ExerciseListPresenter;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;
 import org.hugoandrade.gymapp.view.adapter.ExerciseListAdapter;

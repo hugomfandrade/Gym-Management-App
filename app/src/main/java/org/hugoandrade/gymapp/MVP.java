@@ -16,9 +16,23 @@ import java.util.List;
 
 public interface MVP {
 
+    /**
+     * Presenter Ops that the MobileClientPresenterBase in the "Presenter" layer,
+     * which interacts with the Remote Web Service, implements
+     */
     interface RequiredMobileServicePresenterOps extends RequiredMobileClientPresenterBaseOps {
+
+        /**
+         * "Model" reports to the "Presenter" the data that results from the request to the Remote
+         * Web Service.
+         */
         void sendResults(MobileClientData mobileClientData);
     }
+
+    /**
+     * Model Ops that the MobileClientModel in the "Model" layer, which interacts with the
+     * Remote Web Service, implements
+     */
     interface ProvidedMobileServiceModelOps extends ProvidedMobileClientModelBaseOps<RequiredMobileServicePresenterOps> {
         IMobileClientService getService();
     }
@@ -43,33 +57,6 @@ public interface MVP {
          * User wants to login with the username-password inputed
          */
         void login(String username, String password);
-    }
-    interface RequiredLoginPresenterOps extends RequiredMobileClientPresenterBaseOps {
-        /*
-         * Handle the operation result of login.
-         */
-        void loginOperationResult(boolean wasOperationSuccessful, String message, User user);
-
-        /*
-         * Handle the last logged in username-password
-         */
-        void displayLastLogin(User user);
-    }
-    interface ProvidedLoginModelOps extends ProvidedMobileClientModelBaseOps<RequiredLoginPresenterOps> {
-        /*
-         * Try logging in via the Service.
-         */
-        void login(String username, String password);
-
-        /*
-         * Get last logged in username-password stored in the StorageProvider.
-         */
-        void getLastLogin();
-
-        /*
-         * Set the successful login attempt in the StorageProvider.
-         */
-        void insertLastLogin(User user);
     }
 
 
@@ -125,29 +112,6 @@ public interface MVP {
          */
         void signUp(String username, String password);
     }
-    interface RequiredSignUpPresenterOps extends RequiredMobileClientPresenterBaseOps {
-
-        /*
-         * Handle the operation result of validating the user with the username-code combo.
-         */
-        void validateWaitingUserOperationResult(boolean wasOperationSuccessful, String message, WaitingUser waitingUser);
-
-        /*
-         * Handle the operation result of signing up.
-         */
-        void signUpOperationResult(boolean wasOperationSuccessful, String message, User user);
-    }
-    interface ProvidedSignUpModelOps extends ProvidedMobileClientModelBaseOps<RequiredSignUpPresenterOps> {
-        /*
-         * Try validating the username-code combo  via the Service.
-         */
-        void validateWaitingUser(WaitingUser waitingUser);
-
-        /*
-         * Try signing up user with username-password via the Service.
-         */
-        void signUp(String username, String password);
-    }
 
     /* ************************************************* */
     /* ********************* Admin ********************* */
@@ -172,18 +136,6 @@ public interface MVP {
          */
         void createGymUser(String username, String credential);
     }
-    interface RequiredCreateGymUserPresenterOps extends RequiredMobileClientPresenterBaseOps {
-        /*
-         * Handle the operation result of creating a gym user.
-         */
-        void creatingGymUserOperationResult(boolean wasOperationSuccessful, String message, WaitingUser waitingUser);
-    }
-    interface ProvidedCreateGymUserModelOps extends ProvidedMobileClientModelBaseOps<RequiredCreateGymUserPresenterOps>  {
-        /*
-         * Try creating a new user via the Service.
-         */
-        void createGymUser(WaitingUser waitingUser);
-    }
 
 
     /** These interfaces define the minimum public API provided and required by the
@@ -204,21 +156,6 @@ public interface MVP {
          */
         void createExercise(String name);
     }
-    interface RequiredCreateExercisePresenterOps extends RequiredMobileClientPresenterBaseOps {
-
-        /*
-         * Handle the operation result of creating a new exercise.
-         */
-        void creatingExerciseOperationResult(boolean wasOperationSuccessful, String message, Exercise exercise);
-    }
-    interface ProvidedCreateExerciseModelOps extends ProvidedMobileClientModelBaseOps<RequiredCreateExercisePresenterOps>  {
-
-        /*
-         * Try creating/saving a new exercise to the Web Service via the Service.
-         */
-        void createExercise(Exercise exercise);
-    }
-
 
     /** These interfaces define the minimum public API provided and required by the
      * ExerciseListActivity class in the View layer, the ExerciseListPresenter in the
@@ -231,19 +168,6 @@ public interface MVP {
         void displayExerciseList(List<Exercise> exerciseList);
     }
     interface ProvidedExerciseListPresenterOps extends PresenterOps<RequiredExerciseListViewOps> {
-    }
-    interface RequiredExerciseListPresenterOps extends RequiredMobileClientPresenterBaseOps {
-        /*
-         * Handle the operation result of getting exercises.
-         */
-        void gettingAllExercisesOperationResult(boolean wasOperationSuccessful, String errorMessage, List<Exercise> exerciseList);
-    }
-    interface ProvidedExerciseListModelOps extends ProvidedMobileClientModelBaseOps<RequiredExerciseListPresenterOps> {
-
-        /*
-         * Try getting all available exercises via the Service.
-         */
-        void getExercises();
     }
 
 
@@ -264,20 +188,6 @@ public interface MVP {
     }
     interface ProvidedGymUserListPresenterOps extends PresenterOps<RequiredGymUserListViewOps> {
     }
-    interface RequiredGymUserListPresenterOps extends RequiredMobileClientPresenterBaseOps {
-        /*
-         * Handle the operation result of getting gym users.
-         */
-        void gettingAllGymUsersOperationResult(boolean wasOperationSuccessful, String errorMessage, List<User> userList);
-    }
-    interface ProvidedGymUserListModelOps extends ProvidedMobileClientModelBaseOps<RequiredGymUserListPresenterOps> {
-
-        /*
-         * Try getting all gym users of type 'credential' (staff or member) via the Service.
-         */
-        void getAllGymUsers(String credential);
-    }
-
 
     /* ***************************************************** */
     /* ********************* Gym Staff ********************* */
@@ -307,32 +217,6 @@ public interface MVP {
          */
         void addMemberToMyMembers(User member, String userID);
     }
-    interface RequiredAddGymMemberPresenterOps extends RequiredMobileClientPresenterBaseOps {
-
-        /*
-         * Handle the operation result of getting all gym members that are not
-         * in the "My Members" of the staff
-         */
-        void gettingAllGymMembersOperationResult(boolean wasOperationSuccessful, String errorMessage, List<User> gymMemberList);
-
-        /*
-         * Handle the operation result of adding member to staff's "My Members" list.
-         */
-        void addingMemberToMyMembersOperationResult(boolean wasOperationSuccessful, String errorMessage, User member);
-    }
-    interface ProvidedAddGymMemberModelOps extends ProvidedMobileClientModelBaseOps<RequiredAddGymMemberPresenterOps> {
-
-        /*
-         * Try getting all gym members that are not in the staff's (with ID userID)
-         * "My Members" list via the Service.
-         */
-        void getGymMembersExceptMine(String userID);
-
-        /*
-         * Try adding the selected member to the staff's "My Members" list via the Service.
-         */
-        void addMemberToMyMembers(User member, String userID);
-    }
 
     /** These interfaces define the minimum public API provided and required by the
      * StaffMainActivity class in the View layer, the StaffMainPresenter in the
@@ -345,18 +229,6 @@ public interface MVP {
         void displayMyMembersList(List<User> myMemberList);
     }
     interface ProvidedStaffMainPresenterOps extends PresenterOps<RequiredStaffMainViewOps> {
-    }
-    interface RequiredStaffMainPresenterOps extends RequiredMobileClientPresenterBaseOps {
-        /*
-         * Handle the operation result of getting the members of the staff's "My Members" list
-         */
-        void gettingMyMembersOperationResult(boolean wasOperationSuccessful, String errorMessage, List<User> myMemberList);
-    }
-    interface ProvidedStaffMainModelOps extends ProvidedMobileClientModelBaseOps<RequiredStaffMainPresenterOps> {
-        /*
-         * Try getting the members of the staff's "My Members" list via the Service.
-         */
-        void getMyMembers(String userID);
     }
 
     /* ****************************************************** */
@@ -379,18 +251,6 @@ public interface MVP {
          */
         void dismissSuggestedPlan(ExercisePlanSuggested suggestedPlan, boolean wasDone);
     }
-    interface RequiredSuggestedPlanDetailsPresenterOps extends RequiredMobileClientPresenterBaseOps {
-        /*
-         * Handle the operation result of dismissing the suggested plan
-         */
-        void dismissingSuggestedPlanOperationResult(boolean wasOperationSuccessful, String errorMessage, ExercisePlanSuggested suggestedPlan);
-    }
-    interface ProvidedSuggestedPlanDetailsModelOps extends ProvidedMobileClientModelBaseOps<RequiredSuggestedPlanDetailsPresenterOps> {
-        /*
-         * Try dismissing the suggested plan via the Service.
-         */
-        void dismissSuggestedPlan(ExercisePlanSuggested suggestedPlan, boolean wasDone);
-    }
 
 
     /** These interfaces define the minimum public API provided and required by the
@@ -405,18 +265,6 @@ public interface MVP {
     }
     interface ProvidedSuggestedPlansPresenterOps extends PresenterOps<RequiredSuggestedPlansViewOps> {
     }
-    interface RequiredSuggestedPlansPresenterOps extends RequiredMobileClientPresenterBaseOps {
-        /*
-         * Handle the operation result of getting the suggested plans
-         */
-        void gettingSuggestedPlansOperationResult(boolean wasOperationSuccessful, String errorMessage, List<ExercisePlanSuggested> suggestedPlanList);
-    }
-    interface ProvidedSuggestedPlansModelOps extends ProvidedMobileClientModelBaseOps<RequiredSuggestedPlansPresenterOps> {
-        /*
-         * Try getting the suggested plans of the member with ID userID via the Service.
-         */
-        void getSuggestedPlans(String userID);
-    }
 
     /** These interfaces define the minimum public API provided and required by the
      * MyGymStaffActivity class in the View layer, the MyGymStaffPresenter in the
@@ -430,18 +278,6 @@ public interface MVP {
     }
     interface ProvidedMyGymStaffPresenterOps extends PresenterOps<RequiredMyGymStaffViewOps> {
     }
-    interface RequiredMyGymStaffPresenterOps extends RequiredMobileClientPresenterBaseOps {
-        /*
-         * Handle the operation result of getting the member's staffs
-         */
-        void gettingMyGymStaffOperationResult(boolean wasOperationSuccessful, String errorMessage, List<User> staffList);
-    }
-    interface ProvidedMyGymStaffModelOps extends ProvidedMobileClientModelBaseOps<RequiredMyGymStaffPresenterOps> {
-        /*
-         * Try getting the staff of the member with ID userID via the Service.
-         */
-        void getMyGymStaff(String userID);
-    }
 
 
     /* ****************************************************** */
@@ -449,8 +285,8 @@ public interface MVP {
     /* ****************************************************** */
 
     /** These interfaces define the minimum public API provided and required by the
-     * HistoryActivity class in the View layer, the HistoryPresenter in the
-     * Presenter layer, and HistoryModel in the Model layer to interact between each other.
+     * HistoryActivity class in the View layer and the HistoryPresenter in the
+     * Presenter layer.
      */
     interface RequiredHistoryViewOps extends RequiredMobileClientViewBaseOps {
         /*
@@ -465,23 +301,11 @@ public interface MVP {
     }
     interface ProvidedHistoryPresenterOps extends PresenterOps<RequiredHistoryViewOps> {
     }
-    interface RequiredHistoryPresenterOps extends RequiredMobileClientPresenterBaseOps {
-        /*
-         * Handle the operation result of getting all exercise plan records of the member
-         */
-        void gettingHistoryOperationResult(boolean wasOperationSuccessful, String errorMessage, List<ExercisePlan> exercisePlanList);
-    }
-    interface ProvidedHistoryModelOps extends ProvidedMobileClientModelBaseOps<RequiredHistoryPresenterOps> {
-        /*
-         * Try getting all exercise plan records of the member with ID userID via the Service.
-         */
-        void getHistory(String userID);
-    }
 
 
     /** These interfaces define the minimum public API provided and required by the
-     * BuildWorkoutActivity class in the View layer, the BuildWorkoutPresenter in the
-     * Presenter layer, and BuildWorkoutModel in the Model layer to interact between each other.
+     * BuildWorkoutActivity class in the View layer and the BuildWorkoutPresenter in the
+     * Presenter layer.
      */
     interface RequiredBuildWorkoutViewOps extends RequiredMobileClientViewBaseOps {
         /*
@@ -503,34 +327,6 @@ public interface MVP {
          * Staff wants to create by saving the suggested exercise plan record in the Web service.
          */
         void createSuggestedWorkout(ExercisePlanSuggested exercisePlanSuggested);
-    }
-    interface RequiredBuildWorkoutPresenterOps extends RequiredMobileClientPresenterBaseOps {
-        /*
-         * Handle the operation result of getting all exercises
-         */
-        void gettingAllExercisesOperationResult(boolean wasOperationSuccessful, String errorMessage, List<Exercise> exerciseList);
-        /*
-         * Handle the operation result of creating a new exercise plan record.
-         */
-        void creatingExercisePlanOperationResult(boolean wasOperationSuccessful, String errorMessage, ExercisePlan exercisePlan);
-        /*
-         * Handle the operation result of creating a new suggested exercise plan record.
-         */
-        void creatingExercisePlanSuggestedOperationResult(boolean wasOperationSuccessful, String errorMessage, ExercisePlanSuggested exercisePlanSuggested);
-    }
-    interface ProvidedBuildWorkoutModelOps extends ProvidedMobileClientModelBaseOps<RequiredBuildWorkoutPresenterOps> {
-        /*
-         * Try creating a new ExercisePlan by trying to insert this instance via the Service.
-         */
-        void createWorkout(ExercisePlan exercisePlan);
-        /*
-         * Try creating a new ExercisePlanSuggested by trying to insert this instance via the Service.
-         */
-        void createSuggestedWorkout(ExercisePlanSuggested exercisePlanSuggested);
-        /*
-         * Try getting all exercises via the Service.
-         */
-        void getExercises();
     }
 
     /* ****************************************************** */

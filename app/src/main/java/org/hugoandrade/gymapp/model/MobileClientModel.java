@@ -3,7 +3,7 @@ package org.hugoandrade.gymapp.model;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
-public class MobileServiceModel extends MobileClientModelBase<MVP.RequiredMobileServicePresenterOps>
+public class MobileClientModel extends MobileClientModelBase<MVP.RequiredMobileServicePresenterOps>
 
         implements MVP.ProvidedMobileServiceModelOps {
 

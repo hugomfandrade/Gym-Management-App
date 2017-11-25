@@ -12,7 +12,7 @@ import android.widget.TextView;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
-import org.hugoandrade.gymapp.presenter.SuggestedPlansPresenter;
+import org.hugoandrade.gymapp.presenter.member.SuggestedPlansPresenter;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;
 import org.hugoandrade.gymapp.view.adapter.ExercisePlanSuggestedListAdapter;

@@ -1,4 +1,4 @@
-package org.hugoandrade.gymapp.presenter;
+package org.hugoandrade.gymapp.presenter.admin;
 
 import android.content.Context;
 import android.os.RemoteException;
@@ -7,6 +7,7 @@ import android.util.Log;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.WaitingUser;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
+import org.hugoandrade.gymapp.presenter.MobileClientPresenterBase;
 
 public class CreateGymUserPresenter extends MobileClientPresenterBase<MVP.RequiredCreateGymUserViewOps>
 
@@ -16,8 +17,8 @@ public class CreateGymUserPresenter extends MobileClientPresenterBase<MVP.Requir
     public void onCreate(MVP.RequiredCreateGymUserViewOps view) {
         // Invoke the special onCreate() method in PresenterBase,
         // passing in the MVP.RequiredCreateGymUserViewOps class to
-        // instantiate/manage and "this" to provide CreateGymUserModel
-        // with this MVP.ProvidedCreateGymUserModelOps instance.
+        // instantiate/manage and "this" to provide MobileClientModel
+        // with this MVP.RequiredMobileServicePresenterOps instance.
         super.onCreate(view);
     }
 
@@ -35,6 +36,9 @@ public class CreateGymUserPresenter extends MobileClientPresenterBase<MVP.Requir
         doCreateGymUser(new WaitingUser(username, credential));
     }
 
+    /**
+     * Try creating a new user via the Service.
+     */
     private void doCreateGymUser(WaitingUser waitingUser) {
         if (getMobileClientService() == null) {
             Log.w(TAG, "Service is still not bound");
@@ -68,6 +72,9 @@ public class CreateGymUserPresenter extends MobileClientPresenterBase<MVP.Requir
         }
     }
 
+    /**
+     * Handle the operation result of creating a gym user.
+     */
     private void creatingGymUserOperationResult(boolean wasOperationSuccessful, String message, WaitingUser waitingUser) {
         if (wasOperationSuccessful) {
 

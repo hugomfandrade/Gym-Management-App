@@ -1,4 +1,4 @@
-package org.hugoandrade.gymapp.presenter;
+package org.hugoandrade.gymapp.presenter.staffmember;
 
 import android.os.RemoteException;
 import android.util.Log;
@@ -8,6 +8,7 @@ import org.hugoandrade.gymapp.data.Exercise;
 import org.hugoandrade.gymapp.data.ExercisePlan;
 import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
+import org.hugoandrade.gymapp.presenter.MobileClientPresenterBase;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class BuildWorkoutPresenter extends MobileClientPresenterBase<MVP.Require
     public void onCreate(MVP.RequiredBuildWorkoutViewOps view) {
         // Invoke the special onCreate() method in PresenterBase,
         // passing in the BuildWorkoutModel class to instantiate/manage and
-        // "this" to provide BuildWorkoutModel with this MVP.RequiredBuildWorkoutModelOps
+        // "this" to provide MobileClientModel with this MVP.RequiredMobileServicePresenterOps
         // instance.
         super.onCreate(view);
     }
@@ -56,6 +57,9 @@ public class BuildWorkoutPresenter extends MobileClientPresenterBase<MVP.Require
         doCreateSuggestedWorkout(exercisePlanSuggested);
     }
 
+    /**
+     * Try creating a new ExercisePlan by trying to insert this instance via the Service.
+     */
     private void doCreateWorkout(ExercisePlan exercisePlan) {
         if (getMobileClientService() == null) {
             Log.w(TAG, "Service is still not bound");
@@ -74,6 +78,9 @@ public class BuildWorkoutPresenter extends MobileClientPresenterBase<MVP.Require
         }
     }
 
+    /**
+     * Try creating a new ExercisePlanSuggested by trying to insert this instance via the Service.
+     */
     private void doCreateSuggestedWorkout(ExercisePlanSuggested exercisePlanSuggested) {
         if (getMobileClientService() == null) {
             Log.w(TAG, "Service is still not bound");
@@ -92,6 +99,9 @@ public class BuildWorkoutPresenter extends MobileClientPresenterBase<MVP.Require
         }
     }
 
+    /**
+     * Try getting all exercises via the Service.
+     */
     private void doGetExercises() {
         if (getMobileClientService() == null) {
             Log.w(TAG, "Service is still not bound");
@@ -137,6 +147,9 @@ public class BuildWorkoutPresenter extends MobileClientPresenterBase<MVP.Require
         }
     }
 
+    /**
+     * Handle the operation result of getting all exercises
+     */
     private void gettingAllExercisesOperationResult(boolean wasOperationSuccessful,
                                                     String errorMessage,
                                                     List<Exercise> exerciseList) {
@@ -158,6 +171,9 @@ public class BuildWorkoutPresenter extends MobileClientPresenterBase<MVP.Require
 
     }
 
+    /**
+     * Handle the operation result of creating a new exercise plan record.
+     */
     private void creatingExercisePlanOperationResult(boolean wasOperationSuccessful,
                                                      String errorMessage,
                                                      ExercisePlan exercisePlan) {
@@ -177,6 +193,9 @@ public class BuildWorkoutPresenter extends MobileClientPresenterBase<MVP.Require
         getView().enableUI();
     }
 
+    /**
+     * Handle the operation result of creating a new suggested exercise plan record.
+     */
     private void creatingExercisePlanSuggestedOperationResult(boolean wasOperationSuccessful,
                                                               String errorMessage,
                                                               ExercisePlanSuggested exercisePlanSuggested) {

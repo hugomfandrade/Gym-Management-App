@@ -17,7 +17,7 @@ import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.data.ExercisePlan;
 import org.hugoandrade.gymapp.data.User;
-import org.hugoandrade.gymapp.presenter.HistoryPresenter;
+import org.hugoandrade.gymapp.presenter.staffmember.HistoryPresenter;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;
 import org.hugoandrade.gymapp.view.adapter.ExercisePlanListAdapter;

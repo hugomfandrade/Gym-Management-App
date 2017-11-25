@@ -17,7 +17,7 @@ import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.R;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.data.WaitingUser;
-import org.hugoandrade.gymapp.presenter.CreateGymUserPresenter;
+import org.hugoandrade.gymapp.presenter.admin.CreateGymUserPresenter;
 import org.hugoandrade.gymapp.utils.LoginUtils;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;

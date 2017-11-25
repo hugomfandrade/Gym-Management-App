@@ -6,14 +6,14 @@ import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.common.ContextView;
 import org.hugoandrade.gymapp.common.PresenterOps;
 import org.hugoandrade.gymapp.model.IMobileClientService;
-import org.hugoandrade.gymapp.model.MobileServiceModel;
+import org.hugoandrade.gymapp.model.MobileClientModel;
 
 public abstract class MobileClientPresenterBase<RequiredMainOps extends ContextView>
 
         extends PresenterBase<RequiredMainOps,
                               MVP.RequiredMobileServicePresenterOps,
                               MVP.ProvidedMobileServiceModelOps,
-                              MobileServiceModel>
+        MobileClientModel>
 
         implements PresenterOps<RequiredMainOps>,
                    MVP.RequiredMobileServicePresenterOps {
@@ -24,7 +24,7 @@ public abstract class MobileClientPresenterBase<RequiredMainOps extends ContextV
         // passing in the ImageModel class to instantiate/manage and
         // "this" to provide ImageModel with this MVP.RequiredModelOps
         // instance.
-        super.onCreate(view, MobileServiceModel.class, this);
+        super.onCreate(view, MobileClientModel.class, this);
     }
 
     @Override
@@ -44,7 +44,7 @@ public abstract class MobileClientPresenterBase<RequiredMainOps extends ContextV
         getModel().onDestroy(isChangingConfiguration);
     }
 
-    IMobileClientService getMobileClientService() {
+    protected IMobileClientService getMobileClientService() {
         return getModel().getService();
     }
 

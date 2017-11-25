@@ -1,4 +1,4 @@
-package org.hugoandrade.gymapp.presenter;
+package org.hugoandrade.gymapp.presenter.member;
 
 import android.os.RemoteException;
 import android.util.Log;
@@ -6,6 +6,7 @@ import android.util.Log;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
+import org.hugoandrade.gymapp.presenter.MobileClientPresenterBase;
 
 import java.util.Calendar;
 
@@ -17,7 +18,7 @@ public class SuggestedPlanDetailsPresenter extends MobileClientPresenterBase<MVP
     public void onCreate(MVP.RequiredSuggestedPlanDetailsViewOps view) {
         // Invoke the special onCreate() method in PresenterBase,
         // passing in the SuggestedPlanDetailsModel class to instantiate/manage and
-        // "this" to provide SuggestedPlanDetailsModel with this MVP.RequiredSuggestedPlanDetailsModelOps
+        // "this" to provide MobileClientModel with this MVP.RequiredMobileServicePresenterOps
         // instance.
         super.onCreate(view);
     }
@@ -37,6 +38,9 @@ public class SuggestedPlanDetailsPresenter extends MobileClientPresenterBase<MVP
         doDismissSuggestedPlan(suggestedPlan, wasDone);
     }
 
+    /**
+     * Try dismissing the suggested plan via the Service.
+     */
     private void doDismissSuggestedPlan(ExercisePlanSuggested suggestedPlan, boolean wasDone) {
         if (getMobileClientService() == null) {
             Log.w(TAG, "Service is still not bound");
@@ -69,6 +73,9 @@ public class SuggestedPlanDetailsPresenter extends MobileClientPresenterBase<MVP
         }
     }
 
+    /**
+     * Handle the operation result of dismissing the suggested plan
+     */
     private void dismissingSuggestedPlanOperationResult(boolean wasOperationSuccessful,
                                                         String errorMessage,
                                                         ExercisePlanSuggested suggestedPlan) {

@@ -20,7 +20,7 @@ import org.hugoandrade.gymapp.data.Exercise;
 import org.hugoandrade.gymapp.data.ExercisePlan;
 import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.data.User;
-import org.hugoandrade.gymapp.presenter.BuildWorkoutPresenter;
+import org.hugoandrade.gymapp.presenter.staffmember.BuildWorkoutPresenter;
 import org.hugoandrade.gymapp.utils.UIUtils;
 import org.hugoandrade.gymapp.view.ActivityBase;
 import org.hugoandrade.gymapp.view.adapter.ExerciseSetListAdapter;

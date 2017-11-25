@@ -1,4 +1,4 @@
-package org.hugoandrade.gymapp.presenter;
+package org.hugoandrade.gymapp.presenter.staff;
 
 import android.os.RemoteException;
 import android.util.Log;
@@ -7,6 +7,7 @@ import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
+import org.hugoandrade.gymapp.presenter.MobileClientPresenterBase;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class AddGymMemberPresenter extends MobileClientPresenterBase<MVP.Require
     public void onCreate(MVP.RequiredAddGymMemberViewOps view) {
         // Invoke the special onCreate() method in PresenterBase,
         // passing in the ImageModel class to instantiate/manage and
-        // "this" to provide ImageModel with this OldMVP.RequiredModelOps
+        // "this" to provide MobileClientModel with this MVP.RequiredMobileServicePresenterOps
         // instance.
         super.onCreate(view);
     }
@@ -41,6 +42,10 @@ public class AddGymMemberPresenter extends MobileClientPresenterBase<MVP.Require
         doAddMemberToMyMembers(member, userID);
     }
 
+    /**
+     * Try getting all gym members that are not in the staff's (with ID userID)
+     * "My Members" list via the Service.
+     */
     private void doGetGymMembersExceptMine(String userID) {
         if (getMobileClientService() == null) {
             Log.w(TAG, "Service is still not bound");
@@ -59,6 +64,9 @@ public class AddGymMemberPresenter extends MobileClientPresenterBase<MVP.Require
         }
     }
 
+    /**
+     * Try adding the selected member to the staff's "My Members" list via the Service.
+     */
     private void doAddMemberToMyMembers(User member, String userID) {
         if (getMobileClientService() == null) {
             Log.w(TAG, "Service is still not bound");
@@ -98,6 +106,10 @@ public class AddGymMemberPresenter extends MobileClientPresenterBase<MVP.Require
         }
     }
 
+    /**
+     * Handle the operation result of getting all gym members that are not
+     * in the "My Members" of the staff
+     */
     private void gettingAllGymMembersOperationResult(boolean wasOperationSuccessful,
                                                      String errorMessage,
                                                      List<User> myMemberList) {
@@ -115,6 +127,9 @@ public class AddGymMemberPresenter extends MobileClientPresenterBase<MVP.Require
 
     }
 
+    /**
+     * Handle the operation result of adding member to staff's "My Members" list.
+     */
     private void addingMemberToMyMembersOperationResult(boolean wasOperationSuccessful,
                                                         String errorMessage,
                                                         User member) {

@@ -1,4 +1,4 @@
-package org.hugoandrade.gymapp.presenter;
+package org.hugoandrade.gymapp.presenter.member;
 
 import android.os.RemoteException;
 import android.util.Log;
@@ -7,6 +7,7 @@ import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.model.aidl.MobileClientData;
+import org.hugoandrade.gymapp.presenter.MobileClientPresenterBase;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class MyGymStaffPresenter extends MobileClientPresenterBase<MVP.RequiredM
     public void onCreate(MVP.RequiredMyGymStaffViewOps view) {
         // Invoke the special onCreate() method in PresenterBase,
         // passing in the MyGymStaffModel class to instantiate/manage and
-        // "this" to provide MyGymStaffModel with this MVP.RequiredMyGymStaffModelModelOps
+        // "this" to provide MobileClientModel with this MVP.RequiredMobileServicePresenterOps
         // instance.
         super.onCreate(view);
     }
@@ -37,6 +38,9 @@ public class MyGymStaffPresenter extends MobileClientPresenterBase<MVP.RequiredM
         doGetMyGymStaff(GlobalData.getUser().getID());
     }
 
+    /**
+     * Try getting the staff of the member with ID userID via the Service.
+     */
     private void doGetMyGymStaff(String userID) {
         if (getMobileClientService() == null) {
             Log.w(TAG, "Service is still not bound");
@@ -55,8 +59,8 @@ public class MyGymStaffPresenter extends MobileClientPresenterBase<MVP.RequiredM
         }
     }
 
-     @Override
-     public void sendResults(MobileClientData data) {
+    @Override
+    public void sendResults(MobileClientData data) {
 
          int operationType = data.getOperationType();
          boolean isOperationSuccessful
@@ -69,6 +73,9 @@ public class MyGymStaffPresenter extends MobileClientPresenterBase<MVP.RequiredM
         }
     }
 
+    /**
+     * Handle the operation result of getting the member's staffs
+     */
     private void gettingMyGymStaffOperationResult(boolean wasOperationSuccessful,
                                                   String errorMessage,
                                                   List<User> staffList) {
