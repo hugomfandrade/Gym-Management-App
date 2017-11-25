@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.RemoteException;
 
 import org.hugoandrade.gymapp.data.User;
-import org.hugoandrade.gymapp.model.LoginModel;
 import org.hugoandrade.gymapp.provider.parser.ContentValuesFormatter;
 import org.hugoandrade.gymapp.provider.parser.CursorParser;
 
@@ -18,9 +17,9 @@ import org.hugoandrade.gymapp.provider.parser.CursorParser;
  */
 public class StorageOps {
     /**
-     * Reference back to the LoginModel.
+     * Reference back to the StorageOpsListener.
      */
-    private final LoginModel mLoginModel;
+    private final StorageOpsListener mStorageOpsListener;
 
     /**
      * Define the Proxy for accessing the StorageProvider.
@@ -34,8 +33,8 @@ public class StorageOps {
     /**
      * Constructor initializes the fields.
      */
-    public StorageOps(Context context, LoginModel loginModel) {
-        mLoginModel = loginModel;
+    public StorageOps(Context context, StorageOpsListener storageOpsListener) {
+        mStorageOpsListener = storageOpsListener;
         mContentResolver = context.getContentResolver();
     }
 
@@ -64,10 +63,10 @@ public class StorageOps {
                 }, null, null, null);
 
         if (c.moveToFirst()) {
-            mLoginModel.displayLastLogin(mParser.parseUser(c));
+            mStorageOpsListener.displayLastLogin(mParser.parseUser(c));
         }
         else
-            mLoginModel.displayLastLogin(new User());
+            mStorageOpsListener.displayLastLogin(new User());
     }
 
     /**
@@ -109,5 +108,9 @@ public class StorageOps {
             (uri,
              selection,
              selectionArgs);
+    }
+
+    public interface StorageOpsListener {
+        void displayLastLogin(User user);
     }
 }

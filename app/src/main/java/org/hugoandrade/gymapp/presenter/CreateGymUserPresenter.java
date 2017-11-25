@@ -1,18 +1,16 @@
 package org.hugoandrade.gymapp.presenter;
 
 import android.content.Context;
+import android.os.RemoteException;
+import android.util.Log;
 
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.WaitingUser;
-import org.hugoandrade.gymapp.model.CreateGymUserModel;
+import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
-public class CreateGymUserPresenter extends PresenterBase<MVP.RequiredCreateGymUserViewOps,
-                                                          MVP.RequiredCreateGymUserPresenterOps,
-                                                          MVP.ProvidedCreateGymUserModelOps,
-                                                          CreateGymUserModel>
+public class CreateGymUserPresenter extends MobileClientPresenterBase<MVP.RequiredCreateGymUserViewOps>
 
-        implements MVP.ProvidedCreateGymUserPresenterOps,
-                   MVP.RequiredCreateGymUserPresenterOps {
+        implements MVP.ProvidedCreateGymUserPresenterOps {
 
     @Override
     public void onCreate(MVP.RequiredCreateGymUserViewOps view) {
@@ -20,24 +18,7 @@ public class CreateGymUserPresenter extends PresenterBase<MVP.RequiredCreateGymU
         // passing in the MVP.RequiredCreateGymUserViewOps class to
         // instantiate/manage and "this" to provide CreateGymUserModel
         // with this MVP.ProvidedCreateGymUserModelOps instance.
-        super.onCreate(view, CreateGymUserModel.class, this);
-    }
-
-    @Override
-    public void onResume() {
-        // this activity is focused, so register callback from service
-        getModel().registerCallback();
-    }
-
-    @Override
-    public void onConfigurationChange(MVP.RequiredCreateGymUserViewOps view) { }
-
-    @Override
-    public void onPause() { }
-
-    @Override
-    public void onDestroy(boolean isChangingConfiguration) {
-        getModel().onDestroy(isChangingConfiguration);
+        super.onCreate(view);
     }
 
     @Override
@@ -51,11 +32,43 @@ public class CreateGymUserPresenter extends PresenterBase<MVP.RequiredCreateGymU
         getView().disableUI();
 
         // create gym user with 'username' as username and of type 'credential'
-        getModel().createGymUser(new WaitingUser(username, credential));
+        doCreateGymUser(new WaitingUser(username, credential));
+    }
+
+    private void doCreateGymUser(WaitingUser waitingUser) {
+        if (getMobileClientService() == null) {
+            Log.w(TAG, "Service is still not bound");
+            creatingGymUserOperationResult(false, "Not bound to the service", null);
+            return;
+        }
+
+        try {
+            boolean isCreating = getMobileClientService().createGymUser(waitingUser);
+            if (!isCreating) {
+                creatingGymUserOperationResult(false, "No Network Connection", null);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            creatingGymUserOperationResult(false, "Error sending message", null);
+        }
     }
 
     @Override
-    public void creatingGymUserOperationResult(boolean wasOperationSuccessful, String message, WaitingUser waitingUser) {
+    public void sendResults(MobileClientData data) {
+
+        int operationType = data.getOperationType();
+        boolean isOperationSuccessful
+                = data.getOperationResult() == MobileClientData.OPERATION_SUCCESS;
+
+        if (operationType == MobileClientData.OPERATION_CREATE_USER) {
+            creatingGymUserOperationResult(
+                    isOperationSuccessful,
+                    data.getErrorMessage(),
+                    data.getWaitingUser());
+        }
+    }
+
+    private void creatingGymUserOperationResult(boolean wasOperationSuccessful, String message, WaitingUser waitingUser) {
         if (wasOperationSuccessful) {
 
             // operation was successful, show generated code

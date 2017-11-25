@@ -1,20 +1,18 @@
 package org.hugoandrade.gymapp.presenter;
 
-import android.content.Context;
+import android.os.RemoteException;
+import android.util.Log;
 
 import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.User;
-import org.hugoandrade.gymapp.model.MyGymStaffModel;
+import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
 import java.util.List;
 
-public class MyGymStaffPresenter extends PresenterBase<MVP.RequiredMyGymStaffViewOps,
-                                                       MVP.RequiredMyGymStaffPresenterOps,
-                                                       MVP.ProvidedMyGymStaffModelOps,
-                                                       MyGymStaffModel>
-        implements MVP.ProvidedMyGymStaffPresenterOps,
-                   MVP.RequiredMyGymStaffPresenterOps {
+public class MyGymStaffPresenter extends MobileClientPresenterBase<MVP.RequiredMyGymStaffViewOps>
+
+        implements MVP.ProvidedMyGymStaffPresenterOps {
 
     @Override
     public void onCreate(MVP.RequiredMyGymStaffViewOps view) {
@@ -22,24 +20,7 @@ public class MyGymStaffPresenter extends PresenterBase<MVP.RequiredMyGymStaffVie
         // passing in the MyGymStaffModel class to instantiate/manage and
         // "this" to provide MyGymStaffModel with this MVP.RequiredMyGymStaffModelModelOps
         // instance.
-        super.onCreate(view, MyGymStaffModel.class, this);
-    }
-
-    @Override
-    public void onResume() {
-        // this activity is focused, so register callback from service
-        getModel().registerCallback();
-    }
-
-    @Override
-    public void onConfigurationChange(MVP.RequiredMyGymStaffViewOps view) { }
-
-    @Override
-    public void onPause() { }
-
-    @Override
-    public void onDestroy(boolean isChangingConfiguration) {
-        getModel().onDestroy(isChangingConfiguration);
+        super.onCreate(view);
     }
 
     @Override
@@ -53,23 +34,44 @@ public class MyGymStaffPresenter extends PresenterBase<MVP.RequiredMyGymStaffVie
         getView().disableUI();
 
         // get gym staff of the logged in gym member
-        getModel().getMyGymStaff(GlobalData.getUser().getID());
+        doGetMyGymStaff(GlobalData.getUser().getID());
     }
 
-    @Override
-    public Context getActivityContext() {
-        return getView().getActivityContext();
+    private void doGetMyGymStaff(String userID) {
+        if (getMobileClientService() == null) {
+            Log.w(TAG, "Service is still not bound");
+            gettingMyGymStaffOperationResult(false, "Not bound to the service", null);
+            return;
+        }
+
+        try {
+            boolean isGetting = getMobileClientService().getMyGymStaff(userID);
+            if (!isGetting) {
+                gettingMyGymStaffOperationResult(false, "No Network Connection", null);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            gettingMyGymStaffOperationResult(false, "Error sending message", null);
+        }
     }
 
-    @Override
-    public Context getApplicationContext() {
-        return getView().getApplicationContext();
+     @Override
+     public void sendResults(MobileClientData data) {
+
+         int operationType = data.getOperationType();
+         boolean isOperationSuccessful
+                 = data.getOperationResult() == MobileClientData.OPERATION_SUCCESS;
+
+         if (operationType == MobileClientData.OPERATION_GET_MY_STAFF) {
+             gettingMyGymStaffOperationResult(isOperationSuccessful,
+                     data.getErrorMessage(),
+                     data.getUserList());
+        }
     }
 
-    @Override
-    public void gettingMyGymStaffOperationResult(boolean wasOperationSuccessful,
-                                                 String errorMessage,
-                                                 List<User> staffList) {
+    private void gettingMyGymStaffOperationResult(boolean wasOperationSuccessful,
+                                                  String errorMessage,
+                                                  List<User> staffList) {
 
         if (wasOperationSuccessful) {
 

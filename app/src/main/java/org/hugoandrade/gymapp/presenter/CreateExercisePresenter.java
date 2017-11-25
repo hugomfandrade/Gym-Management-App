@@ -1,18 +1,16 @@
 package org.hugoandrade.gymapp.presenter;
 
-import android.content.Context;
+
+import android.os.RemoteException;
+import android.util.Log;
 
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.Exercise;
-import org.hugoandrade.gymapp.model.CreateExerciseModel;
+import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
-public class CreateExercisePresenter extends PresenterBase<MVP.RequiredCreateExerciseViewOps,
-                                                          MVP.RequiredCreateExercisePresenterOps,
-                                                          MVP.ProvidedCreateExerciseModelOps,
-                                                          CreateExerciseModel>
+public class CreateExercisePresenter extends MobileClientPresenterBase<MVP.RequiredCreateExerciseViewOps>
 
-        implements MVP.ProvidedCreateExercisePresenterOps,
-                   MVP.RequiredCreateExercisePresenterOps {
+        implements MVP.ProvidedCreateExercisePresenterOps {
 
     @Override
     public void onCreate(MVP.RequiredCreateExerciseViewOps view) {
@@ -20,24 +18,7 @@ public class CreateExercisePresenter extends PresenterBase<MVP.RequiredCreateExe
         // passing in the MVP.RequiredCreateExerciseViewOps class to
         // instantiate/manage and "this" to provide CreateExerciseModel
         // with this MVP.ProvidedCreateExerciseModelOps instance.
-        super.onCreate(view, CreateExerciseModel.class, this);
-    }
-
-    @Override
-    public void onResume() {
-        // this activity is focused, so register callback from service
-        getModel().registerCallback();
-    }
-
-    @Override
-    public void onConfigurationChange(MVP.RequiredCreateExerciseViewOps view) { }
-
-    @Override
-    public void onPause() { }
-
-    @Override
-    public void onDestroy(boolean isChangingConfiguration) {
-        getModel().onDestroy(isChangingConfiguration);
+        super.onCreate(view);
     }
 
     @Override
@@ -51,11 +32,43 @@ public class CreateExercisePresenter extends PresenterBase<MVP.RequiredCreateExe
         getView().disableUI();
 
         // create exercise with 'name' as name
-        getModel().createExercise(new Exercise(null, name));
+        doCreateExercise(new Exercise(null, name));
+    }
+
+    private void doCreateExercise(Exercise exercise) {
+        if (getMobileClientService() == null) {
+            Log.w(TAG, "Service is still not bound");
+            creatingExerciseOperationResult(false, "Not bound to the service", null);
+            return;
+        }
+
+        try {
+            boolean isCreating = getMobileClientService().createExercise(exercise);
+            if (!isCreating) {
+                creatingExerciseOperationResult(false, "No Network Connection", null);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            creatingExerciseOperationResult(false, "Error sending message", null);
+        }
     }
 
     @Override
-    public void creatingExerciseOperationResult(boolean wasOperationSuccessful, String message, Exercise exercise) {
+    public void sendResults(MobileClientData data) {
+
+        int operationType = data.getOperationType();
+        boolean isOperationSuccessful
+                = data.getOperationResult() == MobileClientData.OPERATION_SUCCESS;
+
+        if (operationType == MobileClientData.OPERATION_CREATE_EXERCISE) {
+            creatingExerciseOperationResult(
+                    isOperationSuccessful,
+                    data.getErrorMessage(),
+                    data.getExercise());
+        }
+    }
+
+    private void creatingExerciseOperationResult(boolean wasOperationSuccessful, String message, Exercise exercise) {
         if (wasOperationSuccessful) {
 
             // operation was successful, display exercise in list
@@ -69,15 +82,5 @@ public class CreateExercisePresenter extends PresenterBase<MVP.RequiredCreateExe
 
         // enable UI
         getView().enableUI();
-    }
-
-    @Override
-    public Context getActivityContext() {
-        return getView().getActivityContext();
-    }
-
-    @Override
-    public Context getApplicationContext() {
-        return getView().getApplicationContext();
     }
 }

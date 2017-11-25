@@ -54,7 +54,7 @@ public abstract class MobileClientModelBase<RequiredPresenterOps extends MVP.Req
 
     }
 
-    protected void bindService() {
+    private void bindService() {
         if (!isServiceBound) {
             mPresenter.get().getApplicationContext().bindService(
                     MobileClientService.makeIntent(mPresenter.get().getActivityContext()),
@@ -64,7 +64,7 @@ public abstract class MobileClientModelBase<RequiredPresenterOps extends MVP.Req
         }
     }
 
-    protected void unbindService() {
+    private void unbindService() {
         if (isServiceBound) {
             if (mService != null) {
                 try {

@@ -1,19 +1,17 @@
 package org.hugoandrade.gymapp.presenter;
 
-import android.content.Context;
+import android.os.RemoteException;
+import android.util.Log;
 
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.Exercise;
-import org.hugoandrade.gymapp.model.ExerciseListModel;
+import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
 import java.util.List;
 
-public class ExerciseListPresenter extends PresenterBase<MVP.RequiredExerciseListViewOps,
-                                                         MVP.RequiredExerciseListPresenterOps,
-                                                         MVP.ProvidedExerciseListModelOps,
-                                                         ExerciseListModel>
-        implements MVP.ProvidedExerciseListPresenterOps,
-                   MVP.RequiredExerciseListPresenterOps {
+public class ExerciseListPresenter extends MobileClientPresenterBase<MVP.RequiredExerciseListViewOps>
+
+        implements MVP.ProvidedExerciseListPresenterOps {
 
     @Override
     public void onCreate(MVP.RequiredExerciseListViewOps view) {
@@ -21,24 +19,7 @@ public class ExerciseListPresenter extends PresenterBase<MVP.RequiredExerciseLis
         // passing in the ExerciseListModel class to instantiate/manage and
         // "this" to provide ExerciseListModel with this MVP.RequiredExerciseListModelOps
         // instance.
-        super.onCreate(view, ExerciseListModel.class, this);
-    }
-
-    @Override
-    public void onResume() {
-        // this activity is focused, so register callback from service
-        getModel().registerCallback();
-    }
-
-    @Override
-    public void onConfigurationChange(MVP.RequiredExerciseListViewOps view) { }
-
-    @Override
-    public void onPause() { }
-
-    @Override
-    public void onDestroy(boolean isChangingConfiguration) {
-        getModel().onDestroy(isChangingConfiguration);
+        super.onCreate(view);
     }
 
     @Override
@@ -52,23 +33,44 @@ public class ExerciseListPresenter extends PresenterBase<MVP.RequiredExerciseLis
         getView().disableUI();
 
         // get all exercises
-        getModel().getExercises();
+        doGetExercises();
+    }
+
+    private void doGetExercises() {
+        if (getMobileClientService() == null) {
+            Log.w(TAG, "Service is still not bound");
+            gettingAllExercisesOperationResult(false, "Not bound to the service", null);
+            return;
+        }
+
+        try {
+            boolean isGetting = getMobileClientService().getAllExercises();
+            if (!isGetting) {
+                gettingAllExercisesOperationResult(false, "No Network Connection", null);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            gettingAllExercisesOperationResult(false, "Error sending message", null);
+        }
     }
 
     @Override
-    public Context getActivityContext() {
-        return getView().getActivityContext();
+    public void sendResults(MobileClientData data) {
+
+        int operationType = data.getOperationType();
+        boolean isOperationSuccessful
+                = data.getOperationResult() == MobileClientData.OPERATION_SUCCESS;
+
+        if (operationType == MobileClientData.OPERATION_GET_ALL_EXERCISES) {
+            gettingAllExercisesOperationResult(isOperationSuccessful,
+                    data.getErrorMessage(),
+                    data.getExerciseList());
+        }
     }
 
-    @Override
-    public Context getApplicationContext() {
-        return getView().getApplicationContext();
-    }
-
-    @Override
-    public void gettingAllExercisesOperationResult(boolean wasOperationSuccessful,
-                                                  String errorMessage,
-                                                  List<Exercise> exerciseList) {
+    private void gettingAllExercisesOperationResult(boolean wasOperationSuccessful,
+                                                   String errorMessage,
+                                                   List<Exercise> exerciseList) {
 
         if (wasOperationSuccessful) {
 

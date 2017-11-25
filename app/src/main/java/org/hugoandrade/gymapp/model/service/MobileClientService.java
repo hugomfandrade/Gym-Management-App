@@ -202,6 +202,7 @@ public class MobileClientService extends LifecycleLoggingService {
 
                 @Override
                 public void onFailure(@NonNull Throwable t) {
+                    Log.e(TAG, "Login failed: " + t.getMessage());
                     // Report operation was not successful and the message
                     reportOperationFailure(MobileClientData.OPERATION_LOGIN, t.getMessage());
                 }

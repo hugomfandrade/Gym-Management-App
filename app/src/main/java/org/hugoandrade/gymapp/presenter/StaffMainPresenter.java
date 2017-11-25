@@ -1,20 +1,18 @@
 package org.hugoandrade.gymapp.presenter;
 
-import android.content.Context;
+import android.os.RemoteException;
+import android.util.Log;
 
 import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.User;
-import org.hugoandrade.gymapp.model.StaffMainModel;
+import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
 import java.util.List;
 
-public class StaffMainPresenter extends PresenterBase<MVP.RequiredStaffMainViewOps,
-                                                      MVP.RequiredStaffMainPresenterOps,
-                                                      MVP.ProvidedStaffMainModelOps,
-                                                      StaffMainModel>
-        implements MVP.ProvidedStaffMainPresenterOps,
-                   MVP.RequiredStaffMainPresenterOps {
+public class StaffMainPresenter extends MobileClientPresenterBase<MVP.RequiredStaffMainViewOps>
+
+        implements MVP.ProvidedStaffMainPresenterOps {
 
     @Override
     public void onCreate(MVP.RequiredStaffMainViewOps view) {
@@ -22,24 +20,7 @@ public class StaffMainPresenter extends PresenterBase<MVP.RequiredStaffMainViewO
         // passing in the StaffMainModel class to instantiate/manage and
         // "this" to provide StaffMainModel with this MVP.RequiredMainModelOps
         // instance.
-        super.onCreate(view, StaffMainModel.class, this);
-    }
-
-    @Override
-    public void onResume() {
-        // this activity is focused, so register callback from service
-        getModel().registerCallback();
-    }
-
-    @Override
-    public void onConfigurationChange(MVP.RequiredStaffMainViewOps view) { }
-
-    @Override
-    public void onPause() { }
-
-    @Override
-    public void onDestroy(boolean isChangingConfiguration) {
-        getModel().onDestroy(isChangingConfiguration);
+        super.onCreate(view);
     }
 
     @Override
@@ -53,21 +34,42 @@ public class StaffMainPresenter extends PresenterBase<MVP.RequiredStaffMainViewO
         getView().disableUI();
 
         // get all gym users
-        getModel().getMyMembers(GlobalData.getUser().getID());
+        doGetMyMembers(GlobalData.getUser().getID());
+    }
+
+    private void doGetMyMembers(String userID) {
+        if (getMobileClientService() == null) {
+            Log.w(TAG, "Service is still not bound");
+            gettingMyMembersOperationResult(false, "Not bound to the service", null);
+            return;
+        }
+
+        try {
+            boolean isGetting = getMobileClientService().getMyGymMembers(userID);
+            if (!isGetting) {
+                gettingMyMembersOperationResult(false, "No Network Connection", null);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            gettingMyMembersOperationResult(false, "Error sending message", null);
+        }
     }
 
     @Override
-    public Context getActivityContext() {
-        return getView().getActivityContext();
+    public void sendResults(MobileClientData data) {
+
+        int operationType = data.getOperationType();
+        boolean isOperationSuccessful
+                = data.getOperationResult() == MobileClientData.OPERATION_SUCCESS;
+
+        if (operationType== MobileClientData.OPERATION_GET_MY_MEMBERS) {
+            gettingMyMembersOperationResult(isOperationSuccessful,
+                    data.getErrorMessage(),
+                    data.getUserList());
+        }
     }
 
-    @Override
-    public Context getApplicationContext() {
-        return getView().getApplicationContext();
-    }
-
-    @Override
-    public void gettingMyMembersOperationResult(boolean wasOperationSuccessful,
+    private void gettingMyMembersOperationResult(boolean wasOperationSuccessful,
                                                 String errorMessage,
                                                 List<User> myMemberList) {
 

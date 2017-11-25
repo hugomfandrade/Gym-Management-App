@@ -8,11 +8,20 @@ import org.hugoandrade.gymapp.data.ExercisePlan;
 import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.data.WaitingUser;
+import org.hugoandrade.gymapp.model.IMobileClientService;
+import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
 import java.util.List;
 
 
 public interface MVP {
+
+    interface RequiredMobileServicePresenterOps extends RequiredMobileClientPresenterBaseOps {
+        void sendResults(MobileClientData mobileClientData);
+    }
+    interface ProvidedMobileServiceModelOps extends ProvidedMobileClientModelBaseOps<RequiredMobileServicePresenterOps> {
+        IMobileClientService getService();
+    }
 
     /** These interfaces define the minimum public API provided and required by the
      * LoginActivity class in the View layer, the LoginPresenter in the
@@ -560,7 +569,6 @@ public interface MVP {
          */
         void notifyServiceIsBound();
     }
-
     /**
      * Base Model Ops that all models in the "Model" layer which interact with the
      * Remote Web Service must implement

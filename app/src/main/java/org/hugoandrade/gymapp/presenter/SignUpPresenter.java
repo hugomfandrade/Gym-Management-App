@@ -1,18 +1,16 @@
 package org.hugoandrade.gymapp.presenter;
 
-import android.content.Context;
+import android.os.RemoteException;
+import android.util.Log;
 
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.User;
 import org.hugoandrade.gymapp.data.WaitingUser;
-import org.hugoandrade.gymapp.model.SignUpModel;
+import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
-public class SignUpPresenter extends PresenterBase<MVP.RequiredSignUpViewOps,
-                                                   MVP.RequiredSignUpPresenterOps,
-                                                   MVP.ProvidedSignUpModelOps,
-                                                   SignUpModel>
-        implements MVP.ProvidedSignUpPresenterOps,
-                   MVP.RequiredSignUpPresenterOps {
+public class SignUpPresenter extends MobileClientPresenterBase<MVP.RequiredSignUpViewOps>
+
+        implements MVP.ProvidedSignUpPresenterOps {
 
     @Override
     public void onCreate(MVP.RequiredSignUpViewOps view) {
@@ -20,24 +18,7 @@ public class SignUpPresenter extends PresenterBase<MVP.RequiredSignUpViewOps,
         // passing in the SignUpModel class to instantiate/manage and
         // "this" to provide SignUpModel with this OldMVP.RequiredModelOps
         // instance.
-        super.onCreate(view, SignUpModel.class, this);
-    }
-
-    @Override
-    public void onResume() {
-        // this activity is focused, so register callback from service
-        getModel().registerCallback();
-    }
-
-    @Override
-    public void onConfigurationChange(MVP.RequiredSignUpViewOps view) { }
-
-    @Override
-    public void onPause() { }
-
-    @Override
-    public void onDestroy(boolean isChangingConfiguration) {
-        getModel().onDestroy(isChangingConfiguration);
+        super.onCreate(view);
     }
 
     @Override
@@ -51,7 +32,7 @@ public class SignUpPresenter extends PresenterBase<MVP.RequiredSignUpViewOps,
         getView().disableValidateUI();
 
         // try to validate username-code combo
-        getModel().validateWaitingUser(new WaitingUser(null, username, null, code));
+        doValidateWaitingUser(new WaitingUser(null, username, null, code));
     }
 
     @Override
@@ -60,11 +41,65 @@ public class SignUpPresenter extends PresenterBase<MVP.RequiredSignUpViewOps,
         getView().disableSignUpUI();
 
         // try to sign up with username-password combo
-        getModel().signUp(username, password);
+        doSignUp(username, password);
+    }
+
+    private void doValidateWaitingUser(WaitingUser waitingUser) {
+        if (getMobileClientService() == null) {
+            Log.w(TAG, "Service is still not bound");
+            validateWaitingUserOperationResult(false, "Not bound to the service", null);
+            return;
+        }
+
+        try {
+            boolean isValidatingUser = getMobileClientService().validateGymUser(waitingUser);
+            if (!isValidatingUser) {
+                validateWaitingUserOperationResult(false, "No Network Connection", null);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            validateWaitingUserOperationResult(false, "Error sending message", null);
+        }
+    }
+
+    private void doSignUp(String username, String password) {
+        if (getMobileClientService() == null) {
+            Log.w(TAG, "Service is still not bound");
+            signUpOperationResult(false, "Not bound to the service", null);
+            return;
+        }
+
+        try {
+            boolean isSigningUp = getMobileClientService().signUp(username, password);
+            if (!isSigningUp) {
+                signUpOperationResult(false, "No Network Connection", null);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            signUpOperationResult(false, "Error sending message", null);
+        }
     }
 
     @Override
-    public void validateWaitingUserOperationResult(boolean wasOperationSuccessful, String message, WaitingUser waitingUser) {
+    public void sendResults(MobileClientData data) {
+
+        int operationType = data.getOperationType();
+        boolean isOperationSuccessful
+                = data.getOperationResult() == MobileClientData.OPERATION_SUCCESS;
+
+        if (operationType == MobileClientData.OPERATION_SIGN_UP) {
+            signUpOperationResult(isOperationSuccessful,
+                    data.getErrorMessage(),
+                    data.getUser());
+        }
+        else if (data.getOperationType() == MobileClientData.OPERATION_VALIDATE) {
+            validateWaitingUserOperationResult(isOperationSuccessful,
+                    data.getErrorMessage(),
+                    data.getWaitingUser());
+        }
+    }
+
+    private void validateWaitingUserOperationResult(boolean wasOperationSuccessful, String message, WaitingUser waitingUser) {
 
         if (wasOperationSuccessful) {
             // operation was successful, set up 'choose password' step
@@ -79,8 +114,7 @@ public class SignUpPresenter extends PresenterBase<MVP.RequiredSignUpViewOps,
         getView().enableValidateUI();
     }
 
-    @Override
-    public void signUpOperationResult(boolean wasOperationSuccessful, String message, User user) {
+    private void signUpOperationResult(boolean wasOperationSuccessful, String message, User user) {
 
         if (wasOperationSuccessful) {
             // operation was successful, return to login activity
@@ -93,15 +127,5 @@ public class SignUpPresenter extends PresenterBase<MVP.RequiredSignUpViewOps,
         }
         // enable UI
         getView().enableSignUpUI();
-    }
-
-    @Override
-    public Context getActivityContext() {
-        return getView().getActivityContext();
-    }
-
-    @Override
-    public Context getApplicationContext() {
-        return getView().getApplicationContext();
     }
 }

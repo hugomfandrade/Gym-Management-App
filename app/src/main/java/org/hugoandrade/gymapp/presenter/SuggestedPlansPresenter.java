@@ -1,20 +1,18 @@
 package org.hugoandrade.gymapp.presenter;
 
-import android.content.Context;
+import android.os.RemoteException;
+import android.util.Log;
 
 import org.hugoandrade.gymapp.GlobalData;
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.ExercisePlanSuggested;
-import org.hugoandrade.gymapp.model.SuggestedPlansModel;
+import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
 import java.util.List;
 
-public class SuggestedPlansPresenter extends PresenterBase<MVP.RequiredSuggestedPlansViewOps,
-                                                       MVP.RequiredSuggestedPlansPresenterOps,
-                                                       MVP.ProvidedSuggestedPlansModelOps,
-        SuggestedPlansModel>
-        implements MVP.ProvidedSuggestedPlansPresenterOps,
-                   MVP.RequiredSuggestedPlansPresenterOps {
+public class SuggestedPlansPresenter extends MobileClientPresenterBase<MVP.RequiredSuggestedPlansViewOps>
+
+        implements MVP.ProvidedSuggestedPlansPresenterOps {
 
     @Override
     public void onCreate(MVP.RequiredSuggestedPlansViewOps view) {
@@ -22,24 +20,7 @@ public class SuggestedPlansPresenter extends PresenterBase<MVP.RequiredSuggested
         // passing in the MyGymStaffModel class to instantiate/manage and
         // "this" to provide MyGymStaffModel with this MVP.RequiredMyGymStaffModelModelOps
         // instance.
-        super.onCreate(view, SuggestedPlansModel.class, this);
-    }
-
-    @Override
-    public void onResume() {
-        // this activity is focused, so register callback from service
-        getModel().registerCallback();
-    }
-
-    @Override
-    public void onConfigurationChange(MVP.RequiredSuggestedPlansViewOps view) { }
-
-    @Override
-    public void onPause() { }
-
-    @Override
-    public void onDestroy(boolean isChangingConfiguration) {
-        getModel().onDestroy(isChangingConfiguration);
+        super.onCreate(view);
     }
 
     @Override
@@ -53,23 +34,50 @@ public class SuggestedPlansPresenter extends PresenterBase<MVP.RequiredSuggested
         getView().disableUI();
 
         // get gym staff of the logged in gym member
-        getModel().getSuggestedPlans(GlobalData.getUser().getID());
+        doGetSuggestedPlans(GlobalData.getUser().getID());
+    }
+
+    private void doGetSuggestedPlans(String userID) {
+        if (getMobileClientService() == null) {
+            Log.w(TAG, "Service is still not bound");
+            gettingSuggestedPlansOperationResult(false,
+                                                 "Not bound to the service",
+                                                 null);
+            return;
+        }
+
+        try {
+            boolean isGetting = getMobileClientService().getExercisePlanSuggestedList(userID);
+            if (!isGetting) {
+                gettingSuggestedPlansOperationResult(false,
+                                                     "No Network Connection",
+                                                     null);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            gettingSuggestedPlansOperationResult(false,
+                                                 "Error sending message",
+                                                 null);
+        }
     }
 
     @Override
-    public Context getActivityContext() {
-        return getView().getActivityContext();
+    public void sendResults(MobileClientData data) {
+
+        int operationType = data.getOperationType();
+        boolean isOperationSuccessful
+                = data.getOperationResult() == MobileClientData.OPERATION_SUCCESS;
+
+        if (operationType == MobileClientData.OPERATION_GET_HISTORY_SUGGESTED) {
+            gettingSuggestedPlansOperationResult(isOperationSuccessful,
+                                                 data.getErrorMessage(),
+                                                 data.getExercisePlanSuggestedList());
+        }
     }
 
-    @Override
-    public Context getApplicationContext() {
-        return getView().getApplicationContext();
-    }
-
-    @Override
-    public void gettingSuggestedPlansOperationResult(boolean wasOperationSuccessful,
-                                                 String errorMessage,
-                                                     List<ExercisePlanSuggested> suggestedPlanList) {
+    private void gettingSuggestedPlansOperationResult(boolean wasOperationSuccessful,
+                                                      String errorMessage,
+                                                      List<ExercisePlanSuggested> suggestedPlanList) {
 
         if (wasOperationSuccessful) {
 
@@ -84,6 +92,5 @@ public class SuggestedPlansPresenter extends PresenterBase<MVP.RequiredSuggested
 
         // enable UI
         getView().enableUI();
-
     }
 }

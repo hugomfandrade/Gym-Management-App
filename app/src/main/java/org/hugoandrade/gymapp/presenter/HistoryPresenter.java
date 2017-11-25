@@ -1,19 +1,17 @@
 package org.hugoandrade.gymapp.presenter;
 
-import android.content.Context;
+import android.os.RemoteException;
+import android.util.Log;
 
 import org.hugoandrade.gymapp.MVP;
 import org.hugoandrade.gymapp.data.ExercisePlan;
-import org.hugoandrade.gymapp.model.HistoryModel;
+import org.hugoandrade.gymapp.model.aidl.MobileClientData;
 
 import java.util.List;
 
-public class HistoryPresenter extends PresenterBase<MVP.RequiredHistoryViewOps,
-                                                    MVP.RequiredHistoryPresenterOps,
-                                                    MVP.ProvidedHistoryModelOps,
-                                                    HistoryModel>
-        implements MVP.ProvidedHistoryPresenterOps,
-                   MVP.RequiredHistoryPresenterOps {
+public class HistoryPresenter extends MobileClientPresenterBase<MVP.RequiredHistoryViewOps>
+
+        implements MVP.ProvidedHistoryPresenterOps {
 
     @Override
     public void onCreate(MVP.RequiredHistoryViewOps view) {
@@ -21,24 +19,7 @@ public class HistoryPresenter extends PresenterBase<MVP.RequiredHistoryViewOps,
         // passing in the HistoryModel class to instantiate/manage and
         // "this" to provide HistoryModel with this MVP.RequiredHistoryModelOps
         // instance.
-        super.onCreate(view, HistoryModel.class, this);
-    }
-
-    @Override
-    public void onResume() {
-        // this activity is focused, so register callback from service
-        getModel().registerCallback();
-    }
-
-    @Override
-    public void onConfigurationChange(MVP.RequiredHistoryViewOps view) { }
-
-    @Override
-    public void onPause() { }
-
-    @Override
-    public void onDestroy(boolean isChangingConfiguration) {
-        getModel().onDestroy(isChangingConfiguration);
+        super.onCreate(view);
     }
 
     @Override
@@ -52,23 +33,44 @@ public class HistoryPresenter extends PresenterBase<MVP.RequiredHistoryViewOps,
         getView().disableUI();
 
         // get all exercise plans recorded by the gym member
-        getModel().getHistory(userID);
+        doGetHistory(userID);
+    }
+
+    private void doGetHistory(String userID) {
+        if (getMobileClientService() == null) {
+            Log.w(TAG, "Service is still not bound");
+            gettingHistoryOperationResult(false, "Not bound to the service", null);
+            return;
+        }
+
+        try {
+            boolean isGetting = getMobileClientService().getExercisePlanList(userID);
+            if (!isGetting) {
+                gettingHistoryOperationResult(false, "No Network Connection", null);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            gettingHistoryOperationResult(false, "Error sending message", null);
+        }
     }
 
     @Override
-    public Context getActivityContext() {
-        return getView().getActivityContext();
+    public void sendResults(MobileClientData data) {
+
+        int operationType = data.getOperationType();
+        boolean isOperationSuccessful
+                = data.getOperationResult() == MobileClientData.OPERATION_SUCCESS;
+
+        if (operationType == MobileClientData.OPERATION_GET_HISTORY) {
+            gettingHistoryOperationResult(isOperationSuccessful,
+                    data.getErrorMessage(),
+                    data.getExercisePlanList());
+        }
     }
 
-    @Override
-    public Context getApplicationContext() {
-        return getView().getApplicationContext();
-    }
-
-    @Override
-    public void gettingHistoryOperationResult(boolean wasOperationSuccessful,
-                                              String errorMessage,
-                                              List<ExercisePlan> exercisePlanList) {
+    private void gettingHistoryOperationResult(boolean wasOperationSuccessful,
+                                               String errorMessage,
+                                               List<ExercisePlan> exercisePlanList) {
 
         if (wasOperationSuccessful) {
 
